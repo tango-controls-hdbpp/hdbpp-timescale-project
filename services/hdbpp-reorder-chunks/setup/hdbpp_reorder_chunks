@@ -1,0 +1,2 @@
+# /etc/cron.d/hdbpp_reorder_chunks: crontab entries for the hdbpp_reorder_chunks script
+0 0 * * * root [ -x /usr/local/bin/hdbpp_reorder_chunks.py ] && /usr/local/bin/hdbpp_reorder_chunks.py --syslog -c /etc/hdb/hdbpp_reorder_chunks.conf

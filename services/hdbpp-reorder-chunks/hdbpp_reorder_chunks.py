@@ -22,25 +22,18 @@
 # -----------------------------------------------------------------------------
 
 """
-This simple script implements a time to live feature for the hdbpp database project.
-The script reads the attributes ttl field, and if set, removes all data over the time
-to live age for that attribute
-
-It is important to note how the script calculates the data to remove. It works on the 
-basis that yesterday is the first day of a time to live value, i.e. todays data is
-always kept. A time to live value of 1 day would remove all data older than yesterday.
-Time calculations are made from midnight.
+Simple script to reorder the attribute data in the data tables. This must be done to archive
+the query performance defined in the evaluation studies.
 
 The script is built to be run once a day, and configured with a simple yaml style config
 file. The config file may define multiple database clusters that a single instance of
-this script will delete dta from.
+this script will reorder.
 """
 
 import os
 import time
 import sys
 import argparse
-import math
 import psycopg2
 import yaml
 import logging
@@ -48,12 +41,48 @@ import logging.handlers
 
 from datetime import timedelta
 
-logger = logging.getLogger('hdbpp-ttl')
+logger = logging.getLogger('hdbpp-reorder-chunks')
 
 version_major = 0
 version_minor = 1
 version_patch = 0
 debug = False
+
+# This is a fixed string in the schema, so rather than work it out with
+# queries etc, we just use this as a postfix
+idx_postfix = "_att_conf_id_data_time_idx"
+
+# All available data tables in the hdb database, the script attempts to reorder
+# chunks on all hyper tables in the hdb database
+tables = [
+    "att_array_devboolean",
+    "att_array_devdouble",
+    "att_array_devencoded",
+    "att_array_devenum",
+    "att_array_devfloat",
+    "att_array_devlong",
+    "att_array_devlong64",
+    "att_array_devshort",
+    "att_array_devstate",
+    "att_array_devstring",
+    "att_array_devuchar",
+    "att_array_devulong",
+    "att_array_devulong64",
+    "att_array_devushort",
+    "att_scalar_devboolean",
+    "att_scalar_devdouble",
+    "att_scalar_devencoded",
+    "att_scalar_devenum",
+    "att_scalar_devfloat",
+    "att_scalar_devlong",
+    "att_scalar_devlong64",
+    "att_scalar_devshort",
+    "att_scalar_devstate",
+    "att_scalar_devstring",
+    "att_scalar_devuchar",
+    "att_scalar_devulong",
+    "att_scalar_devulong64",
+    "att_scalar_devushort"]
 
 
 def valid_config(config):
@@ -80,6 +109,28 @@ def valid_config(config):
             if "user" not in val["connection"]:
                 logger.error("No user defined in 'connection' section. Please check the config file is valid")
                 return False
+
+        if "schedule" not in val:
+            logger.error("Missing section 'connection' in config file. Please check the config file is valid")
+            return False
+
+        else:
+            if "window" not in val["schedule"]:
+                logger.error("No window defined in 'connection' section. Please check the config file is valid")
+                return False
+
+            if len(val["schedule"]["window"].split()) == 2:
+                schedule = val["schedule"]["window"].split()
+
+                try:
+                    i = int(schedule[0])
+                except ValueError:
+                    logger.error("The schedule must be of the format: NUMBER PERIOD example: 28 days")
+                    return False
+
+                if schedule[1] != "days" and schedule[1] != "hours" and schedule[1] != "week":
+                    logger.error("The schedule period supports hours/days/weeks")
+                    return False
 
     return True
 
@@ -126,16 +177,23 @@ def load_config(path):
 
     logger.info("Loaded config file: {}".format(path))
 
-    # return the dictionary with the configuration in for the script to use
+    # return the dictionary for the script to use
     return config
 
 
-def process_ttl(server_config):
+def reorder_table(table_name, server_config, schedule):
     """
-    This function opens a connection to the server and processes all ttl values in the
-    att_conf table. What this means in practice is it selects all values from att_conf 
-    with a valid ttl value, then runs a delete for that attributes data in its data
-    table
+    Perform a reorder chunks request on the given table name on the given
+    server config. This function will open a connection, perform the action then
+    close the connection.
+
+    Arguments:
+        table_name : str -- name of the table to reorder the chunks for
+        server_config : dict -- dictionary of values from the config file that defines the server
+        schedule : dict -- dictionary of keys from the config that defines the reorder schedule
+
+    Returns:
+        bool -- True on success, False otherwise
     """
 
     # first attempt to open a connection to the database
@@ -158,38 +216,36 @@ def process_ttl(server_config):
         logger.error("Error: {}".format(error))
         return False
 
-    # now we have a database connection, proceed to examine each attribute and try drop any data
-    # that is out of date
+    # now we have a database connection, proceed to reorder the given table. The operation is
+    # timed purely for information purposes
     try:
+        start_time = time.monotonic()
         cursor = connection.cursor()
+        logger.debug("Fetching the last '{}' of chunks....".format(schedule["window"]))
 
         # ensure we are clustering on the composite index
-        cursor.execute("SELECT att_conf_id, ttl, table_name, att_name FROM att_conf WHERE ttl IS NOT NULL AND ttl !=0")
-        attributes = cursor.fetchall()
-        logger.debug("Fetched {} attributes with a ttl configured".format(len(attributes)))
+        cursor.execute("ALTER TABLE {} CLUSTER ON {}{};".format(table_name, table_name, idx_postfix))
 
-        for attr in attributes:
+        # get the config window of chunks to be reordered, we pass the window from the
+        # configuration directly into the SQL, this is why its format is strictly enforced.
+        cursor.execute("SELECT show_chunks('{}', newer_than => interval '{}');".format(table_name, schedule["window"]))
+        chunks = cursor.fetchall()
+        logger.debug("Fetched {} chunk(s)".format(len(chunks)))
 
-            # the ttl is stored in hours, but here to keep things simple we work only in days,
-            # so note how the ttl is divided by 24 and rounded up to ensure data is not removed
-            # to soon.
+        for chunk in chunks:
 
-            # also note the delete is done by counting back from midnight of yesterday, this
-            # means a ttl of 1 will always at least 24 hours of data (yesterday), since today is considered
-            # day 0 (or filling)
-            cursor.execute(
-                "DELETE FROM {} WHERE data_time < CURRENT_DATE - INTERVAL '{} days' AND att_conf_id = {}".format(
-                    attr[2], math.ceil(attr[1] / 24), attr[0]
-                )
-            )
-
-            logger.info("Deleted {} rows in table: {} for attribute: {}".format(cursor.rowcount, attr[2], attr[3]))
+            # do the actual reorder of the chunk
+            logger.debug("Reordering chunk: {} in table: {}".format(chunk[0], table_name))
+            cursor.execute("SELECT reorder_chunk('{}', index => '{}{}');".format(chunk[0], table_name, idx_postfix))
+            logger.debug("Finished reordering chunk: {} in table: {}".format(chunk[0], table_name))
 
         connection.commit()
         cursor.close()
+        logger.debug("Reorder of table {} took: {}".format(table_name, timedelta(seconds=time.monotonic() - start_time)))
+        connection.close()
 
     except (Exception, psycopg2.Error) as error:
-        logger.error("Error deleting attributes: {}".format(error))
+        logger.error("Error reordering table: {}: {}".format(table_name, error))
 
         # closing database connection.
         if(connection):
@@ -237,12 +293,22 @@ def run_command(args):
 
         # we have a config file, validate the config
         if valid_config(config):
+
+            # config is valid, now check and add defaults where required
+            add_defaults_to_config(config)
+
+            # now reorder the tables with the given config for
+            # each root entry in the config file
             for key, val in config.items():
                 start_time = time.monotonic()
-                logger.info("Processing ttl requests for configuration: {}".format(key))
-                process_ttl(val["connection"])
-                delete_time = timedelta(seconds=time.monotonic() - start_time)
-                logger.info("Processed ttl request for configuration {} in: {}".format(key, delete_time))
+                logger.info("Processing reorder chunks configuration: {} with schedule: {}".format(key, val["schedule"]))
+
+                for table in tables:
+                    if not reorder_table(table, val["connection"], val["schedule"]):
+                        logger.error("Breaking reorder tables attempt due to previous error")
+                        return False
+
+                logger.info("Processed reorder chunks configuration {} in: {}".format(key, timedelta(seconds=time.monotonic() - start_time)))
 
         else:
             return False
@@ -251,7 +317,7 @@ def run_command(args):
 
 
 def main() -> bool:
-    parser = argparse.ArgumentParser(description="HDB TimscaleDb ttl service script")
+    parser = argparse.ArgumentParser(description="HDB TimscaleDb reorder chunks service script")
     parser.add_argument("-v", "--version", action="store_true", help="version information")
     parser.add_argument("-d", "--debug", action="store_true", help="debug output for development")
     parser.add_argument("-c", "--config", default="/etc/hdb/reorder.conf", help="config file to use")
@@ -265,13 +331,13 @@ def main() -> bool:
 
     args = parser.parse_args()
 
-    stdout_formatter = logging.Formatter("%(asctime)s hdbpp-ttl[%(process)d]: %(message)s", "%Y-%m-%d %H:%M:%S")
+    stdout_formatter = logging.Formatter("%(asctime)s hdbpp-reorder-chunks[%(process)d]: %(message)s", "%Y-%m-%d %H:%M:%S")
     stdout_handler = logging.StreamHandler()
     stdout_handler.setFormatter(stdout_formatter)
     logger.addHandler(stdout_handler)
 
     if args.syslog:
-        syslog_formatter = logging.Formatter("hdbpp-ttl[%(process)d]: %(message)s")
+        syslog_formatter = logging.Formatter("hdbpp-reorder-chunks[%(process)d]: %(message)s")
         syslog_handler = logging.handlers.SysLogHandler(address='/dev/log')
         syslog_handler.setFormatter(syslog_formatter)
         logger.addHandler(syslog_handler)

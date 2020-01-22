@@ -6,6 +6,8 @@ The script will remove data older than the time to live value, and this is calcu
 
 It is recommended (and pre-configured) to run in the evening, when the system is not being heavily used.
 
+A single deployment of the script can manage multiple databases or database clusters if it is configured correctly. See the configuration file.
+
 ## Dependencies
 
 Following Python dependencies must be installed: 
@@ -43,6 +45,10 @@ Finally copy the example config into place and customize it:
 mkdir -p /etc/hdb
 cp setup/example_hdbpp_ttl.conf /etc/hdb/hdbpp_ttl.conf
 ```
+
+#### Logs
+
+The direct deploy cron file redirects logging to syslog. Therefore a simple grep for 'hdbpp-ttl' in the syslog will show when and what the result was of the last run.
 
 ### Docker (recommended)
 
@@ -89,10 +95,12 @@ To check if the cron service is running:
 docker exec -ti hdbpp_reorder_chunks bash -c "grep cron"
 ```
 
+#### Logs
+
 Check log output from the cron job and ensure you see data being removed:
 
 ```
-docker logs hdbpp_tll
+docker logs hdbpp_ttl
 ```
 
 ## Configuration
