@@ -1,0 +1,2 @@
+# /etc/cron.d/hdbpp_ttl: crontab entries for the hdbpp_ttl script
+0 22 * * * root /usr/local/bin/python3 /usr/src/service/hdbpp_ttl.py -c /etc/hdb/hdbpp_ttl.conf > /proc/1/fd/1 2>/proc/1/fd/2
