@@ -130,7 +130,7 @@ def load_config(path):
     return config
 
 
-def process_ttl(server_config):
+def process_ttl(server_config, dryrun):
     """
     This function opens a connection to the server and processes all ttl values in the
     att_conf table. What this means in practice is it selects all values from att_conf 
@@ -166,7 +166,7 @@ def process_ttl(server_config):
         # ensure we are clustering on the composite index
         cursor.execute("SELECT att_conf_id, ttl, table_name, att_name FROM att_conf WHERE ttl IS NOT NULL AND ttl !=0")
         attributes = cursor.fetchall()
-        logger.debug("Fetched {} attributes with a ttl configured".format(len(attributes)))
+        logger.info("Fetched {} attributes with a ttl configured".format(len(attributes)))
 
         for attr in attributes:
 
@@ -177,13 +177,25 @@ def process_ttl(server_config):
             # also note the delete is done by counting back from midnight of yesterday, this
             # means a ttl of 1 will always at least 24 hours of data (yesterday), since today is considered
             # day 0 (or filling)
-            cursor.execute(
-                "DELETE FROM {} WHERE data_time < CURRENT_DATE - INTERVAL '{} days' AND att_conf_id = {}".format(
-                    attr[2], math.ceil(attr[1] / 24), attr[0]
+            if not dryrun:
+                cursor.execute(
+                    "DELETE FROM {} WHERE data_time < CURRENT_DATE - INTERVAL '{} days' AND att_conf_id = {}".format(
+                        attr[2], math.ceil(int(attr[1]) / 24), attr[0]
+                    )
                 )
-            )
 
-            logger.info("Deleted {} rows in table: {} for attribute: {}".format(cursor.rowcount, attr[2], attr[3]))
+                logger.info("Deleted {} rows in table: {} for attribute: {}".format(cursor.rowcount, attr[2], attr[3]))
+
+            else:
+                cursor.execute(
+                    "SELECT COUNT(*) FROM {} WHERE data_time < CURRENT_DATE - INTERVAL '{} days' AND att_conf_id = {}".format(
+                        attr[2], math.ceil(int(attr[1]) / 24), attr[0]
+                    )
+                )
+
+                result = cursor.fetchone()
+                logger.info("{} rows would be deleted in table: {} for attribute: {}".format(result[0], attr[2], attr[3]))
+
 
         connection.commit()
         cursor.close()
@@ -240,7 +252,7 @@ def run_command(args):
             for key, val in config.items():
                 start_time = time.monotonic()
                 logger.info("Processing ttl requests for configuration: {}".format(key))
-                process_ttl(val["connection"])
+                process_ttl(val["connection"], args.dryrun)
                 delete_time = timedelta(seconds=time.monotonic() - start_time)
                 logger.info("Processed ttl request for configuration {} in: {}".format(key, delete_time))
 
@@ -257,6 +269,7 @@ def main() -> bool:
     parser.add_argument("-c", "--config", default="/etc/hdb/reorder.conf", help="config file to use")
     parser.add_argument("--validate", action="store_true", help="validate the given config file")
     parser.add_argument("--syslog", action="store_true", help="send output to syslog")
+    parser.add_argument("--dryrun", action="store_true", help="do not actually do the delete, just simulate it")
     parser.set_defaults(func=run_command)
 
     if len(sys.argv) == 1:
