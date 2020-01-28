@@ -1,0 +1,8 @@
+pyyaml
+apscheduler
+flask
+flask-restful
+requests
+Flask-RestPlus
+Flask-SQLAlchemy
+gunicorn

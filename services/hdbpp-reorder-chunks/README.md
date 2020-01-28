@@ -1,5 +1,17 @@
 # hdbpp-reorder-chunks
 
+- [hdbpp-reorder-chunks](#hdbpp-reorder-chunks)
+  - [Dependencies](#Dependencies)
+  - [Usage](#Usage)
+  - [Deployment](#Deployment)
+    - [Docker (Recommended)](#Docker-Recommended)
+      - [Validation](#Validation)
+      - [Logs](#Logs)
+    - [Direct](#Direct)
+      - [Logs](#Logs-1)
+  - [Configuration](#Configuration)
+  - [License](#License)
+
 This project provides a means to ensure the timescale database data is kept in the optimal query order. To ensure the data can be queried quickly on an attribute basis, it is ordered by att_conf_id and data_time, this is not the same as the insert order, which is data_time (since its received in real time). Without reordering the data, the query performance is seriously degraded.
 
 To achieve this reordering, we run a simple script that reorders the last X days of chunks (default is 28). It is recommended this script is run every day at midnight to ensure any data inserted over the last day is optimised. It should not be necessary to run the script more often, but it is possible if the scenario requires it.
@@ -10,14 +22,75 @@ A single deployment of the script can manage multiple databases or database clus
 
 ## Dependencies
 
-Following Python dependencies must be installed: 
+Following Python dependencies are required for direct deployment:
 
 * pyyaml
 * psycopg2-binary
 
+## Usage
+
+The script has a simple command line help menu with some helpful utilities. To view:
+
+```bash
+./hdbpp_reorder_chunks.py --help
+```
+
 ## Deployment
 
 The script can be deployed directly or as a docker image.
+
+### Docker (Recommended)
+
+The Docker image is designed to allow the user to mount the configuration file to /etc/hdb/hdbpp_reorder_chunks.conf. This can be skipped and the configuration file under setup edited directly before building the Docker image, but the docker image will have to be rebuilt for each config change.
+
+Build and deploy the Docker image:
+
+```
+cd docker
+make
+```
+
+If using a Docker registry then the Makefile can push the image to your registry (remember to update docker commands to include your registry address):
+
+```
+export DOCKER_REGISTRY=<your registry here>
+make push
+```
+
+Copy the example config into place on the system that will run the Docker container:
+
+```bash
+mkdir -p /etc/hdb
+cp setup/hdbpp_reorder_chunks.conf /etc/hdb/hdbpp_reorder_chunks.conf
+```
+
+Then run the container with the config file mounted to /etc/hdb/hdbpp_reorder_chunks.conf (add the registry name if required):
+
+```
+docker run -d -v /etc/hdb/hdbpp_reorder_chunks.conf:/etc/hdb/hdbpp_reorder_chunks.conf:ro --rm --name hdbpp_reorder_chunks hdbpp-reorder-chunks
+```
+
+#### Validation
+
+To check if the job is scheduled:
+
+```
+docker exec -ti hdbpp_reorder_chunks bash -c "crontab -l"
+```
+
+To check if the cron service is running:
+
+```
+docker exec -ti hdbpp_reorder_chunks bash -c "grep cron"
+```
+
+#### Logs
+
+Check log output from the cron job and ensure you see data being reordered on a daily basis:
+
+```
+docker logs hdbpp_reorder_chunks
+```
 
 ### Direct
 
@@ -43,65 +116,12 @@ Finally copy the example config into place and customize it:
 
 ```bash
 mkdir -p /etc/hdb
-cp setup/example_hdbpp_reorder_chunks.conf /etc/hdb/hdbpp_reorder_chunks.conf
+cp setup/hdbpp_reorder_chunks.conf /etc/hdb/hdbpp_reorder_chunks.conf
 ```
 
 #### Logs
 
 The direct deploy cron file redirects logging to syslog. Therefore a simple grep for 'hdbpp-reorder-chunks' in the syslog will show when and what the result was of the last run.
-
-### Docker (recommended)
-
-The Docker image is designed to allow the user to mount the configuration file to /etc/hdb/hdbpp_reorder_chunks.conf. This can be skipped and the configuration file under setup edited directly before building the Docker image.
-
-Build and deploy the Docker image:
-
-```
-cd docker
-make
-```
-
-If using a Docker registry then the Makefile can push the image to your registry (remember to update docker commands to include your registry address):
-
-```
-export DOCKER_REGISTRY=<your registry here>
-make push
-```
-
-Copy the example config into place on the system that will run the Docker container:
-
-```bash
-mkdir -p /etc/hdb
-cp setup/example_hdbpp_reorder_chunks.conf /etc/hdb/hdbpp_reorder_chunks.conf
-```
-
-Then run the container with the config file mounted to /etc/hdb/hdbpp_reorder_chunks.conf:
-
-```
-docker run -d -v /etc/hdb/hdbpp_reorder_chunks.conf:/etc/hdb/hdbpp_reorder_chunks.conf:ro --rm --name hdbpp_reorder_chunks hdbpp-ttl
-```
-
-#### Validation
-
-To check if the job is scheduled:
-
-```
-docker exec -ti hdbpp_reorder_chunks bash -c "crontab -l"
-```
-
-To check if the cron service is running:
-
-```
-docker exec -ti hdbpp_reorder_chunks bash -c "grep cron"
-```
-
-#### Logs
-
-Check log output from the cron job and ensure you see data being reordered on a daily basis:
-
-```
-docker logs hdbpp_reorder_chunks
-```
 
 ## Configuration
 
