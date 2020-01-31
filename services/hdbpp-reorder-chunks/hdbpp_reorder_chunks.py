@@ -185,6 +185,7 @@ def write_config(path, config):
 
     Arguments:
         path : str -- Path and name of the config file to write
+        config : dict -- Config object to write
 
     """
 
