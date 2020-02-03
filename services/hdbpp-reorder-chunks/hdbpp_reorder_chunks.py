@@ -45,7 +45,7 @@ logger = logging.getLogger('hdbpp-reorder-chunks')
 
 version_major = 0
 version_minor = 1
-version_patch = 0
+version_patch = 1
 debug = False
 
 # This is a fixed string in the schema, so rather than work it out with
