@@ -64,10 +64,17 @@ mkdir -p /etc/hdb
 cp setup/hdbpp_reorder_chunks.conf /etc/hdb/hdbpp_reorder_chunks.conf
 ```
 
-Then run the container with the config file mounted to /etc/hdb/hdbpp_reorder_chunks.conf (add the registry name if required):
+You should keep a list of the chunk that are ordered in a yaml file. If this is the first deployment you can copy an empty one into place ont the system that will run the Docker container:
+
+```bash
+mkdir -p /var/lib/hdb
+cp setup/chunks.conf /var/lib/hdb/chunks.conf
+```
+
+Then run the container with the config file mounted to /etc/hdb/hdbpp_reorder_chunks.conf and the reordered chunk list file mounted to /var/lib/hdb/chunks.conf (add the registry name if required):
 
 ```
-docker run -d -v /etc/hdb/hdbpp_reorder_chunks.conf:/etc/hdb/hdbpp_reorder_chunks.conf:ro --rm --name hdbpp_reorder_chunks hdbpp-reorder-chunks
+docker run -d -v /etc/hdb/hdbpp_reorder_chunks.conf:/etc/hdb/hdbpp_reorder_chunks.conf:ro /var/lib/hdb/chunks.conf:/var/lib/hdb/chunks.conf:rw --rm --name hdbpp_reorder_chunks hdbpp-reorder-chunks
 ```
 
 #### Validation

@@ -45,7 +45,7 @@ logger = logging.getLogger('hdbpp-reorder-chunks')
 
 version_major = 0
 version_minor = 1
-version_patch = 0
+version_patch = 1
 debug = False
 
 # This is a fixed string in the schema, so rather than work it out with
@@ -180,8 +180,27 @@ def load_config(path):
     # return the dictionary for the script to use
     return config
 
+def write_config(path, config):
+    """Write the config file from the given path
 
-def reorder_table(table_name, server_config, schedule):
+    Arguments:
+        path : str -- Path and name of the config file to write
+        config : dict -- Config object to write
+
+    """
+
+    with open(path, 'w') as fp:
+        try:
+            yaml.safe_dump(config, fp)
+
+        except yaml.YAMLError as error:
+            logger.error("Unable to write the config file: {}. Error: {}".format(path, error))
+            return None
+
+    logger.info("Written config file: {}".format(path))
+
+
+def reorder_table(table_name, server_config, schedule, ordered_chunks):
     """
     Perform a reorder chunks request on the given table name on the given
     server config. This function will open a connection, perform the action then
@@ -191,6 +210,7 @@ def reorder_table(table_name, server_config, schedule):
         table_name : str -- name of the table to reorder the chunks for
         server_config : dict -- dictionary of values from the config file that defines the server
         schedule : dict -- dictionary of keys from the config that defines the reorder schedule
+        ordered_chunks : list -- list of chunks that have already been ordered
 
     Returns:
         bool -- True on success, False otherwise
@@ -228,16 +248,21 @@ def reorder_table(table_name, server_config, schedule):
 
         # get the config window of chunks to be reordered, we pass the window from the
         # configuration directly into the SQL, this is why its format is strictly enforced.
-        cursor.execute("SELECT show_chunks('{}', newer_than => interval '{}');".format(table_name, schedule["window"]))
+        cursor.execute("SELECT show_chunks('{}', newer_than => now() - interval '{}', older_than => now());".format(table_name, schedule["window"]))
         chunks = cursor.fetchall()
         logger.debug("Fetched {} chunk(s)".format(len(chunks)))
 
         for chunk in chunks:
+            #Check if this chunk was already processed.
+            if chunk[0] not in ordered_chunks:
+                # do the actual reorder of the chunk
+                logger.debug("Reordering chunk: {} in table: {}".format(chunk[0], table_name))
+                cursor.execute("SELECT reorder_chunk('{}', index => '{}{}');".format(chunk[0], table_name, idx_postfix))
+                logger.debug("Finished reordering chunk: {} in table: {}".format(chunk[0], table_name))
+                ordered_chunks.append(chunk[0])
+            else:
+                logger.debug("Do not reorder previously ordered chunk: {} in table: {}".format(chunk[0], table_name))
 
-            # do the actual reorder of the chunk
-            logger.debug("Reordering chunk: {} in table: {}".format(chunk[0], table_name))
-            cursor.execute("SELECT reorder_chunk('{}', index => '{}{}');".format(chunk[0], table_name, idx_postfix))
-            logger.debug("Finished reordering chunk: {} in table: {}".format(chunk[0], table_name))
 
         connection.commit()
         cursor.close()
@@ -287,7 +312,7 @@ def run_command(args):
 
     else:
         config = load_config(args.config)
-
+        ordered_chunks = load_config(args.ordered_chunks)
         if config is None:
             return False
 
@@ -304,11 +329,16 @@ def run_command(args):
                 logger.info("Processing reorder chunks configuration: {} with schedule: {}".format(key, val["schedule"]))
 
                 for table in tables:
-                    if not reorder_table(table, val["connection"], val["schedule"]):
-                        logger.error("Breaking reorder tables attempt due to previous error")
-                        return False
+                    if ordered_chunks is not None:
+                        if ordered_chunks[table] is None:
+                            ordered_chunks[table] = []
+                        if not reorder_table(table, val["connection"], val["schedule"], ordered_chunks[table]):
+                            write_config(args.ordered_chunks, ordered_chunks)
+                            logger.error("Breaking reorder tables attempt due to previous error")
+                            return False
 
                 logger.info("Processed reorder chunks configuration {} in: {}".format(key, timedelta(seconds=time.monotonic() - start_time)))
+            write_config(args.ordered_chunks, ordered_chunks)
 
         else:
             return False
@@ -321,6 +351,7 @@ def main() -> bool:
     parser.add_argument("-v", "--version", action="store_true", help="version information")
     parser.add_argument("-d", "--debug", action="store_true", help="debug output for development")
     parser.add_argument("-c", "--config", default="/etc/hdb/reorder.conf", help="config file to use")
+    parser.add_argument("-o", "--ordered_chunks", default="/var/lib/hdb/chunks.conf", help="File with the list of ordered chunks to use")
     parser.add_argument("--validate", action="store_true", help="validate the given config file")
     parser.add_argument("--syslog", action="store_true", help="send output to syslog")
     parser.set_defaults(func=run_command)
