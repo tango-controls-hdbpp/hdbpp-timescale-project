@@ -6,11 +6,13 @@ LABEL maintainer="stuart.james@esrf.fr"
 
 RUN mkdir -p /etc/hdb
 RUN mkdir -p /usr/src/service
+RUN mkdir -p /var/lib/hdb
 WORKDIR /usr/src/service
 
 # copy the various parts of the server across, including a basic config file
 COPY build-files/requirements.txt build-files/hdbpp_reorder_chunks.py ./ 
 COPY build-files/setup/hdbpp_reorder_chunks.conf /etc/hdb/hdbpp_reorder_chunks.conf
+COPY build-files/setup/chunks.conf /var/lib/hdb/chunks.conf
 COPY build-files/setup/hdbpp_reorder_chunks_docker /etc/cron.d/hdbpp_reorder_chunks
      
 RUN chmod 0644 /etc/cron.d/hdbpp_reorder_chunks

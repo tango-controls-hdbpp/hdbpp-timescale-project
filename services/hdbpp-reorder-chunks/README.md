@@ -119,6 +119,13 @@ Copy the cron file into place (take the one without docker in the name). The tri
 cp setup/hdbpp_reorder_chunks /etc/cron.d
 ```
 
+Copy the list of reordered chunks into place. If you already reordered some chunks previously, you should add their names to the list not to process them again:
+
+```bash
+mkdir -p /var/lib/hdb
+cp setup/chunks.conf /var/lib/hdb/chunks.conf
+```
+
 Finally copy the example config into place and customize it:
 
 ```bash
