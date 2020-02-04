@@ -19,17 +19,19 @@
 # along with hdbpp-timescale-project.  If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-import copy
-import requests
 import logging
 import atexit
+from threading import Lock
+import requests
+from requests.exceptions import HTTPError
 
+import psycopg2
 import server.config as config
 
 from server import db as db
 from server.models import Servers
-from threading import Lock
-from requests.exceptions import HTTPError
+from server.models import Database
+from server.models import Attributes
 from apscheduler.schedulers.background import BackgroundScheduler
 
 logger = logging.getLogger(config.LOGGER_NAME)
@@ -90,6 +92,127 @@ def update_cluster_status(configuration):
 
     logger.debug("Updated cluster server status with data from the cluster")
 
+def extract_interval_rows(query_result):
+    """
+    From a query result containing the table name, the interval length,
+    and the estimate of rows number, extract valuable information to inject
+    this data into the database.
+    Mainly the type and format from the table_name, and the datas in itself
+
+    Arguments:
+        query_result : tuple -- One line of the query result
+    Returns:
+        tuple with the str table_name, the type, the format, the interval
+        and the row count.
+    """
+    table_name = query_result[0]
+    table_name_split = table_name.split('_')
+    
+    if len(table_name_split) is not 3:
+        return None, None, None, None, None
+    
+    if table_name_split[1] == "scalar":
+        att_format = 'SCALAR'
+    else:
+        att_format = 'SPECTRUM'
+    
+    att_type = ('DEV_'+table_name_split[2][3:]).upper()
+    
+    if att_type not in config.DB_TYPES:
+        return None, None, None, None, None
+    
+    return table_name, att_type, att_format, query_result[1], query_result[2]
+
+def update_database_info(configuration):
+    """
+    Update the information on the HDB database and store it in
+    the database.
+
+    Arguments:
+        configuration : dict -- Server configuration
+    """
+
+    # first attempt to open a connection to the database
+    try:
+        logger.debug("Attempting to connect to server: {}".format(configuration["database"]["host"]))
+        # attempt to connect to the server
+        connection = psycopg2.connect(
+        user=configuration["database"]["user"],
+            password=configuration["database"]["password"],
+            host=configuration["database"]["host"],
+            port=configuration["database"]["port"],
+            database=configuration["database"]["database"])
+        connection.autocommit = True
+        logger.debug("Connected to database at server: {}".format(configuration["database"]["host"]))
+
+    except (Exception, psycopg2.Error) as error:
+        logger.error("Error: {}".format(error))
+        return
+    
+    # now we have a database connection, proceed to get all the information we want
+    try:
+        cursor = connection.cursor()
+        logger.debug("Fetching information about the database.")
+
+        cursor.execute("SELECT pg_database_size('"+configuration["database"]["database"]+"');")
+        database_size = cursor.fetchall()
+        db.session.query(Database).filter(Database.name == configuration["database"]["database"]).update({"size":database_size[0][0]})
+        db.session.commit()
+
+        logger.debug("Fetching information about the attributes tables from the database.")
+
+        # Retrieve all the parameters and their type.
+        cursor.execute(("SELECT att_conf_type.type, att_conf_format.format, count(*) "
+                        "FROM att_conf "
+                        "JOIN att_conf_type ON att_conf.att_conf_type_id = att_conf_type.att_conf_type_id "
+                        "JOIN att_conf_format ON att_conf.att_conf_format_id = att_conf_format.att_conf_format_id "
+                        "GROUP BY att_conf_format.format, att_conf_type.type;"))
+        attributes = cursor.fetchall()
+
+        for attribute in attributes:
+            logger.debug("Updating parameter type {} and format {} to count: {}".format(attribute[0],attribute[1],attribute[2]))
+            db.session.query(Attributes).filter(Attributes.att_format == attribute[1], Attributes.att_type == attribute[0]).update({"att_count":attribute[2]})
+        
+        db.session.commit()
+
+        # Retrieve all the tables row_count and intervals.
+        cursor.execute(("SELECT h.table_name, interval_length, row_estimate "
+                        "FROM _timescaledb_catalog.dimension d "
+                        "LEFT JOIN _timescaledb_catalog.hypertable h ON (d.hypertable_id = h.id) "
+                        "JOIN (SELECT * from hypertable_approximate_row_count()) AS t ON t.table_name = h.table_name;"))
+        sizes = cursor.fetchall()
+        
+        for size in sizes:
+            table_name, att_type, att_format, interval, rows = extract_interval_rows(size)
+            
+            if att_type:
+                #retrieve the table size
+                cursor.execute("SELECT total_bytes FROM hypertable_relation_size('"+table_name+"');")
+                table_size = cursor.fetchall()[0][0]
+                #retrieve the last chunk size for this table
+                cursor.execute("SELECT total_bytes FROM chunk_relation_size('"+table_name+"') order by ranges desc limit 1;")
+                chunk_size = cursor.fetchall()[0][0]
+                logger.debug(("Updating parameter type {} and format {} to interval size: {}us"
+                              "\n  Estimate number of rows: {}"
+                              "\n  Table size: {}"
+                              "\n  Last chunk size: {}").format(att_type, att_format, interval, rows, table_size, chunk_size))
+                db.session.query(Attributes).filter(Attributes.att_format == att_format, Attributes.att_type == att_type) \
+                        .update({"att_row_count":rows, "att_interval":interval, "att_size":table_size, "att_current_chunk_size":chunk_size})
+
+        db.session.commit()
+        connection.commit()
+        cursor.close()
+    
+    except (Exception, psycopg2.Error) as error:
+        logger.error("Error retrieving all the attributes: {}".format(error))
+        # closing database connection.
+        if(connection):
+            connection.close()
+            logger.debug("Closed connection to server: {} due to error".format(configuration["database"]["host"]))
+        return
+    
+    connection.close()
+    logger.debug("Closed connection to server: {}".format(configuration["database"]["host"]))
 
 def create_scheduler():
     global scheduler
@@ -101,7 +224,23 @@ def create_scheduler():
 
 
 def init_services(configuration):
-    from server.models import Servers
+
+    # clear the database db
+    db.session.query(Database).delete()
+    db.session.commit()
+    db.session.add(Database(configuration["database"]["database"]))
+    db.session.commit()
+
+    # clear the attributes db
+    db.session.query(Attributes).delete()
+    db.session.commit()
+
+    # add the defaults
+    for fmt in config.DB_FORMAT:
+        for typ in config.DB_TYPES:
+            att = Attributes(fmt, typ)
+            db.session.add(att)
+            db.session.commit()
 
     # clear the cluster status and reset with defaults
     db.session.query(Servers).delete()
@@ -127,3 +266,12 @@ def init_services(configuration):
         id='servers',
         replace_existing=True,
         seconds=int(configuration["cluster"]["status_update"]))
+
+    # now schedule a job to update the attributes information
+    scheduler.add_job(
+        update_database_info,
+        'interval',
+        args=[configuration],
+        id='database',
+        replace_existing=True,
+        seconds=int(configuration["database"]["update_interval"]))

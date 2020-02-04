@@ -48,3 +48,62 @@ class Servers(db.Model):
 
     def __repr__(self):
         return "<Server %r" % self.hostname
+
+class Attributes(db.Model):
+    """
+    Represents information about the attributes in the database
+
+    Attributes
+    ----------
+    att_type : str
+        type of the attribute
+    att_format : str
+        format of the attribute (Scalar or Spectrum)
+    att_count : int
+        Number of attributes with this format and type
+    att_row_count : int
+        An estimate of the number of lines for this format and type
+    att_size : int
+        Total size of the table, in bytes for this format and type
+    att_current_chunk_size : int
+        Total size of the current chunk, in bytes for this format and type
+    att_interval : int
+        Interval for the chunks, in microseconds, for this format and type
+    """
+    __tablename__ = 'Attributes'
+    att_type = db.Column(db.String(), nullable=False, primary_key=True)
+    att_format = db.Column(db.String(), nullable=False, primary_key=True)
+    att_count = db.Column(db.Integer, nullable=False)
+    att_row_count = db.Column(db.Integer, nullable=False)
+    att_size = db.Column(db.Integer, nullable=False)
+    att_current_chunk_size = db.Column(db.Integer, nullable=False)
+    att_interval = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, att_format, att_type):
+        self.att_type = att_type
+        self.att_format = att_format
+        self.att_count = 0
+        self.att_row_count = 0
+        self.att_size = 0
+        self.att_current_chunk_size = 0
+        self.att_interval = 0
+
+    def __repr__(self):
+        return "<Attribute %r.%r>" % self.att_format, self.att_type
+
+class Database(db.Model):
+    """
+    Represents general information about the database
+    Attributes
+    ----------
+    size : int
+       size of the database, in bytes.
+
+    """
+    __tablename__ = 'Database'
+    name = db.Column(db.String(), nullable=False, primary_key=True)
+    size = db.Column(db.Integer(), nullable=False)
+
+    def __init__(self, name):
+        self.name = name
+        self.size = 0

@@ -131,31 +131,9 @@ Now setup a process manager, i.e. supervisord to run the server. The run command
 
 The direct deploy cron file redirects logging to syslog. Therefore a simple grep for 'hdbpp-cluster-reporting' in the syslog will show when and what the result was of the last run.
 
-#### Validation
-
-To check if the job is scheduled:
-
-```
-docker exec -ti hdbpp_reorder_chunks bash -c "crontab -l"
-```
-
-To check if the cron service is running:
-
-```
-docker exec -ti hdbpp_reorder_chunks bash -c "grep cron"
-```
-
-#### Logs
-
-Check log output from the cron job and ensure you see data being removed:
-
-```
-docker logs hdbpp_ttl
-```
-
 ## Configuration
 
-The example config file setup/hdbpp_ttl is commented for easy customisation.
+The example config file setup/hdbpp_cluster_reporting.conf is commented for easy customisation.
 
 ## License
 

@@ -23,20 +23,24 @@ import logging
 
 import server.config as config
 import server.models as models
-
 from flask_restplus import Resource
-from flask import jsonify, abort
+from flask import jsonify
 
 logger = logging.getLogger(config.LOGGER_NAME)
 
-#class Attributes(Resource):
-#    def get(self):
-#        return jsonify(hosts)
+class Databases(Resource):
+    def get(self):
+        databases = []
+        results = models.Database.query.with_entities(models.Database.name)
+        for res in results:
+            databases.append(res.name)
+        return jsonify(databases)
 
-#class ScalarAttributes(Resource):
-#    def get(self):
-#        return jsonify(hosts)
+class DatabaseSize(Resource):
+    def get(self, db_name):
+        result = models.Database.query.with_entities(models.Database.size).filter(models.Database.name == db_name)
+        return jsonify(result[0].size)
 
-#class SpectrumAttributes(Resource):
-#    def get(self):
-#        return jsonify(1)
+class DatabaseSizeUnit(Resource):
+    def get(self):
+        return jsonify("bytes")
