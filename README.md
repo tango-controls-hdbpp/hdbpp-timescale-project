@@ -20,11 +20,15 @@ Contains various services deployed to assist in running the hdbpp database clust
 
 ### device-servers/*
 
-External device server projects required to complete this project are included here (example Event Subscriber). This is also the location for any TimescaleDb centric device servers.
+This is also the location for any TimescaleDb centric device servers.
 
 ### resources/*
 
 Project resources. Including the HDB++ schema, TimescaleDB HDB++ Docker images, test scripts that can allow a user to test the project quickly.
+
+### external/* 
+
+This directory will be created at CMake configuration time and will contain the external dependencies for the complete build. These are hdbpp-es, hdbpp-cm, and libhdbpp.
 
 ## Version Table
 
