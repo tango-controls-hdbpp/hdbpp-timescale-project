@@ -340,7 +340,7 @@ def main():
     parser.add_argument(
         "-c",
         "--connect",
-        action="store_true",
+        metavar="STR",
         default="user=postgres host=localhost port=5432 password=password dbname=hdb",
         help="connect string (default user=postgres password=password host=localhost port=5432 dbname=hdb)"
     )

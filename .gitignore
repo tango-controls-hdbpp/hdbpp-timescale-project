@@ -37,3 +37,5 @@ lib/
 .project
 .settings
 
+# Custom stuff
+external/

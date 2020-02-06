@@ -12,12 +12,19 @@ git clone --recurse-submodules https://github.com/tango-controls-hdbpp/hdbpp-tim
 
 ## Overview
 
-This project consolidates several other hdbpp projects into a single repository, and acts as a location to store all support tools and services for the hdbpp deployment based on TimescaleDb. The project contents is contained in the following sections/folders:
+This project consolidates several other hdbpp projects into a single repository, and acts as a location to store all support tools and services for the hdbpp project based on TimescaleDb. Brief overview of the modules:
 
-* Services. Mainly python scripts run in Docker images to perform various functions on the database. 
-* Device Servers. Including any device servers built for this project. This section also includes via sub modules device servers required for the deployment of the hdbpp project. Including these here allows the entire project to be built with a single command.
-* Resources. A collection of helpful resources, such as Docker images, test scripts etc, that can allow a user to test the project quickly.
-* Experimental: Any currently experimental work that is not ready for production use.
+### services/*
+
+Contains various services deployed to assist in running the hdbpp database cluster operation. Its recommended to use the Docker images to ease deployment.
+
+### device-servers/*
+
+External device server projects required to complete this project are included here (example Event Subscriber). This is also the location for any TimescaleDb centric device servers.
+
+### resources/*
+
+Project resources. Including the HDB++ schema, TimescaleDB HDB++ Docker images, test scripts that can allow a user to test the project quickly.
 
 ## Version Table
 

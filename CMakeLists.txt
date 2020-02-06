@@ -23,6 +23,13 @@ project(hdbpp-timescale-project)
 # produced here, and test against it if they are run from the build folder
 set(LIBHDBPP_PROJECT_BUILD TRUE)
 
+# component versions that will be pulled on building
+set(HDBPP_ES_VERSION "integrated-build")
+set(HDBPP_CM_VERSION "integrated-build")
+set(LIBHDBPP_VERSION "exp-refactor")
+set(EXTERNAL_PROJECT_DIR "external")
+set(DOWNLOAD_DIR "download")
+
 # this will enable clang on all sub-compoents
 option(ENABLE_CLANG "Enable clang code and layout analysis" ON)
 
@@ -45,11 +52,35 @@ if(ENABLE_CLANG)
     endif(NOT CLANG_TIDY_EXE)
 endif(ENABLE_CLANG)
 
+# configure hdbpp-es
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Fetch-hdbpp-es.cmake.in 
+    ${CMAKE_BINARY_DIR}/hdbpp-es-${DOWNLOAD_DIR}/CMakeLists.txt)
+
+execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" . WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/hdbpp-es-${DOWNLOAD_DIR}" )
+execute_process(COMMAND "${CMAKE_COMMAND}" --build . WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/hdbpp-es-${DOWNLOAD_DIR}" )
+
+# configure hdbpp-cm
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Fetch-hdbpp-cm.cmake.in 
+    ${CMAKE_BINARY_DIR}/hdbpp-cm-${DOWNLOAD_DIR}/CMakeLists.txt)
+
+execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" . WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/hdbpp-cm-${DOWNLOAD_DIR}" )
+execute_process(COMMAND "${CMAKE_COMMAND}" --build . WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/hdbpp-cm-${DOWNLOAD_DIR}" )
+
+# configure libhdbpp
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Fetch-libhdbpp.cmake.in 
+    ${CMAKE_BINARY_DIR}/libhdbpp-${DOWNLOAD_DIR}/CMakeLists.txt)
+    
+execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" . WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/libhdbpp-${DOWNLOAD_DIR}" )
+execute_process(COMMAND "${CMAKE_COMMAND}" --build . WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/libhdbpp-${DOWNLOAD_DIR}" )
+
 # add the various components to the project
-add_subdirectory(device-servers/hdbpp-es EXCLUDE_FROM_ALL)
-add_subdirectory(device-servers/hdbpp-cm EXCLUDE_FROM_ALL)
+add_subdirectory(${EXTERNAL_PROJECT_DIR}/hdbpp-es EXCLUDE_FROM_ALL)
+add_subdirectory(${EXTERNAL_PROJECT_DIR}/hdbpp-cm EXCLUDE_FROM_ALL)
+add_subdirectory(${EXTERNAL_PROJECT_DIR}/libhdbpp EXCLUDE_FROM_ALL)
 add_subdirectory(device-servers/hdbpp-health-check EXCLUDE_FROM_ALL)
-add_subdirectory(libraries/libhdbpp EXCLUDE_FROM_ALL)
 
 # update the libhdbpp project
 set_target_properties(libhdbpp_shared_library
