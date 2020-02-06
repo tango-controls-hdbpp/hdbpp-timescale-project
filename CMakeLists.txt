@@ -27,7 +27,10 @@ set(LIBHDBPP_PROJECT_BUILD TRUE)
 set(HDBPP_ES_VERSION "integrated-build")
 set(HDBPP_CM_VERSION "integrated-build")
 set(LIBHDBPP_VERSION "exp-refactor")
+<<<<<<< HEAD
 set(LIBHDBPP_TIMESCALE_VERSION "project-build2")
+=======
+>>>>>>> hdbpp-health-check device server, project build system
 set(EXTERNAL_PROJECT_DIR "external")
 set(DOWNLOAD_DIR "download")
 
