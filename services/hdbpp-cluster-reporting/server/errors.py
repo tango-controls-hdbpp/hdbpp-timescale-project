@@ -19,30 +19,36 @@
 # along with hdbpp-timescale-project.  If not, see <http://www.gnu.org/licenses/>.
 # -----------------------------------------------------------------------------
 
-import logging
-
-import server.config as config
-import server.models as models
-from flask_restplus import Resource
 from flask import jsonify
 
-logger = logging.getLogger(config.LOGGER_NAME)
+class InvalidUsage(Exception):
+    """
+    Generic exception to raise if an error occurs during a query.
+    The handler will return an http error code with a message.
+    The default return code is 400 Bad request.
 
-class Databases(Resource):
-    def get(self):
-        databases = []
-        results = models.Database.query.with_entities(models.Database.name)
+    Attributes:
+    -----------
+        message: str -- error message to be displayed
+        status_code: int -- HTTP error code
+        payload: dict -- extra dict if further data might be of use
+    """
 
-        for res in results:
-            databases.append(res.name)
+    def __init__(self, message, status_code=400, payload=None):
+        Exception.__init__(self)
+        self.message = message
         
-        return jsonify(databases)
+        if status_code is not None:
+            self.status_code = status_code
+            self.payload = payload
 
-class DatabaseSize(Resource):
-    def get(self, db_name):
-        result = models.Database.query.with_entities(models.Database.size).filter(models.Database.name == db_name)
-        return jsonify(result[0].size)
+    def to_dict(self):
+        rv = dict(self.payload or ())
+        rv['message'] = self.message
+        return rv
 
-class DatabaseSizeUnit(Resource):
-    def get(self):
-        return jsonify("bytes")
+def handle_error(e):
+    response = jsonify(e.to_dict())
+    response.status_code = e.status_code
+    return response
+

@@ -189,13 +189,16 @@ def update_database_info(configuration):
                 #retrieve the table size
                 cursor.execute("SELECT total_bytes FROM hypertable_relation_size('"+table_name+"');")
                 table_size = cursor.fetchall()[0][0]
+                
                 #retrieve the last chunk size for this table
                 cursor.execute("SELECT total_bytes FROM chunk_relation_size('"+table_name+"') order by ranges desc limit 1;")
                 chunk_size = cursor.fetchall()[0][0]
+                
                 logger.debug(("Updating parameter type {} and format {} to interval size: {}us"
                               "\n  Estimate number of rows: {}"
                               "\n  Table size: {}"
                               "\n  Last chunk size: {}").format(att_type, att_format, interval, rows, table_size, chunk_size))
+                
                 db.session.query(Attributes).filter(Attributes.att_format == att_format, Attributes.att_type == att_type) \
                         .update({"att_row_count":rows, "att_interval":interval, "att_size":table_size, "att_current_chunk_size":chunk_size})
 

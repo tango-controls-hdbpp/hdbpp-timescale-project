@@ -31,19 +31,19 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI ="sqlite:////tmp/reporting2.db"
+    SQLALCHEMY_DATABASE_URI ="sqlite:////tmp/reporting.db"
 
 
 class TestingConfig(Config):
     DEBUG = True
     TESTING = True
     PRESERVE_CONTEXT_ON_EXCEPTION = False
-    SQLALCHEMY_DATABASE_URI = "sqlite:////tmp/reporting2.db"
+    SQLALCHEMY_DATABASE_URI = "sqlite:////tmp/reporting.db"
 
 
 class ProductionConfig(Config):
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL") or "sqlite:////tmp/reporting2.db"
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL") or "sqlite:////tmp/reporting.db"
 
 
 config_by_name = dict(

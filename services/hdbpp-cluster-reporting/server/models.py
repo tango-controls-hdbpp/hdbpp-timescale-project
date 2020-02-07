@@ -89,7 +89,7 @@ class Attributes(db.Model):
         self.att_interval = 0
 
     def __repr__(self):
-        return "<Attribute %r.%r>" % self.att_format, self.att_type
+        return "<Attributes %r.%r>" % self.att_format, self.att_type
 
 class Database(db.Model):
     """

@@ -31,6 +31,8 @@ import server.routes.servers as servers_endpoint
 import server.routes.attributes as attributes_endpoint
 import server.routes.database as database_endpoint
 
+from server.errors import InvalidUsage
+from server.errors import handle_error 
 from server import db
 from flask import Flask
 from flask_restplus import Api, Resource
@@ -191,6 +193,8 @@ def create_app(config_name):
     app = Flask(__name__)
     app.config.from_object(config.config_by_name[config_name])
     app.app_context().push()
+
+    app.register_error_handler(InvalidUsage, handle_error)
 
     app.register_blueprint(blueprint, url_prefix='/api/v1')
 

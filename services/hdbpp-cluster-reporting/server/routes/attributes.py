@@ -26,6 +26,7 @@ import server.models as models
 from sqlalchemy.sql import func
 from flask_restplus import Resource
 from flask import jsonify, abort
+from server.errors import InvalidUsage
 
 logger = logging.getLogger(config.LOGGER_NAME)
 
@@ -40,11 +41,13 @@ def get_from_db(att_format, att_type, req):
         req: SQLAlchemy InstrumentedAttributes -- Output field requested.
     """
     if att_type not in config.DB_TYPES or att_format not in config.DB_FORMAT:
-        raise Exception("The type: {} and format: {} is not supported.".format(att_type, att_format))
+        logger.error("The type: {} and format: {} is not supported.".format(att_type, att_format))
+        raise InvalidUsage("The type: {} and format: {} is not supported.".format(att_type, att_format))
 
     attributes_result = models.Attributes.query \
             .with_entities(req.label('result')) \
             .filter(models.Attributes.att_type == att_type, models.Attributes.att_format == att_format)
+
     return jsonify(attributes_result[0].result)
 
 class AttributesCount(Resource):
@@ -55,7 +58,8 @@ class AttributesCount(Resource):
 class AttributesTypeOrFormatCount(Resource):
     def get(self, att_info):
         if att_info not in config.DB_TYPES and att_info not in config.DB_FORMAT:
-            raise Exception("The type or format: {} is not supported.".format(att_info))
+            logger.error("The type or format: {} is not supported.".format(att_info))
+            raise InvalidUsage("The type or format: {} is not supported.".format(att_info))
         
         attributes_result = models.Attributes.query.with_entities(models.Attributes.att_type) \
                 .filter(models.Attributes.att_type == att_info)
@@ -87,6 +91,7 @@ class AttributesFormatCount(Resource):
                 .with_entities(func.sum(models.Attributes.att_count).label('c')) \
                 .group_by(models.Attributes.att_format) \
                 .filter(models.Attributes.att_format == att_format)
+
         return jsonify(attributes_result[0].c)
 
 class AttributesFormatTypeCount(Resource):
@@ -117,10 +122,3 @@ class AttributesCurrentSize(Resource):
     def get(self, att_format, att_type):
         return get_from_db(att_format, att_type, models.Attributes.att_current_chunk_size)
 
-#class ScalarAttributes(Resource):
-#    def get(self):
-#        return jsonify(hosts)
-
-#class SpectrumAttributes(Resource):
-#    def get(self):
-#        return jsonify(1)
