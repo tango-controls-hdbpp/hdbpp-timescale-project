@@ -22,7 +22,7 @@
 import logging
 
 import server.config as config
-import server.models as models
+from server.models import Datatable
 from sqlalchemy.sql import func
 from flask_restplus import Resource
 from flask import jsonify, abort
@@ -44,15 +44,15 @@ def get_from_db(att_format, att_type, req):
         logger.error("The type: {} and format: {} is not supported.".format(att_type, att_format))
         raise InvalidUsage("The type: {} and format: {} is not supported.".format(att_type, att_format))
 
-    attributes_result = models.Attributes.query \
+    attributes_result = Datatable.query \
             .with_entities(req.label('result')) \
-            .filter(models.Attributes.att_type == att_type, models.Attributes.att_format == att_format)
+            .filter(Datatable.att_type == att_type, Datatable.att_format == att_format)
 
     return jsonify(attributes_result[0].result)
 
 class AttributesCount(Resource):
     def get(self):
-        attributes_result = models.Attributes.query.with_entities(func.sum(models.Attributes.att_count).label('c'))
+        attributes_result = Datatable.query.with_entities(func.sum(Datatable.att_count).label('c'))
         return jsonify(attributes_result[0].c)
 
 class AttributesTypeOrFormatCount(Resource):
@@ -61,16 +61,16 @@ class AttributesTypeOrFormatCount(Resource):
             logger.error("The type or format: {} is not supported.".format(att_info))
             raise InvalidUsage("The type or format: {} is not supported.".format(att_info))
         
-        attributes_result = models.Attributes.query.with_entities(models.Attributes.att_type) \
-                .filter(models.Attributes.att_type == att_info)
+        attributes_result = Datatable.query.with_entities(Datatable.att_type) \
+                .filter(Datatable.att_type == att_info)
         
         #Check if the information passed is a type, if not it should be a format.
         if attributes_result.count() == 0:
-            attributes_result = models.Attributes.query.with_entities(func.sum(models.Attributes.att_count).label('c')) \
-                    .group_by(models.Attributes.att_format).filter(models.Attributes.att_format == att_info)
+            attributes_result = Datatable.query.with_entities(func.sum(Datatable.att_count).label('c')) \
+                    .group_by(Datatable.att_format).filter(Datatable.att_format == att_info)
         else:
-            attributes_result = models.Attributes.query.with_entities(func.sum(models.Attributes.att_count).label('c')) \
-                    .group_by(models.Attributes.att_type).filter(models.Attributes.att_type == att_info)
+            attributes_result = Datatable.query.with_entities(func.sum(Datatable.att_count).label('c')) \
+                    .group_by(Datatable.att_type).filter(Datatable.att_type == att_info)
         
         if attributes_result.count() == 0:
             return 0
@@ -87,16 +87,16 @@ class AttributesType(Resource):
 
 class AttributesFormatCount(Resource):
     def get(self, att_format):
-        attributes_result = models.Attributes.query \
-                .with_entities(func.sum(models.Attributes.att_count).label('c')) \
-                .group_by(models.Attributes.att_format) \
-                .filter(models.Attributes.att_format == att_format)
+        attributes_result = Datatable.query \
+                .with_entities(func.sum(Datatable.att_count).label('c')) \
+                .group_by(Datatable.att_format) \
+                .filter(Datatable.att_format == att_format)
 
         return jsonify(attributes_result[0].c)
 
 class AttributesFormatTypeCount(Resource):
     def get(self, att_format, att_type):
-        return get_from_db(att_format, att_type, models.Attributes.att_count)
+        return get_from_db(att_format, att_type, Datatable.att_count)
 
 class AttributesIntervalUnit(Resource):
     def get(self):
@@ -108,17 +108,17 @@ class AttributesSizeUnit(Resource):
 
 class AttributesInterval(Resource):
     def get(self, att_format, att_type):
-        return get_from_db(att_format, att_type, models.Attributes.att_interval)
+        return get_from_db(att_format, att_type, Datatable.att_interval)
 
 class AttributesRowCount(Resource):
     def get(self, att_format, att_type):
-        return get_from_db(att_format, att_type, models.Attributes.att_row_count)
+        return get_from_db(att_format, att_type, Datatable.att_row_count)
 
 class AttributesSize(Resource):
     def get(self, att_format, att_type):
-        return get_from_db(att_format, att_type, models.Attributes.att_size)
+        return get_from_db(att_format, att_type, Datatable.att_size)
 
 class AttributesCurrentSize(Resource):
     def get(self, att_format, att_type):
-        return get_from_db(att_format, att_type, models.Attributes.att_current_chunk_size)
+        return get_from_db(att_format, att_type, Datatable.att_current_chunk_size)
 
