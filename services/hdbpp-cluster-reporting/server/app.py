@@ -264,7 +264,7 @@ def main():
     app = create_app(mode)
 
     from server.models import Servers
-    from server.models import Attributes
+    from server.models import Datatable
     from server.models import Database
     db.app = app
     db.init_app(app)

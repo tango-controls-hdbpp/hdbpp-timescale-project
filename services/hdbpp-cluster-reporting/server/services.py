@@ -31,7 +31,7 @@ import server.config as config
 from server import db as db
 from server.models import Servers
 from server.models import Database
-from server.models import Attributes
+from server.models import Datatable
 from apscheduler.schedulers.background import BackgroundScheduler
 
 logger = logging.getLogger(config.LOGGER_NAME)
@@ -171,7 +171,7 @@ def update_database_info(configuration):
 
         for attribute in attributes:
             logger.debug("Updating parameter type {} and format {} to count: {}".format(attribute[0],attribute[1],attribute[2]))
-            db.session.query(Attributes).filter(Attributes.att_format == attribute[1], Attributes.att_type == attribute[0]).update({"att_count":attribute[2]})
+            db.session.query(Datatable).filter(Datatable.att_format == attribute[1], Datatable.att_type == attribute[0]).update({"att_count":attribute[2]})
         
         db.session.commit()
 
@@ -199,7 +199,7 @@ def update_database_info(configuration):
                               "\n  Table size: {}"
                               "\n  Last chunk size: {}").format(att_type, att_format, interval, rows, table_size, chunk_size))
                 
-                db.session.query(Attributes).filter(Attributes.att_format == att_format, Attributes.att_type == att_type) \
+                db.session.query(Datatable).filter(Datatable.att_format == att_format, Datatable.att_type == att_type) \
                         .update({"att_row_count":rows, "att_interval":interval, "att_size":table_size, "att_current_chunk_size":chunk_size})
 
         db.session.commit()
@@ -235,13 +235,13 @@ def init_services(configuration):
     db.session.commit()
 
     # clear the attributes db
-    db.session.query(Attributes).delete()
+    db.session.query(Datatable).delete()
     db.session.commit()
 
     # add the defaults
     for fmt in config.DB_FORMAT:
         for typ in config.DB_TYPES:
-            att = Attributes(fmt, typ)
+            att = Datatable(fmt, typ)
             db.session.add(att)
             db.session.commit()
 

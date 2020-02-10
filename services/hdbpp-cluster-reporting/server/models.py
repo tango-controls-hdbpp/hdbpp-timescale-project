@@ -49,16 +49,16 @@ class Servers(db.Model):
     def __repr__(self):
         return "<Server %r" % self.hostname
 
-class Attributes(db.Model):
+class Datatable(db.Model):
     """
-    Represents information about the attributes in the database
+    Represents information about a datatable of the database
 
     Attributes
     ----------
     att_type : str
-        type of the attribute
+        type of the attributes from this table
     att_format : str
-        format of the attribute (Scalar or Spectrum)
+        format of the attributes (Scalar or Spectrum)
     att_count : int
         Number of attributes with this format and type
     att_row_count : int
@@ -70,7 +70,7 @@ class Attributes(db.Model):
     att_interval : int
         Interval for the chunks, in microseconds, for this format and type
     """
-    __tablename__ = 'Attributes'
+    __tablename__ = 'Datatable'
     att_type = db.Column(db.String(), nullable=False, primary_key=True)
     att_format = db.Column(db.String(), nullable=False, primary_key=True)
     att_count = db.Column(db.Integer, nullable=False)
@@ -89,7 +89,7 @@ class Attributes(db.Model):
         self.att_interval = 0
 
     def __repr__(self):
-        return "<Attributes %r.%r>" % self.att_format, self.att_type
+        return "<Data table %r.%r>" % self.att_format, self.att_type
 
 class Database(db.Model):
     """
