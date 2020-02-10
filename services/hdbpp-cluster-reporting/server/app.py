@@ -20,7 +20,6 @@
 # -----------------------------------------------------------------------------
 
 import os
-import sys
 import logging
 import argparse
 import yaml
@@ -29,7 +28,11 @@ import server.config as config
 import server.services as services
 import server.routes.status as status_endpoint
 import server.routes.servers as servers_endpoint
+import server.routes.attributes as attributes_endpoint
+import server.routes.database as database_endpoint
 
+from server.errors import InvalidUsage
+from server.errors import handle_error 
 from server import db
 from flask import Flask
 from flask_restplus import Api, Resource
@@ -93,7 +96,7 @@ def load_config(config_file):
         config_file : str -- Path and name of the config file to load
 
     Returns:
-        dict -- dictionary of values from the yaml config file. 
+        dict -- dictionary of values from the yaml config file.
     """
 
     with open(config_file, 'r') as fp:
@@ -134,6 +137,21 @@ def set_config_defaults(configuration):
     
     if configuration["cluster"]["patroni_port"] == None:
         configuration["cluster"]["patroni_port"] = 8008
+
+    if configuration["database"]["user"] == None:
+        configuration["database"]["user"] = "postgres"
+
+    if configuration["database"]["password"] == None:
+        configuration["database"]["password"] = "password"
+    
+    if configuration["database"]["port"] == None:
+        configuration["database"]["port"] = 5432
+    
+    if configuration["database"]["database"] == None:
+        configuration["database"]["database"] = "hdb"
+    
+    if configuration["database"]["update_interval"] == None:
+        configuration["database"]["update_interval"] = 600
 
 def config_logging(args):
     """
@@ -176,6 +194,8 @@ def create_app(config_name):
     app.config.from_object(config.config_by_name[config_name])
     app.app_context().push()
 
+    app.register_error_handler(InvalidUsage, handle_error)
+
     app.register_blueprint(blueprint, url_prefix='/api/v1')
 
     # create the routes
@@ -185,6 +205,24 @@ def create_app(config_name):
     api.add_resource(servers_endpoint.Server, '/servers/server/<string:host>')
     api.add_resource(servers_endpoint.ServerState, '/servers/server/state/<string:host>')
     api.add_resource(servers_endpoint.ServerRole, '/servers/server/role/<string:host>')
+
+    api.add_resource(attributes_endpoint.AttributesType, '/database/attributes/type')
+    api.add_resource(attributes_endpoint.AttributesFormat, '/database/attributes/format')
+    api.add_resource(attributes_endpoint.AttributesCount, '/database/attributes/count')
+    api.add_resource(attributes_endpoint.AttributesTypeOrFormatCount, '/database/attributes/count/<string:att_info>')
+    api.add_resource(attributes_endpoint.AttributesFormatTypeCount, '/database/attributes/count/<string:att_format>/<string:att_type>')
+    
+    api.add_resource(attributes_endpoint.AttributesRowCount, '/database/tables/row_count/<string:att_format>/<string:att_type>')
+    api.add_resource(attributes_endpoint.AttributesInterval, '/database/tables/interval/<string:att_format>/<string:att_type>')
+    api.add_resource(attributes_endpoint.AttributesIntervalUnit, '/database/tables/interval/unit')
+    api.add_resource(attributes_endpoint.AttributesSize, '/database/tables/size/<string:att_format>/<string:att_type>')
+    api.add_resource(attributes_endpoint.AttributesSizeUnit, '/database/tables/size/unit')
+    api.add_resource(attributes_endpoint.AttributesCurrentSize, '/database/tables/current_size/<string:att_format>/<string:att_type>')
+    api.add_resource(attributes_endpoint.AttributesSizeUnit, '/database/tables/current_size/unit')
+    
+    api.add_resource(database_endpoint.Databases, '/databases')
+    api.add_resource(database_endpoint.DatabaseSize, '/database/size/<string:db_name>')
+    api.add_resource(database_endpoint.DatabaseSizeUnit, '/database/size/unit')
 
     return app
 
@@ -226,6 +264,8 @@ def main():
     app = create_app(mode)
 
     from server.models import Servers
+    from server.models import Datatable
+    from server.models import Database
     db.app = app
     db.init_app(app)
     db.create_all()
