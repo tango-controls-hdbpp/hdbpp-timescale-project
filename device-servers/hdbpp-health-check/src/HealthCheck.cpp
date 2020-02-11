@@ -75,7 +75,7 @@ std::tuple<HealthCheck::HealthCheckResult, std::string> HealthCheck::check_hosts
         // Retrieve the error message if there is any
 	std::string error_message;
 	if (document.HasMember("message") && document["message"].IsString())
-            error_message = "\n" + document["message"];
+            error_message = "\n" + std::string(document["message"].GetString());
 	
         else
             error_message = "";
