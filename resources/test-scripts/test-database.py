@@ -209,6 +209,14 @@ def insert_events(cursor, att_id, type, format, write, num_data, span):
     """
     Insert an event for an attribute
     """
+    start_time = datetime.now() - timedelta(days=span)
+    increment = timedelta(days=span) / num_data
+    insert_events(cursor, att_id, type, format, write, num_data, span, start_time)
+
+def insert_events(cursor, att_id, type, format, write, num_data, span, timestamp, increment):
+    """
+    Insert an event for an attribute
+    """
     data_requested = 1
 
     # for array data, the array is randomly sized for each entry between 2
@@ -226,10 +234,6 @@ def insert_events(cursor, att_id, type, format, write, num_data, span):
 
     if write is 2 or write is 3:
         value_w = data
-
-    start_time = datetime.now() - timedelta(days=span)
-    increment = timedelta(days=span) / num_data
-    timestamp = start_time
 
     for _ in range(num_data):
 
@@ -379,7 +383,7 @@ def run_data_command(args):
 
         # attempt to connect to the server
         connection = psycopg2.connect(args.connect)
-        connection.autocommit = True
+        connection.autocommit = False
 
         if verbose:
             print("Connected to database at server")
@@ -403,19 +407,22 @@ def run_data_command(args):
     count = 0
 
     # when infinite, must be ctrl-c to kill
-    while count < args.events:
+    while args.events == 0 or count < args.events:
 
         if verbose:
             print("Generating event data")
 
+        start_time = datetime.now() - timedelta(days=0)
+        increment = timedelta(days=0)
+
         # insert some data for each attribute
         for attribute in attributes:
-            insert_events(cursor, attribute[0], db_types[attribute[1]], db_formats[attribute[2]], db_write[attribute[3]], 1, 0)
+            insert_events(cursor, attribute[0], db_types[attribute[1]], db_formats[attribute[2]], db_write[attribute[3]], 1, 0, start_time, increment)
 
         time.sleep(args.interval)
 
-        if args.events != 0:
-            count = count + 1
+        count = count + 1
+        connection.commit()
 
     connection.commit()
     cursor.close()
@@ -445,7 +452,7 @@ def main():
     parser_new_db.set_defaults(func=run_new_db_command)
 
     parser_data = subparsers.add_parser("data", help="write data to the database at intervals")
-    parser_data.add_argument("--interval", metavar="SECONDS", default=5, type=int, help="write data to the database every x seconds (default 5)")
+    parser_data.add_argument("--interval", metavar="SECONDS", default=5, type=float, help="write data to the database every x seconds (default 5)")
     parser_data.add_argument("--events", metavar="NUM", default=0, type=int, help="number of events, 0 for infinite (default 0)")
     parser_data.set_defaults(func=run_data_command)
 
