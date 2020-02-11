@@ -72,19 +72,27 @@ std::tuple<HealthCheck::HealthCheckResult, std::string> HealthCheck::check_hosts
         if (!document.IsObject() || !document["state"].IsString() || document.HasMember("state"))
             return std::make_tuple(HealthCheckResult::ConnectionProblem, invalid_response);
 
+        // Retrieve the error message if there is any
+	std::string error_message;
+	if (document.HasMember("message") && document["message"].IsString())
+            error_message = "\n" + document["message"];
+	
+        else
+            error_message = "";
+
         // get a valid reponse, now check the cluster
         if (document["state"] == "Ok")
-            return std::make_tuple(HealthCheckResult::Ok, server_no_errors);
+            return std::make_tuple(HealthCheckResult::Ok, server_no_errors + error_message);
 
         else if (document["state"] == "Warning")
-            return std::make_tuple(HealthCheckResult::Warning, server_warning);
+            return std::make_tuple(HealthCheckResult::Warning, server_warning + error_message);
 
         else if (document["state"] == "Error") 
-            return std::make_tuple(HealthCheckResult::Error, server_error);
+            return std::make_tuple(HealthCheckResult::Error, server_error + error_message);
 
         else
             return std::make_tuple(
-                HealthCheckResult::ConnectionProblem, "Unable to understand database cluster host state, please fix so state can be reported.");
+                HealthCheckResult::ConnectionProblem, server_bad_response + error_message);
     }
 
     return std::make_tuple(HealthCheckResult::ConnectionProblem, no_reponse);
