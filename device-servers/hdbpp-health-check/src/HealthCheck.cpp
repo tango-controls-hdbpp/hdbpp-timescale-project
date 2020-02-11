@@ -69,7 +69,7 @@ std::tuple<HealthCheck::HealthCheckResult, std::string> HealthCheck::check_hosts
         rapidjson::Document document;
         document.Parse(result->body.c_str());
 
-        if (!document.IsObject() || !document["state"].IsString() || document.HasMember("state"))
+        if (!document.IsObject() || !document.HasMember("state") || !document["state"].IsString())
             return std::make_tuple(HealthCheckResult::ConnectionProblem, invalid_response);
 
         // Retrieve the error message if there is any

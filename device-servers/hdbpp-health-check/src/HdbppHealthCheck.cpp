@@ -354,7 +354,7 @@ void HdbppHealthCheck::health_check_thread()
 
             // check if the result is anything but an ok, if its not we change the
             // state of the server
-            if (!std::get<0>(result) == HealthCheck::HealthCheckResult::Ok)
+            if (std::get<0>(result) == HealthCheck::HealthCheckResult::Ok)
             {
                 set_status("No problems");
                 set_state(Tango::ON);
