@@ -15,3 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 * Updated create-test-database help display.
 * Added a CMake project build system that can build all required elements for deployment.
+
+### Changed [hdbpp-timescale-docker]
+
+* Updated to TimescaleDB version 1.6

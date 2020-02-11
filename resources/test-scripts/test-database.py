@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # This quick and dirty script will insert random attributes with random data into the HDB
-# database. The data inserted is basic and a poor representation of the possible range of 
+# database. The data inserted is basic and a poor representation of the possible range of
 # each tango type, rather its use is to provide a database to run tests against.
 #
 # The script can be refined for better data in future.
@@ -10,6 +10,7 @@ import argparse
 import psycopg2
 import random
 import string
+import time
 
 from datetime import datetime
 from datetime import timedelta
@@ -17,13 +18,13 @@ from random import randint
 
 verbose = False
 
-# following dicts are lookup tables to build the correct table name in the database
+# following dicts are lookup tables
 types = {
     1: "devboolean",
     2: "devshort",
     3: "devlong",
-    4: "devdouble",
-    5: "devfloat",
+    4: "devfloat",
+    5: "devdouble",
     6: "devushort",
     7: "devulong",
     8: "devstring",
@@ -32,7 +33,7 @@ types = {
     23: "devlong64",
     24: "devulong64",
     28: "devencoded",
-    30: "devenum",
+    29: "devenum",
 }
 
 format_types = {0: "scalar", 1: "array", 2: "image"}
@@ -48,6 +49,17 @@ write_numbers = [0, 1, 2, 3]
 # queries etc, we just use this as a postfix
 idx_postfix = "_att_conf_id_data_time_idx"
 
+
+# used to convert att data back for reuse when generating events
+
+db_types = {
+    "DEV_BOOLEAN": 1, "DEV_SHORT": 2,
+    "DEV_LONG": 3, "DEV_FLOAT": 4, "DEV_DOUBLE": 5, "DEV_USHORT": 6, "DEV_ULONG": 7, "DEV_STRING": 8,
+    "DEV_STATE": 19, "DEV_UCHAR": 22, "DEV_LONG64": 23, "DEV_ULONG64": 24, "DEV_ENCODED": 28, "DEV_ENUM": 29,
+}
+
+db_formats = {"SCALAR": 0, "SPECTRUM": 1, "IMAGE": 2}
+db_write = {"READ": 0, "READ_WITH_WRITE": 1, "WRITE": 2, "READ_WRITE": 3}
 
 def random_string(len=10):
     """
@@ -69,12 +81,12 @@ def store_attribute_query():
     Query to store an attribute in the database, returns the id so data can be added
     """
     query = (
-        "INSERT INTO att_conf " +
-        "(att_name, att_conf_type_id, att_conf_format_id, att_conf_write_id, table_name, cs_name, domain, family, member, name, hide, ttl)" +
-        "(SELECT %s,att_conf_type_id,att_conf_format_id,att_conf_write_id,%s,%s,%s,%s,%s,%s,%s,%s " +
-        "FROM att_conf_type, att_conf_format, att_conf_write " +
-        "WHERE att_conf_type.type_num = %s AND att_conf_format.format_num = %s AND att_conf_write.write_num = %s) " +
-        "RETURNING att_conf_id"
+        "INSERT INTO att_conf "
+        + "(att_name, att_conf_type_id, att_conf_format_id, att_conf_write_id, table_name, cs_name, domain, family, member, name, hide, ttl)"
+        + "(SELECT %s,att_conf_type_id,att_conf_format_id,att_conf_write_id,%s,%s,%s,%s,%s,%s,%s,%s "
+        + "FROM att_conf_type, att_conf_format, att_conf_write "
+        + "WHERE att_conf_type.type_num = %s AND att_conf_format.format_num = %s AND att_conf_write.write_num = %s) "
+        + "RETURNING att_conf_id"
     )
 
     return query
@@ -85,11 +97,11 @@ def store_data_query(type, format, write):
     Query to store data in the database, using a given id from the store attribute query
     """
     query = (
-        "INSERT INTO " +
-        table_name(type, format) +
-        " (att_conf_id, data_time" +
-        ",value_r, value_w" +
-        ",quality) VALUES (%s,%s,%s,%s,%s)"
+        "INSERT INTO "
+        + table_name(type, format)
+        + " (att_conf_id, data_time"
+        + ",value_r, value_w"
+        + ",quality) VALUES (%s,%s,%s,%s,%s)"
     )
 
     return query
@@ -100,9 +112,23 @@ def store_data_error_query(table_name):
     Query to store some error data in the database
     """
     query = (
-        "INSERT INTO " +
-        table_name +
-        " (att_conf_id, data_time,quality) VALUES (%s,TO_TIMESTAMP(%s),%s)"
+        "INSERT INTO "
+        + table_name
+        + " (att_conf_id, data_time,quality) VALUES (%s,TO_TIMESTAMP(%s),%s)"
+    )
+
+    return query
+
+
+def select_att_conf_query():
+    """
+    Query to select all attributes in the att conf table    
+    """
+    query = (
+        "SELECT att_conf_id, " \
+            "(SELECT type FROM att_conf_type WHERE att_conf_type_id = a.att_conf_type_id), " \
+            "(SELECT format FROM att_conf_format WHERE att_conf_format_id = a.att_conf_format_id), " \
+            "(SELECT write FROM att_conf_write WHERE att_conf_write_id = a.att_conf_write_id) FROM att_conf a"
     )
 
     return query
@@ -119,7 +145,6 @@ def data(type, data_requested):
     """
     Create noddy random data for each type
     """
-
     result = []
 
     for _ in range(data_requested):
@@ -162,9 +187,11 @@ def data(type, data_requested):
         elif type is 24:
             result.append(randint(0, 10000))
 
-        # elif type is 28:
+        elif type is 28:
+            raise Exception("Unsupported type - Encoded")
 
-        # elif type is 30:
+        elif type is 9:
+            raise Exception("Unsupported type - Enum")
 
     # for a scalar, the requested number is 1, so return the actual value
     # to be stored in te data tables, in the case of an array the list is returned
@@ -178,10 +205,45 @@ def data(type, data_requested):
     return result
 
 
+def insert_events(cursor, att_id, type, format, write, num_data, span):
+    """
+    Insert an event for an attribute
+    """
+    data_requested = 1
+
+    # for array data, the array is randomly sized for each entry between 2
+    # and 1024
+    if format is 1:
+        data_requested = randint(2, 1024)
+
+    # each value initially raised no data, we then check below for the
+    # write type, and if required, assign the data generator
+    value_r = no_data
+    value_w = no_data
+
+    if write is 0 or write is 1:
+        value_r = data
+
+    if write is 2 or write is 3:
+        value_w = data
+
+    start_time = datetime.now() - timedelta(days=span)
+    increment = timedelta(days=span) / num_data
+    timestamp = start_time
+
+    for _ in range(num_data):
+
+        # store the data
+        cursor.execute(store_data_query(type, format, write),
+                       (att_id, timestamp, value_r(type, data_requested), value_w(type, data_requested), 1))
+
+        timestamp = timestamp + increment
+
+
 def generate_attributes(connection, num_attrs, num_data, type, format, write, span, ttl):
     """
     Generate an attribute and its data for the given type info. The number of times the
-    attribute is created is multipled by num_attrs, and each generated attribute creates
+    attribute is created is multiplied by num_attrs, and each generated attribute creates
     num_data data entries
     """
 
@@ -207,38 +269,10 @@ def generate_attributes(connection, num_attrs, num_data, type, format, write, sp
         # fetch the id created for the attribute, this will be used in the data table
         att_id = cursor.fetchone()[0]
 
-        data_requested = 1
-
-        # for array data, the array is randomly sized for each entry between 2
-        # and 1024
-        if format is 1:
-            data_requested = randint(2, 1024)
-
-        # each value initially raised no data, we then check below for the
-        # write type, and if required, assign the data generator
-        value_r = no_data
-        value_w = no_data
-
-        if write is 0 or write is 1:
-            value_r = data
-
-        if write is 2 or write is 3:
-            value_w = data
-
         if verbose:
             print("Inserting {} data items for attribute: {}".format(num_data, fqdn_attr_name))
 
-        start_time = datetime.now() - timedelta(days=span)
-        increment = timedelta(days=span) / num_data
-        timestamp = start_time
-
-        for _ in range(num_data):
-
-            # store the data
-            cursor.execute(store_data_query(type, format, write),
-                           (att_id, timestamp, value_r(type, data_requested), value_w(type, data_requested), 1))
-
-            timestamp = timestamp + increment
+        insert_events(cursor, att_id, type, format, write, num_data, span)
 
         connection.commit()
         cursor.close()
@@ -287,7 +321,7 @@ def truncate_tables(connection):
     cursor.close()
 
 
-def run_command(args):
+def run_new_db_command(args):
     """
     Handler for argparse
     """
@@ -295,7 +329,7 @@ def run_command(args):
     # first attempt to open a connection to the database
     try:
         if verbose:
-            print("Attempting to connect to server")
+            print("Attempting to connect to server. Connect: {}".format(args.connect))
 
         # attempt to connect to the server
         connection = psycopg2.connect(args.connect)
@@ -333,8 +367,63 @@ def run_command(args):
     return True
 
 
+def run_data_command(args):
+    """
+    Handler for argparse
+    """
+
+    # first attempt to open a connection to the database
+    try:
+        if verbose:
+            print("Attempting to connect to server. Connect: {}".format(args.connect))
+
+        # attempt to connect to the server
+        connection = psycopg2.connect(args.connect)
+        connection.autocommit = True
+
+        if verbose:
+            print("Connected to database at server")
+
+    except (Exception, psycopg2.Error) as error:
+        print("Error: {}".format(error))
+        return False
+
+    # grab all the existing attributes
+    cursor = connection.cursor()
+
+    if verbose:
+        print("Fetching attributes")
+
+    cursor.execute(select_att_conf_query())
+    attributes = cursor.fetchall()
+
+    if verbose:
+        print("Fetched {} attributes(s)".format(len(attributes)))
+
+    count = 0
+
+    # when infinite, must be ctrl-c to kill
+    while count < args.events:
+
+        if verbose:
+            print("Generating event data")
+
+        # insert some data for each attribute
+        for attribute in attributes:
+            insert_events(cursor, attribute[0], db_types[attribute[1]], db_formats[attribute[2]], db_write[attribute[3]], 1, 0)
+
+        time.sleep(args.interval)
+
+        if args.events != 0:
+            count = count + 1
+
+    connection.commit()
+    cursor.close()
+
+    return True
+
 def main():
-    parser = argparse.ArgumentParser(description="Create random test data in the hdb database")
+    parser = argparse.ArgumentParser(description="Create and simulate random test data in the hdb database")
     parser.add_argument("-v", "--verbose", action="store_true", help="verbose execution")
 
     parser.add_argument(
@@ -345,18 +434,25 @@ def main():
         help="connect string (default user=postgres password=password host=localhost port=5432 dbname=hdb)"
     )
 
-    parser.add_argument("--num-attr", metavar="NUM", default=100, type=int, help="number of attributes to insert per type (default 100)")
-    parser.add_argument("--num-data", metavar="NUM", default=100, type=int, help="number of data items to insert per attribute (default 100)")
-    parser.add_argument("--span", metavar="DAYS", default=0, type=int, help="number of days in the past to spread the events over (default 1)")
-    parser.add_argument("--ttl", metavar="DAYS", default=0, help="ttl to give the data")
-    parser.add_argument("--truncate", action="store_true", help="truncate all tables first")
+    subparsers = parser.add_subparsers(title="available commands", metavar="mode")
 
-    parser.set_defaults(func=run_command)
+    parser_new_db = subparsers.add_parser("db", help="create/load random data into the database")
+    parser_new_db.add_argument("--num-attr", metavar="NUM", default=100, type=int, help="number of attributes to insert per type (default 100)")
+    parser_new_db.add_argument("--num-data", metavar="NUM", default=100, type=int, help="number of data items to insert per attribute (default 100)")
+    parser_new_db.add_argument("--span", metavar="DAYS", default=0, type=int, help="number of days in the past to spread the events over (default 1)")
+    parser_new_db.add_argument("--ttl", metavar="DAYS", default=0, help="ttl to give the data")
+    parser_new_db.add_argument("--truncate", action="store_true", help="truncate all tables first")
+    parser_new_db.set_defaults(func=run_new_db_command)
+
+    parser_data = subparsers.add_parser("data", help="write data to the database at intervals")
+    parser_data.add_argument("--interval", metavar="SECONDS", default=5, type=int, help="write data to the database every x seconds (default 5)")
+    parser_data.add_argument("--events", metavar="NUM", default=0, type=int, help="number of events, 0 for infinite (default 0)")
+    parser_data.set_defaults(func=run_data_command)
+
     args = parser.parse_args()
 
-    if args.verbose:
-        global verbose
-        verbose = True
+    global verbose
+    verbose = args.verbose
 
     return args.func(args)
 
