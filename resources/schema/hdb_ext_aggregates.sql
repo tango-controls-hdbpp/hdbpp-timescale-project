@@ -30,7 +30,9 @@ CREATE VIEW cagg_scalar_devdouble_1min(
        	AS SELECT att_conf_id, time_bucket('1 min', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devdouble GROUP BY time_bucket('1 min', data_time), att_conf_id;
+       	FROM att_scalar_devdouble
+       	        WHERE data_time > now() - interval '1 year'
+        GROUP BY time_bucket('1 min', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devdouble_10min(
 		att_conf_id, data_time, count_rows, count_errors
@@ -40,7 +42,9 @@ CREATE VIEW cagg_scalar_devdouble_10min(
        	AS SELECT att_conf_id, time_bucket('10 mins', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devdouble GROUP BY time_bucket('10 mins', data_time), att_conf_id;
+       	FROM att_scalar_devdouble
+                WHERE data_time > now() - interval '1 year'
+        GROUP BY time_bucket('10 mins', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devdouble_1hour(
 		att_conf_id, data_time, count_rows, count_errors
@@ -50,7 +54,9 @@ CREATE VIEW cagg_scalar_devdouble_1hour(
        	AS SELECT att_conf_id, time_bucket('1 hour', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devdouble GROUP BY time_bucket('1 hour', data_time), att_conf_id;
+       	FROM att_scalar_devdouble 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('1 hour', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devdouble_8hour(
 		att_conf_id, data_time, count_rows, count_errors
@@ -60,7 +66,9 @@ CREATE VIEW cagg_scalar_devdouble_8hour(
        	AS SELECT att_conf_id, time_bucket('8 hours', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devdouble GROUP BY time_bucket('8 hours', data_time), att_conf_id;
+       	FROM att_scalar_devdouble 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('8 hours', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devdouble_1day(
 		att_conf_id, data_time, count_rows, count_errors
@@ -70,7 +78,9 @@ CREATE VIEW cagg_scalar_devdouble_1day(
        	AS SELECT att_conf_id, time_bucket('1 day', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devdouble GROUP BY time_bucket('1 day', data_time), att_conf_id;
+       	FROM att_scalar_devdouble 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('1 day', data_time), att_conf_id;
 
 -- Float attributes
 CREATE VIEW cagg_scalar_devfloat_1min(
@@ -81,7 +91,9 @@ CREATE VIEW cagg_scalar_devfloat_1min(
        	AS SELECT att_conf_id, time_bucket('1 min', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devfloat GROUP BY time_bucket('1 min', data_time), att_conf_id;
+       	FROM att_scalar_devfloat 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('1 min', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devfloat_10min(
 		att_conf_id, data_time, count_rows, count_errors
@@ -91,7 +103,9 @@ CREATE VIEW cagg_scalar_devfloat_10min(
        	AS SELECT att_conf_id, time_bucket('10 mins', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devfloat GROUP BY time_bucket('10 mins', data_time), att_conf_id;
+       	FROM att_scalar_devfloat 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('10 mins', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devfloat_1hour(
 		att_conf_id, data_time, count_rows, count_errors
@@ -101,7 +115,9 @@ CREATE VIEW cagg_scalar_devfloat_1hour(
        	AS SELECT att_conf_id, time_bucket('1 hour', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devfloat GROUP BY time_bucket('1 hour', data_time), att_conf_id;
+       	FROM att_scalar_devfloat 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('1 hour', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devfloat_8hour(
 		att_conf_id, data_time, count_rows, count_errors
@@ -111,7 +127,9 @@ CREATE VIEW cagg_scalar_devfloat_8hour(
        	AS SELECT att_conf_id, time_bucket('8 hours', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devfloat GROUP BY time_bucket('8 hours', data_time), att_conf_id;
+       	FROM att_scalar_devfloat 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('8 hours', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devfloat_1day(
 		att_conf_id, data_time, count_rows, count_errors
@@ -121,7 +139,9 @@ CREATE VIEW cagg_scalar_devfloat_1day(
        	AS SELECT att_conf_id, time_bucket('1 day', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devfloat GROUP BY time_bucket('8 hours', data_time), att_conf_id;
+       	FROM att_scalar_devfloat 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('8 hours', data_time), att_conf_id;
 
 -- Long Attributes
 CREATE VIEW cagg_scalar_devlong_1min(
@@ -132,7 +152,9 @@ CREATE VIEW cagg_scalar_devlong_1min(
        	AS SELECT att_conf_id, time_bucket('1 min', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devlong GROUP BY time_bucket('1 min', data_time), att_conf_id;
+       	FROM att_scalar_devlong         
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('1 min', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devlong_10min(
 		att_conf_id, data_time, count_rows, count_errors
@@ -142,7 +164,9 @@ CREATE VIEW cagg_scalar_devlong_10min(
        	AS SELECT att_conf_id, time_bucket('10 mins', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devlong GROUP BY time_bucket('10 mins', data_time), att_conf_id;
+       	FROM att_scalar_devlong 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('10 mins', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devlong_1hour(
 		att_conf_id, data_time, count_rows, count_errors
@@ -152,7 +176,9 @@ CREATE VIEW cagg_scalar_devlong_1hour(
        	AS SELECT att_conf_id, time_bucket('1 hour', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devlong GROUP BY time_bucket('1 hour', data_time), att_conf_id;
+       	FROM att_scalar_devlong 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('1 hour', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devlong_8hour(
 		att_conf_id, data_time, count_rows, count_errors
@@ -162,7 +188,9 @@ CREATE VIEW cagg_scalar_devlong_8hour(
        	AS SELECT att_conf_id, time_bucket('8 hours', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devlong GROUP BY time_bucket('8 hours', data_time), att_conf_id;
+       	FROM att_scalar_devlong 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('8 hours', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devlong_1day(
 		att_conf_id, data_time, count_rows, count_errors
@@ -172,7 +200,9 @@ CREATE VIEW cagg_scalar_devlong_1day(
        	AS SELECT att_conf_id, time_bucket('1 day', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devlong GROUP BY time_bucket('1 day', data_time), att_conf_id;
+       	FROM att_scalar_devlong 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('1 day', data_time), att_conf_id;
 
 -- Long 64 attributes
 CREATE VIEW cagg_scalar_devlong64_1min(
@@ -183,7 +213,9 @@ CREATE VIEW cagg_scalar_devlong64_1min(
        	AS SELECT att_conf_id, time_bucket('1 min', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devlong64 GROUP BY time_bucket('1 min', data_time), att_conf_id;
+       	FROM att_scalar_devlong64 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('1 min', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devlong64_10min(
 		att_conf_id, data_time, count_rows, count_errors
@@ -193,7 +225,9 @@ CREATE VIEW cagg_scalar_devlong64_10min(
        	AS SELECT att_conf_id, time_bucket('10 mins', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devlong64 GROUP BY time_bucket('10 mins', data_time), att_conf_id;
+       	FROM att_scalar_devlong64 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('10 mins', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devlong64_1hour(
 		att_conf_id, data_time, count_rows, count_errors
@@ -203,7 +237,9 @@ CREATE VIEW cagg_scalar_devlong64_1hour(
        	AS SELECT att_conf_id, time_bucket('1 hour', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devlong64 GROUP BY time_bucket('1 hour', data_time), att_conf_id;
+       	FROM att_scalar_devlong64 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('1 hour', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devlong64_8hour(
 		att_conf_id, data_time, count_rows, count_errors
@@ -213,7 +249,9 @@ CREATE VIEW cagg_scalar_devlong64_8hour(
        	AS SELECT att_conf_id, time_bucket('8 hours', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devlong64 GROUP BY time_bucket('8 hours', data_time), att_conf_id;
+       	FROM att_scalar_devlong64 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('8 hours', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devlong64_1day(
 		att_conf_id, data_time, count_rows, count_errors
@@ -223,7 +261,9 @@ CREATE VIEW cagg_scalar_devlong64_1day(
        	AS SELECT att_conf_id, time_bucket('1 day', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devlong64 GROUP BY time_bucket('1 hour', data_time), att_conf_id;
+       	FROM att_scalar_devlong64 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('1 hour', data_time), att_conf_id;
 
 -- Short attributes
 CREATE VIEW cagg_scalar_devshort_1min(
@@ -234,7 +274,9 @@ CREATE VIEW cagg_scalar_devshort_1min(
        	AS SELECT att_conf_id, time_bucket('1 min', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devshort GROUP BY time_bucket('1 min', data_time), att_conf_id;
+       	FROM att_scalar_devshort 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('1 min', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devshort_10min(
 		att_conf_id, data_time, count_rows, count_errors
@@ -244,7 +286,9 @@ CREATE VIEW cagg_scalar_devshort_10min(
        	AS SELECT att_conf_id, time_bucket('10 mins', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devshort GROUP BY time_bucket('10 mins', data_time), att_conf_id;
+       	FROM att_scalar_devshort 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('10 mins', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devshort_1hour(
 		att_conf_id, data_time, count_rows, count_errors
@@ -254,7 +298,9 @@ CREATE VIEW cagg_scalar_devshort_1hour(
        	AS SELECT att_conf_id, time_bucket('1 hour', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devshort GROUP BY time_bucket('1 hour', data_time), att_conf_id;
+       	FROM att_scalar_devshort 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('1 hour', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devshort_8hour(
 		att_conf_id, data_time, count_rows, count_errors
@@ -264,7 +310,9 @@ CREATE VIEW cagg_scalar_devshort_8hour(
        	AS SELECT att_conf_id, time_bucket('8 hours', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devshort GROUP BY time_bucket('8 hours', data_time), att_conf_id;
+       	FROM att_scalar_devshort 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('8 hours', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devshort_1day(
 		att_conf_id, data_time, count_rows, count_errors
@@ -274,7 +322,9 @@ CREATE VIEW cagg_scalar_devshort_1day(
        	AS SELECT att_conf_id, time_bucket('1 day', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devshort GROUP BY time_bucket('1 day', data_time), att_conf_id;
+       	FROM att_scalar_devshort 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('1 day', data_time), att_conf_id;
 
 -- Unsigned long attributes
 CREATE VIEW cagg_scalar_devulong_1min(
@@ -285,7 +335,9 @@ CREATE VIEW cagg_scalar_devulong_1min(
        	AS SELECT att_conf_id, time_bucket('1 min', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devulong GROUP BY time_bucket('1 min', data_time), att_conf_id;
+       	FROM att_scalar_devulong 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('1 min', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devulong_10min(
 		att_conf_id, data_time, count_rows, count_errors
@@ -295,7 +347,9 @@ CREATE VIEW cagg_scalar_devulong_10min(
        	AS SELECT att_conf_id, time_bucket('10 mins', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devulong GROUP BY time_bucket('10 mins', data_time), att_conf_id;
+       	FROM att_scalar_devulong 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('10 mins', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devulong_1hour(
 		att_conf_id, data_time, count_rows, count_errors
@@ -305,7 +359,9 @@ CREATE VIEW cagg_scalar_devulong_1hour(
        	AS SELECT att_conf_id, time_bucket('1 hour', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devulong GROUP BY time_bucket('1 hour', data_time), att_conf_id;
+       	FROM att_scalar_devulong 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('1 hour', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devulong_8hour(
 		att_conf_id, data_time, count_rows, count_errors
@@ -315,7 +371,9 @@ CREATE VIEW cagg_scalar_devulong_8hour(
        	AS SELECT att_conf_id, time_bucket('8 hours', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devulong GROUP BY time_bucket('8 hours', data_time), att_conf_id;
+       	FROM att_scalar_devulong 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('8 hours', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devulong_1day(
 		att_conf_id, data_time, count_rows, count_errors
@@ -325,7 +383,9 @@ CREATE VIEW cagg_scalar_devulong_1day(
        	AS SELECT att_conf_id, time_bucket('1 day', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devulong GROUP BY time_bucket('1 day', data_time), att_conf_id;
+       	FROM att_scalar_devulong 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('1 day', data_time), att_conf_id;
 
 -- Unsigned long 64 attributes
 CREATE VIEW cagg_scalar_devulong64_1min(
@@ -336,7 +396,9 @@ CREATE VIEW cagg_scalar_devulong64_1min(
        	AS SELECT att_conf_id, time_bucket('1 min', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devulong64 GROUP BY time_bucket('1 min', data_time), att_conf_id;
+       	FROM att_scalar_devulong64 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('1 min', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devulong64_10min(
 		att_conf_id, data_time, count_rows, count_errors
@@ -346,7 +408,9 @@ CREATE VIEW cagg_scalar_devulong64_10min(
        	AS SELECT att_conf_id, time_bucket('10 mins', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devulong64 GROUP BY time_bucket('10 mins', data_time), att_conf_id;
+       	FROM att_scalar_devulong64 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('10 mins', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devulong64_1hour(
 		att_conf_id, data_time, count_rows, count_errors
@@ -356,7 +420,9 @@ CREATE VIEW cagg_scalar_devulong64_1hour(
        	AS SELECT att_conf_id, time_bucket('1 hour', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devulong64 GROUP BY time_bucket('1 hour', data_time), att_conf_id;
+       	FROM att_scalar_devulong64 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('1 hour', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devulong64_8hour(
 		att_conf_id, data_time, count_rows, count_errors
@@ -366,7 +432,9 @@ CREATE VIEW cagg_scalar_devulong64_8hour(
        	AS SELECT att_conf_id, time_bucket('8 hours', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devulong64 GROUP BY time_bucket('8 hours', data_time), att_conf_id;
+       	FROM att_scalar_devulong64 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('8 hours', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devulong64_1day(
 		att_conf_id, data_time, count_rows, count_errors
@@ -376,7 +444,9 @@ CREATE VIEW cagg_scalar_devulong64_1day(
        	AS SELECT att_conf_id, time_bucket('1 day', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devulong64 GROUP BY time_bucket('1 day', data_time), att_conf_id;
+       	FROM att_scalar_devulong64 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('1 day', data_time), att_conf_id;
 
 -- Unsigned short attributes
 CREATE VIEW cagg_scalar_devushort_1min(
@@ -387,7 +457,9 @@ CREATE VIEW cagg_scalar_devushort_1min(
        	AS SELECT att_conf_id, time_bucket('1 min', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devushort GROUP BY time_bucket('1 min', data_time), att_conf_id;
+       	FROM att_scalar_devushort 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('1 min', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devushort_10min(
 		att_conf_id, data_time, count_rows, count_errors
@@ -397,7 +469,9 @@ CREATE VIEW cagg_scalar_devushort_10min(
        	AS SELECT att_conf_id, time_bucket('10 mins', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devushort GROUP BY time_bucket('10 mins', data_time), att_conf_id;
+       	FROM att_scalar_devushort 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('10 mins', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devushort_1hour(
 		att_conf_id, data_time, count_rows, count_errors
@@ -407,7 +481,9 @@ CREATE VIEW cagg_scalar_devushort_1hour(
        	AS SELECT att_conf_id, time_bucket('1 hour', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devushort GROUP BY time_bucket('1 hour', data_time), att_conf_id;
+       	FROM att_scalar_devushort 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('1 hour', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devushort_8hour(
 		att_conf_id, data_time, count_rows, count_errors
@@ -417,7 +493,9 @@ CREATE VIEW cagg_scalar_devushort_8hour(
        	AS SELECT att_conf_id, time_bucket('8 hours', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devushort GROUP BY time_bucket('8 hours', data_time), att_conf_id;
+       	FROM att_scalar_devushort 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('8 hours', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devushort_1day(
 		att_conf_id, data_time, count_rows, count_errors
@@ -427,4 +505,6 @@ CREATE VIEW cagg_scalar_devushort_1day(
        	AS SELECT att_conf_id, time_bucket('1 day', data_time), count(*), count(att_error_desc_id)
 		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
-       	FROM att_scalar_devushort GROUP BY time_bucket('1 day', data_time), att_conf_id;
+       	FROM att_scalar_devushort 
+                WHERE data_time > now() - interval '1 year' 
+        GROUP BY time_bucket('1 day', data_time), att_conf_id;
