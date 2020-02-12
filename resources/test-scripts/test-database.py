@@ -205,19 +205,18 @@ def data(type, data_requested):
     return result
 
 
-def insert_events(cursor, att_id, type, format, write, num_data, span):
-    """
-    Insert an event for an attribute
-    """
-    start_time = datetime.now() - timedelta(days=span)
-    increment = timedelta(days=span) / num_data
-    insert_events(cursor, att_id, type, format, write, num_data, span, start_time)
-
-def insert_events(cursor, att_id, type, format, write, num_data, span, timestamp, increment):
+def insert_events(cursor, att_id, type, format, write, num_data, span, timestamp=None, increment=None):
     """
     Insert an event for an attribute
     """
     data_requested = 1
+    
+    #Manage timestamp and increment if not provided
+    if timestamp is None:
+        timestamp = datetime.now() - timedelta(days=span)
+
+    if increment is None:
+        increment = timedelta(days=span) / num_data
 
     # for array data, the array is randomly sized for each entry between 2
     # and 1024
@@ -236,11 +235,11 @@ def insert_events(cursor, att_id, type, format, write, num_data, span, timestamp
         value_w = data
 
     for _ in range(num_data):
-
+        
         # store the data
         cursor.execute(store_data_query(type, format, write),
                        (att_id, timestamp, value_r(type, data_requested), value_w(type, data_requested), 1))
-
+        
         timestamp = timestamp + increment
 
 
@@ -253,6 +252,7 @@ def generate_attributes(connection, num_attrs, num_data, type, format, write, sp
 
     # because we have to have this...
     cs_name = "localhost:10000"
+    cursor = connection.cursor()
 
     for _ in range(num_attrs):
         domain = random_string(10)
@@ -261,7 +261,6 @@ def generate_attributes(connection, num_attrs, num_data, type, format, write, sp
         name = random_string(10)
         fqdn_attr_name = "tango://" + cs_name + "/" + domain + "/" + family + "/" + member + "/" + name
 
-        cursor = connection.cursor()
 
         if verbose:
             print("Inserting attribute: {} with traits: {}/{}/{}".format(fqdn_attr_name, type, format, write))
@@ -278,8 +277,8 @@ def generate_attributes(connection, num_attrs, num_data, type, format, write, sp
 
         insert_events(cursor, att_id, type, format, write, num_data, span)
 
-        connection.commit()
-        cursor.close()
+    connection.commit()
+    cursor.close()
 
 
 def order_chunks(connection, table_name, span):
@@ -337,7 +336,7 @@ def run_new_db_command(args):
 
         # attempt to connect to the server
         connection = psycopg2.connect(args.connect)
-        connection.autocommit = True
+        connection.autocommit = False
 
         if verbose:
             print("Connected to database at server")
@@ -446,7 +445,7 @@ def main():
     parser_new_db = subparsers.add_parser("db", help="create/load random data into the database")
     parser_new_db.add_argument("--num-attr", metavar="NUM", default=100, type=int, help="number of attributes to insert per type (default 100)")
     parser_new_db.add_argument("--num-data", metavar="NUM", default=100, type=int, help="number of data items to insert per attribute (default 100)")
-    parser_new_db.add_argument("--span", metavar="DAYS", default=0, type=int, help="number of days in the past to spread the events over (default 1)")
+    parser_new_db.add_argument("--span", metavar="DAYS", default=1, type=int, help="number of days in the past to spread the events over (default 1)")
     parser_new_db.add_argument("--ttl", metavar="DAYS", default=0, help="ttl to give the data")
     parser_new_db.add_argument("--truncate", action="store_true", help="truncate all tables first")
     parser_new_db.set_defaults(func=run_new_db_command)
