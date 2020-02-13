@@ -508,3 +508,53 @@ CREATE VIEW cagg_scalar_devushort_1day(
        	FROM att_scalar_devushort 
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 day', data_time), att_conf_id;
+
+-- Drop all the views
+-- DROP VIEW cagg_scalar_devdouble_1min CASCADE;
+-- DROP VIEW cagg_scalar_devdouble_10min CASCADE;
+-- DROP VIEW cagg_scalar_devdouble_1hour CASCADE;
+-- DROP VIEW cagg_scalar_devdouble_8hour CASCADE;
+-- DROP VIEW cagg_scalar_devdouble_1day CASCADE;
+
+-- DROP VIEW cagg_scalar_devfloat_1min CASCADE;
+-- DROP VIEW cagg_scalar_devfloat_10min CASCADE;
+-- DROP VIEW cagg_scalar_devfloat_1hour CASCADE;
+-- DROP VIEW cagg_scalar_devfloat_8hour CASCADE;
+-- DROP VIEW cagg_scalar_devfloat_1day CASCADE;
+
+-- DROP VIEW cagg_scalar_devlong_1min CASCADE;
+-- DROP VIEW cagg_scalar_devlong_10min CASCADE;
+-- DROP VIEW cagg_scalar_devlong_1hour CASCADE;
+-- DROP VIEW cagg_scalar_devlong_8hour CASCADE;
+-- DROP VIEW cagg_scalar_devlong_1day CASCADE;
+
+-- DROP VIEW cagg_scalar_devlong64_1min CASCADE;
+-- DROP VIEW cagg_scalar_devlong64_10min CASCADE;
+-- DROP VIEW cagg_scalar_devlong64_1hour CASCADE;
+-- DROP VIEW cagg_scalar_devlong64_8hour CASCADE;
+-- DROP VIEW cagg_scalar_devlong64_1day CASCADE;
+
+-- DROP VIEW cagg_scalar_devshort_1min CASCADE;
+-- DROP VIEW cagg_scalar_devshort_10min CASCADE;
+-- DROP VIEW cagg_scalar_devshort_1hour CASCADE;
+-- DROP VIEW cagg_scalar_devshort_8hour CASCADE;
+-- DROP VIEW cagg_scalar_devshort_1day CASCADE;
+
+-- DROP VIEW cagg_scalar_devulong_1min CASCADE;
+-- DROP VIEW cagg_scalar_devulong_10min CASCADE;
+-- DROP VIEW cagg_scalar_devulong_1hour CASCADE;
+-- DROP VIEW cagg_scalar_devulong_8hour CASCADE;
+-- DROP VIEW cagg_scalar_devulong_1day CASCADE;
+
+-- DROP VIEW cagg_scalar_devulong64_1min CASCADE;
+-- DROP VIEW cagg_scalar_devulong64_10min CASCADE;
+-- DROP VIEW cagg_scalar_devulong64_1hour CASCADE;
+-- DROP VIEW cagg_scalar_devulong64_8hour CASCADE;
+-- DROP VIEW cagg_scalar_devulong64_1day CASCADE;
+
+-- DROP VIEW cagg_scalar_devushort_1min CASCADE;
+-- DROP VIEW cagg_scalar_devushort_10min CASCADE;
+-- DROP VIEW cagg_scalar_devushort_1hour CASCADE;
+-- DROP VIEW cagg_scalar_devushort_8hour CASCADE;
+-- DROP VIEW cagg_scalar_devushort_1day CASCADE;
+
