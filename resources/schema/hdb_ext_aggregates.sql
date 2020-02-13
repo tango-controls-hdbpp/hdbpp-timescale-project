@@ -141,7 +141,7 @@ CREATE VIEW cagg_scalar_devfloat_1day(
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
        	FROM att_scalar_devfloat 
                 WHERE data_time > now() - interval '1 year' 
-        GROUP BY time_bucket('8 hours', data_time), att_conf_id;
+        GROUP BY time_bucket('1 day', data_time), att_conf_id;
 
 -- Long Attributes
 CREATE VIEW cagg_scalar_devlong_1min(
@@ -263,7 +263,7 @@ CREATE VIEW cagg_scalar_devlong64_1day(
 		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
        	FROM att_scalar_devlong64 
                 WHERE data_time > now() - interval '1 year' 
-        GROUP BY time_bucket('1 hour', data_time), att_conf_id;
+        GROUP BY time_bucket('1 day', data_time), att_conf_id;
 
 -- Short attributes
 CREATE VIEW cagg_scalar_devshort_1min(
