@@ -24,60 +24,260 @@
 -- Double attributes
 CREATE VIEW cagg_scalar_devdouble_1min(
 		att_conf_id, data_time, count_rows, count_errors
-		, count_r, mean_r, min_r, max_r, stddev_r
-		, count_w, mean_w, min_w, max_w, stddev_w
+		, count_r, count_nan_r, mean_r, min_r, max_r, stddev_r
+		, count_w, count_nan_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='1 min')
        	AS SELECT att_conf_id, time_bucket('1 min', data_time), count(*), count(att_error_desc_id)
-		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
-		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
+		, count(value_r), sum(
+                    CASE 
+                        WHEN value_r='NaN' THEN 1 
+                        WHEN value_r='infinity' THEN 1 
+                        WHEN value_r='-infinity' THEN 1 
+                        ELSE 0 
+                    END)
+                , avg(
+                    (CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)::numeric)::float8
+                , min(value_r), max(value_r), stddev(
+                    (CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)::numeric)::float8
+		, count(value_w), sum(
+                    CASE 
+                        WHEN value_w='NaN' THEN 1 
+                        WHEN value_w='infinity' THEN 1 
+                        WHEN value_w='-infinity' THEN 1 
+                        ELSE 0 
+                    END)
+                , avg(
+                    (CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)::numeric)::float8
+                , min(value_w), max(value_w), stddev(
+                    (CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)::numeric)::float8
        	FROM att_scalar_devdouble
        	        WHERE data_time > now() - interval '1 year'
         GROUP BY time_bucket('1 min', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devdouble_10min(
 		att_conf_id, data_time, count_rows, count_errors
-		, count_r, mean_r, min_r, max_r, stddev_r
-		, count_w, mean_w, min_w, max_w, stddev_w
+		, count_r, count_nan_r, mean_r, min_r, max_r, stddev_r
+		, count_w, count_nan_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='10 mins')
        	AS SELECT att_conf_id, time_bucket('10 mins', data_time), count(*), count(att_error_desc_id)
-		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
-		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
+		, count(value_r), sum(
+                    CASE 
+                        WHEN value_r='NaN' THEN 1 
+                        WHEN value_r='infinity' THEN 1 
+                        WHEN value_r='-infinity' THEN 1 
+                        ELSE 0 
+                    END)
+                , avg(
+                    (CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)::numeric)::float8
+                , min(value_r), max(value_r), stddev(
+                    (CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)::numeric)::float8
+		, count(value_w), sum(
+                    CASE 
+                        WHEN value_w='NaN' THEN 1 
+                        WHEN value_w='infinity' THEN 1 
+                        WHEN value_w='-infinity' THEN 1 
+                        ELSE 0 
+                    END)
+                , avg(
+                    (CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)::numeric)::float8
+                , min(value_w), max(value_w), stddev(
+                    (CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)::numeric)::float8
        	FROM att_scalar_devdouble
                 WHERE data_time > now() - interval '1 year'
         GROUP BY time_bucket('10 mins', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devdouble_1hour(
 		att_conf_id, data_time, count_rows, count_errors
-		, count_r, mean_r, min_r, max_r, stddev_r
-		, count_w, mean_w, min_w, max_w, stddev_w
+		, count_r, count_nan_r, mean_r, min_r, max_r, stddev_r
+		, count_w, count_nan_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='1 hour')
        	AS SELECT att_conf_id, time_bucket('1 hour', data_time), count(*), count(att_error_desc_id)
-		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
-		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
+		, count(value_r), sum(
+                    CASE 
+                        WHEN value_r='NaN' THEN 1 
+                        WHEN value_r='infinity' THEN 1 
+                        WHEN value_r='-infinity' THEN 1 
+                        ELSE 0 
+                    END)
+                , avg(
+                    (CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)::numeric)::float8
+                , min(value_r), max(value_r), stddev(
+                    (CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)::numeric)::float8
+		, count(value_w), sum(
+                    CASE 
+                        WHEN value_w='NaN' THEN 1 
+                        WHEN value_w='infinity' THEN 1 
+                        WHEN value_w='-infinity' THEN 1 
+                        ELSE 0 
+                    END)
+                , avg(
+                    (CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)::numeric)::float8
+                , min(value_w), max(value_w), stddev(
+                    (CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)::numeric)::float8
        	FROM att_scalar_devdouble 
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 hour', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devdouble_8hour(
 		att_conf_id, data_time, count_rows, count_errors
-		, count_r, mean_r, min_r, max_r, stddev_r
-		, count_w, mean_w, min_w, max_w, stddev_w
+		, count_r, count_nan_r, mean_r, min_r, max_r, stddev_r
+		, count_w, count_nan_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='8 hours')
        	AS SELECT att_conf_id, time_bucket('8 hours', data_time), count(*), count(att_error_desc_id)
-		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
-		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
+		, count(value_r), sum(
+                    CASE 
+                        WHEN value_r='NaN' THEN 1 
+                        WHEN value_r='infinity' THEN 1 
+                        WHEN value_r='-infinity' THEN 1 
+                        ELSE 0 
+                    END)
+                , avg(
+                    (CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)::numeric)::float8
+                , min(value_r), max(value_r), stddev(
+                    (CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)::numeric)::float8
+		, count(value_w), sum(
+                    CASE 
+                        WHEN value_w='NaN' THEN 1 
+                        WHEN value_w='infinity' THEN 1 
+                        WHEN value_w='-infinity' THEN 1 
+                        ELSE 0 
+                    END)
+                , avg(
+                    (CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)::numeric)::float8
+                , min(value_w), max(value_w), stddev(
+                    (CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)::numeric)::float8
        	FROM att_scalar_devdouble 
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('8 hours', data_time), att_conf_id;
 
 CREATE VIEW cagg_scalar_devdouble_1day(
 		att_conf_id, data_time, count_rows, count_errors
-		, count_r, mean_r, min_r, max_r, stddev_r
-		, count_w, mean_w, min_w, max_w, stddev_w
+		, count_r, count_nan_r, mean_r, min_r, max_r, stddev_r
+		, count_w, count_nan_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='1 day')
        	AS SELECT att_conf_id, time_bucket('1 day', data_time), count(*), count(att_error_desc_id)
-		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
-		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
+		, count(value_r), sum(
+                    CASE 
+                        WHEN value_r='NaN' THEN 1 
+                        WHEN value_r='infinity' THEN 1 
+                        WHEN value_r='-infinity' THEN 1
+                        ELSE 0 
+                    END)
+                , avg(
+                    (CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)::numeric)::float8
+                , min(value_r), max(value_r), stddev(
+                    (CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)::numeric)::float8
+		, count(value_w), sum(
+                    CASE 
+                        WHEN value_w='NaN' THEN 1 
+                        WHEN value_w='infinity' THEN 1 
+                        WHEN value_w='-infinity' THEN 1 
+                        ELSE 0 
+                    END)
+                , avg(
+                    (CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)::numeric)::float8
+                , min(value_w), max(value_w), stddev(
+                    (CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)::numeric)::float8
        	FROM att_scalar_devdouble 
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 day', data_time), att_conf_id;
@@ -89,8 +289,48 @@ CREATE VIEW cagg_scalar_devfloat_1min(
 		, count_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='1 min')
        	AS SELECT att_conf_id, time_bucket('1 min', data_time), count(*), count(att_error_desc_id)
-		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
-		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
+		, count(value_r), sum(
+                    CASE 
+                        WHEN value_r='NaN' THEN 1 
+                        WHEN value_r='infinity' THEN 1 
+                        WHEN value_r='-infinity' THEN 1 
+                        ELSE 0 
+                    END)
+                , avg(
+                    (CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)::numeric)::float8
+                , min(value_r), max(value_r), stddev(
+                    (CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)::numeric)::float8
+		, count(value_w), sum(
+                    CASE 
+                        WHEN value_w='NaN' THEN 1 
+                        WHEN value_w='infinity' THEN 1 
+                        WHEN value_w='-infinity' THEN 1 
+                        ELSE 0 
+                    END)
+                , avg(
+                    (CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)::numeric)::float8
+                , min(value_w), max(value_w), stddev(
+                    (CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)::numeric)::float8
        	FROM att_scalar_devfloat 
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 min', data_time), att_conf_id;
@@ -101,8 +341,48 @@ CREATE VIEW cagg_scalar_devfloat_10min(
 		, count_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='10 mins')
        	AS SELECT att_conf_id, time_bucket('10 mins', data_time), count(*), count(att_error_desc_id)
-		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
-		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
+		, count(value_r), sum(
+                    CASE 
+                        WHEN value_r='NaN' THEN 1 
+                        WHEN value_r='infinity' THEN 1 
+                        WHEN value_r='-infinity' THEN 1 
+                        ELSE 0 
+                    END)
+                , avg(
+                    (CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)::numeric)::float8
+                , min(value_r), max(value_r), stddev(
+                    (CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)::numeric)::float8
+		, count(value_w), sum(
+                    CASE 
+                        WHEN value_w='NaN' THEN 1 
+                        WHEN value_w='infinity' THEN 1 
+                        WHEN value_w='-infinity' THEN 1 
+                        ELSE 0 
+                    END)
+                , avg(
+                    (CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)::numeric)::float8
+                , min(value_w), max(value_w), stddev(
+                    (CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)::numeric)::float8
        	FROM att_scalar_devfloat 
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('10 mins', data_time), att_conf_id;
@@ -113,8 +393,48 @@ CREATE VIEW cagg_scalar_devfloat_1hour(
 		, count_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='1 hour')
        	AS SELECT att_conf_id, time_bucket('1 hour', data_time), count(*), count(att_error_desc_id)
-		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
-		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
+		, count(value_r), sum(
+                    CASE 
+                        WHEN value_r='NaN' THEN 1 
+                        WHEN value_r='infinity' THEN 1 
+                        WHEN value_r='-infinity' THEN 1 
+                        ELSE 0 
+                    END)
+                , avg(
+                    (CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)::numeric)::float8
+                , min(value_r), max(value_r), stddev(
+                    (CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)::numeric)::float8
+		, count(value_w), sum(
+                    CASE 
+                        WHEN value_w='NaN' THEN 1 
+                        WHEN value_w='infinity' THEN 1 
+                        WHEN value_w='-infinity' THEN 1 
+                        ELSE 0 
+                    END)
+                , avg(
+                    (CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)::numeric)::float8
+                , min(value_w), max(value_w), stddev(
+                    (CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)::numeric)::float8
        	FROM att_scalar_devfloat 
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 hour', data_time), att_conf_id;
@@ -125,8 +445,48 @@ CREATE VIEW cagg_scalar_devfloat_8hour(
 		, count_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='8 hours')
        	AS SELECT att_conf_id, time_bucket('8 hours', data_time), count(*), count(att_error_desc_id)
-		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
-		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
+		, count(value_r), sum(
+                    CASE 
+                        WHEN value_r='NaN' THEN 1 
+                        WHEN value_r='infinity' THEN 1 
+                        WHEN value_r='-infinity' THEN 1 
+                        ELSE 0 
+                    END)
+                , avg(
+                    (CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)::numeric)::float8
+                , min(value_r), max(value_r), stddev(
+                    (CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)::numeric)::float8
+		, count(value_w), sum(
+                    CASE 
+                        WHEN value_w='NaN' THEN 1 
+                        WHEN value_w='infinity' THEN 1 
+                        WHEN value_w='-infinity' THEN 1 
+                        ELSE 0 
+                    END)
+                , avg(
+                    (CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)::numeric)::float8
+                , min(value_w), max(value_w), stddev(
+                    (CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)::numeric)::float8
        	FROM att_scalar_devfloat 
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('8 hours', data_time), att_conf_id;
@@ -137,8 +497,48 @@ CREATE VIEW cagg_scalar_devfloat_1day(
 		, count_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='1 day')
        	AS SELECT att_conf_id, time_bucket('1 day', data_time), count(*), count(att_error_desc_id)
-		, count(value_r), avg(value_r), min(value_r), max(value_r), stddev(value_r)
-		, count(value_w), avg(value_w), min(value_w), max(value_w), stddev(value_w)
+		, count(value_r), sum(
+                    CASE 
+                        WHEN value_r='NaN' THEN 1 
+                        WHEN value_r='infinity' THEN 1 
+                        WHEN value_r='-infinity' THEN 1 
+                        ELSE 0 
+                    END)
+                , avg(
+                    (CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)::numeric)::float8
+                , min(value_r), max(value_r), stddev(
+                    (CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)::numeric)::float8
+		, count(value_w), sum(
+                    CASE 
+                        WHEN value_w='NaN' THEN 1 
+                        WHEN value_w='infinity' THEN 1 
+                        WHEN value_w='-infinity' THEN 1 
+                        ELSE 0 
+                    END)
+                , avg(
+                    (CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)::numeric)::float8
+                , min(value_w), max(value_w), stddev(
+                    (CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)::numeric)::float8
        	FROM att_scalar_devfloat 
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 day', data_time), att_conf_id;
