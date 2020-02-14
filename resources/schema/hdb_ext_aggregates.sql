@@ -42,7 +42,21 @@ CREATE VIEW cagg_scalar_devdouble_1min(
                         WHEN value_r='-infinity' THEN null 
                         ELSE value_r 
                     END)::numeric)::float8
-                , min(value_r), max(value_r), stddev(
+                , min(
+                    CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)
+                , max(
+                    CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)
+                , stddev(
                     (CASE 
                         WHEN value_r='NaN' THEN null 
                         WHEN value_r='infinity' THEN null 
@@ -63,7 +77,21 @@ CREATE VIEW cagg_scalar_devdouble_1min(
                         WHEN value_w='-infinity' THEN null 
                         ELSE value_w 
                     END)::numeric)::float8
-                , min(value_w), max(value_w), stddev(
+                , min(
+                    CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)
+                , max(
+                    CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)
+                , stddev(
                     (CASE 
                         WHEN value_w='NaN' THEN null 
                         WHEN value_w='infinity' THEN null 
@@ -94,7 +122,21 @@ CREATE VIEW cagg_scalar_devdouble_10min(
                         WHEN value_r='-infinity' THEN null 
                         ELSE value_r 
                     END)::numeric)::float8
-                , min(value_r), max(value_r), stddev(
+                , min(
+                    CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)
+                , max(
+                    CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)
+                , stddev(
                     (CASE 
                         WHEN value_r='NaN' THEN null 
                         WHEN value_r='infinity' THEN null 
@@ -115,7 +157,21 @@ CREATE VIEW cagg_scalar_devdouble_10min(
                         WHEN value_w='-infinity' THEN null 
                         ELSE value_w 
                     END)::numeric)::float8
-                , min(value_w), max(value_w), stddev(
+                , min(
+                    CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)
+                , max(
+                    CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)
+                , stddev(
                     (CASE 
                         WHEN value_w='NaN' THEN null 
                         WHEN value_w='infinity' THEN null 
@@ -146,7 +202,21 @@ CREATE VIEW cagg_scalar_devdouble_1hour(
                         WHEN value_r='-infinity' THEN null 
                         ELSE value_r 
                     END)::numeric)::float8
-                , min(value_r), max(value_r), stddev(
+                , min(
+                    CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)
+                , max(
+                    CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)
+                , stddev(
                     (CASE 
                         WHEN value_r='NaN' THEN null 
                         WHEN value_r='infinity' THEN null 
@@ -167,7 +237,21 @@ CREATE VIEW cagg_scalar_devdouble_1hour(
                         WHEN value_w='-infinity' THEN null 
                         ELSE value_w 
                     END)::numeric)::float8
-                , min(value_w), max(value_w), stddev(
+                , min(
+                    CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)
+                , max(
+                    CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)
+                , stddev(
                     (CASE 
                         WHEN value_w='NaN' THEN null 
                         WHEN value_w='infinity' THEN null 
@@ -198,7 +282,21 @@ CREATE VIEW cagg_scalar_devdouble_8hour(
                         WHEN value_r='-infinity' THEN null 
                         ELSE value_r 
                     END)::numeric)::float8
-                , min(value_r), max(value_r), stddev(
+                , min(
+                    CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)
+                , max(
+                    CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)
+                , stddev(
                     (CASE 
                         WHEN value_r='NaN' THEN null 
                         WHEN value_r='infinity' THEN null 
@@ -219,7 +317,21 @@ CREATE VIEW cagg_scalar_devdouble_8hour(
                         WHEN value_w='-infinity' THEN null 
                         ELSE value_w 
                     END)::numeric)::float8
-                , min(value_w), max(value_w), stddev(
+                , min(
+                    CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)
+                , max(
+                    CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)
+                , stddev(
                     (CASE 
                         WHEN value_w='NaN' THEN null 
                         WHEN value_w='infinity' THEN null 
@@ -250,7 +362,21 @@ CREATE VIEW cagg_scalar_devdouble_1day(
                         WHEN value_r='-infinity' THEN null 
                         ELSE value_r 
                     END)::numeric)::float8
-                , min(value_r), max(value_r), stddev(
+                , min(
+                    CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)
+                , max(
+                    CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)
+                , stddev(
                     (CASE 
                         WHEN value_r='NaN' THEN null 
                         WHEN value_r='infinity' THEN null 
@@ -271,7 +397,21 @@ CREATE VIEW cagg_scalar_devdouble_1day(
                         WHEN value_w='-infinity' THEN null 
                         ELSE value_w 
                     END)::numeric)::float8
-                , min(value_w), max(value_w), stddev(
+                , min(
+                    CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)
+                , max(
+                    CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)
+                , stddev(
                     (CASE 
                         WHEN value_w='NaN' THEN null 
                         WHEN value_w='infinity' THEN null 
@@ -303,7 +443,21 @@ CREATE VIEW cagg_scalar_devfloat_1min(
                         WHEN value_r='-infinity' THEN null 
                         ELSE value_r 
                     END)::numeric)::float8
-                , min(value_r), max(value_r), stddev(
+                , min(
+                    CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)
+                , max(
+                    CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)
+                , stddev(
                     (CASE 
                         WHEN value_r='NaN' THEN null 
                         WHEN value_r='infinity' THEN null 
@@ -324,7 +478,21 @@ CREATE VIEW cagg_scalar_devfloat_1min(
                         WHEN value_w='-infinity' THEN null 
                         ELSE value_w 
                     END)::numeric)::float8
-                , min(value_w), max(value_w), stddev(
+                , min(
+                    CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)
+                , max(
+                    CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)
+                , stddev(
                     (CASE 
                         WHEN value_w='NaN' THEN null 
                         WHEN value_w='infinity' THEN null 
@@ -355,7 +523,21 @@ CREATE VIEW cagg_scalar_devfloat_10min(
                         WHEN value_r='-infinity' THEN null 
                         ELSE value_r 
                     END)::numeric)::float8
-                , min(value_r), max(value_r), stddev(
+                , min(
+                    CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)
+                , max(
+                    CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)
+                , stddev(
                     (CASE 
                         WHEN value_r='NaN' THEN null 
                         WHEN value_r='infinity' THEN null 
@@ -376,7 +558,21 @@ CREATE VIEW cagg_scalar_devfloat_10min(
                         WHEN value_w='-infinity' THEN null 
                         ELSE value_w 
                     END)::numeric)::float8
-                , min(value_w), max(value_w), stddev(
+                , min(
+                    CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)
+                , max(
+                    CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)
+                , stddev(
                     (CASE 
                         WHEN value_w='NaN' THEN null 
                         WHEN value_w='infinity' THEN null 
@@ -407,7 +603,21 @@ CREATE VIEW cagg_scalar_devfloat_1hour(
                         WHEN value_r='-infinity' THEN null 
                         ELSE value_r 
                     END)::numeric)::float8
-                , min(value_r), max(value_r), stddev(
+                , min(
+                    CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)
+                , max(
+                    CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)
+                , stddev(
                     (CASE 
                         WHEN value_r='NaN' THEN null 
                         WHEN value_r='infinity' THEN null 
@@ -428,7 +638,21 @@ CREATE VIEW cagg_scalar_devfloat_1hour(
                         WHEN value_w='-infinity' THEN null 
                         ELSE value_w 
                     END)::numeric)::float8
-                , min(value_w), max(value_w), stddev(
+                , min(
+                    CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)
+                , max(
+                    CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)
+                , stddev(
                     (CASE 
                         WHEN value_w='NaN' THEN null 
                         WHEN value_w='infinity' THEN null 
@@ -459,7 +683,21 @@ CREATE VIEW cagg_scalar_devfloat_8hour(
                         WHEN value_r='-infinity' THEN null 
                         ELSE value_r 
                     END)::numeric)::float8
-                , min(value_r), max(value_r), stddev(
+                , min(
+                    CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)
+                , max(
+                    CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)
+                , stddev(
                     (CASE 
                         WHEN value_r='NaN' THEN null 
                         WHEN value_r='infinity' THEN null 
@@ -480,7 +718,21 @@ CREATE VIEW cagg_scalar_devfloat_8hour(
                         WHEN value_w='-infinity' THEN null 
                         ELSE value_w 
                     END)::numeric)::float8
-                , min(value_w), max(value_w), stddev(
+                , min(
+                    CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)
+                , max(
+                    CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)
+                , stddev(
                     (CASE 
                         WHEN value_w='NaN' THEN null 
                         WHEN value_w='infinity' THEN null 
@@ -511,7 +763,21 @@ CREATE VIEW cagg_scalar_devfloat_1day(
                         WHEN value_r='-infinity' THEN null 
                         ELSE value_r 
                     END)::numeric)::float8
-                , min(value_r), max(value_r), stddev(
+                , min(
+                    CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)
+                , max(
+                    CASE 
+                        WHEN value_r='NaN' THEN null 
+                        WHEN value_r='infinity' THEN null 
+                        WHEN value_r='-infinity' THEN null 
+                        ELSE value_r 
+                    END)
+                , stddev(
                     (CASE 
                         WHEN value_r='NaN' THEN null 
                         WHEN value_r='infinity' THEN null 
@@ -532,7 +798,21 @@ CREATE VIEW cagg_scalar_devfloat_1day(
                         WHEN value_w='-infinity' THEN null 
                         ELSE value_w 
                     END)::numeric)::float8
-                , min(value_w), max(value_w), stddev(
+                , min(
+                    CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)
+                , max(
+                    CASE 
+                        WHEN value_w='NaN' THEN null 
+                        WHEN value_w='infinity' THEN null 
+                        WHEN value_w='-infinity' THEN null 
+                        ELSE value_w 
+                    END)
+                , stddev(
                     (CASE 
                         WHEN value_w='NaN' THEN null 
                         WHEN value_w='infinity' THEN null 
