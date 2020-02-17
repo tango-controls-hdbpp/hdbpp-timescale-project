@@ -66,3 +66,5 @@ SERVER_ROLE_UNKNOWN = "unknown"
 #Supported types and format, the one not listed there will generate errors on queries.
 DB_TYPES = ['DEV_BOOLEAN', 'DEV_SHORT', 'DEV_LONG', 'DEV_FLOAT', 'DEV_DOUBLE', 'DEV_USHORT', 'DEV_ULONG', 'DEV_STRING', 'DEV_STATE', 'DEV_UCHAR', 'DEV_LONG64', 'DEV_ULONG64']
 DB_FORMAT = ['SCALAR', 'SPECTRUM']
+AGG_TYPES = ['DEV_SHORT', 'DEV_LONG', 'DEV_FLOAT', 'DEV_DOUBLE', 'DEV_USHORT', 'DEV_ULONG', 'DEV_LONG64', 'DEV_ULONG64']
+AGG_INTERVAL = ['1min', '10min', '1hour', '8hour', '1day']
