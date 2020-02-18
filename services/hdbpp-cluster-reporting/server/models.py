@@ -20,6 +20,18 @@
 # -----------------------------------------------------------------------------
 
 from server import db
+from server import config
+
+def return_not_none(value, default):
+    """
+    Helper function to return the value or a default
+    one if it's None.
+
+    """
+    if value is not None:
+        return value
+    else:
+        return default
 
 
 class Servers(db.Model):
@@ -35,16 +47,29 @@ class Servers(db.Model):
         server status
     role : str
         server role, i.e. master or replica
+    lag : int
+        for replica only, lag from master
+    api_url : str
+        url of the pattroni rest endpoint
+    version : str
+        patroni version
     """
     __tablename__ = 'Servers'
     hostname = db.Column(db.String(), primary_key=True)
     state = db.Column(db.String(), nullable=False)
     role = db.Column(db.String(), nullable=False)
+    lag = db.Column(db.Integer, nullable=False)
+    api_url = db.Column(db.String(), nullable=False)
+    version = db.Column(db.String(), nullable=False)
 
-    def __init__(self, hostname, state, role):
+    def __init__(self, hostname, state=None, role=None, lag=None, api_url=None, version=None):
         self.hostname = hostname
-        self.state = state
-        self.role = role
+        
+        self.state = return_not_none(state, config.CONNECTION_STATE_UNKNOWN)
+        self.role = return_not_none(role, config.SERVER_ROLE_UNKNOWN)
+        self.lag = return_not_none(lag, 0)
+        self.api_url = return_not_none(api_url, "")
+        self.version = return_not_none(version, "0.0.0")
 
     def __repr__(self):
         return "<Server %r" % self.hostname

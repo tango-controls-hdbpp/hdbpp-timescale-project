@@ -33,6 +33,9 @@ from server.models import Servers
 from server.models import Database
 from server.models import Datatable
 from apscheduler.schedulers.background import BackgroundScheduler
+from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import MultipleResultsFound
+from packaging.version import parse as parse_version
 
 logger = logging.getLogger(config.LOGGER_NAME)
 
@@ -47,14 +50,153 @@ def update_cluster_status(configuration):
     Arguments:
         configuration : dict -- Server configuration
     """
+    
+    all_nodes_updated = False
 
     for host in configuration["cluster"]["hosts"]:
         role = config.SERVER_ROLE_UNKNOWN
         state = config.CONNECTION_STATE_UNKNOWN
+        api_url = ""
+        vers = "0.0.0"
 
         try:
+            # First check if version has been initialiazed
+            host_row = db.session.query(Servers).filter(
+                                        Servers.hostname == host).one()
+            
+            if parse_version(host_row.version) == parse_version(vers):
+                # attempt to contact the server and gets it config
+                response = requests.get("http://{}:{}/patroni".format(host, configuration["cluster"]["patroni_port"]))
+
+                # If the response was successful, no Exception will be raised
+                response.raise_for_status()
+
+                # valid response received
+                if response.status_code == 200:
+                    if "patroni" in response.json() and "version" in response.json()["patroni"]:
+                        host_row.version = response.json()["patroni"]["version"]
+                    else:
+                        logger.error(
+                            "Response did not contain a version for the host, please check the cluster")
+            
+            vers = host_row.version
+        
+        except NoResultFound:
+            logger.error(
+                    "Host {} not found in database, initialization error.".format(host))
+                                
+        except MultipleResultsFound:
+            logger.error(
+                    "Host {} is configured multiple times".format(host))
+
+        except HTTPError as http_err:
+            logger.error(
+                "HTTP error occurred contacting: {}. Error: {}".format(host, http_err))
+
+        except Exception as err:
+            logger.error(
+                "An error occurred contacting: {}. Error: {}".format(host, err))
+
+        db.session.commit();
+
+        # check for version 1.6.1, where the /cluster endpoint is implemented
+        if not all_nodes_updated and parse_version(vers) > parse_version("1.6.1"):
+            try:
+                # attempt to contact the server cluster endpoint and retrieve the nodes
+                response = requests.get("http://{}:{}/cluster".format(host, configuration["cluster"]["patroni_port"]))
+                                
+                # If the response was successful, no Exception will be raised
+                response.raise_for_status()
+ 
+                # valid response received
+                if response.status_code == 200:
+                    if "members" in response.json():
+                        nodes = response.json()["members"]
+                    else:
+                        logger.error(
+                            "Response did not contain any members in the cluster, please check the cluster")
+
+                    # Now treat the information for all nodes.
+                    if nodes is not None:
+                        for node in nodes:
+                            if "host" in node:
+                                host = node["host"]
+                            else:
+                                logger.error(
+                                    "Response did not contain a host, please check the cluster")
+
+                            if "role" in node:
+                                role = node["role"]
+                            else:
+                                logger.error(
+                                    "Response did not contain a role for the host, please check the cluster")
+
+                            if "state" in node:
+                                state = node["state"]
+                            else:
+                                logger.error(
+                                    "Response did not contain a state for the host, please check the cluster")
+
+                            if "api_url" in node:
+                                api_url = node["api_url"]
+                            else:
+                                logger.error(
+                                    "Response did not contain the api url for the host, please check the cluster")
+
+                            if "lag" in node and role is "replica":
+                                lag = node["lag"]
+                            else:
+                                logger.error(
+                                    "Response did not contain the lag for this replica, please check the cluster")
+                            
+                            if host is not None:
+                                try:
+                                    # if present in db update it otherwise add it
+                                    server_row = db.session.query(Servers).filter(
+                                        Servers.hostname == host).one()
+                                    
+                                    server_row.hostname = host
+                                    server_row.state = state
+                                    server_row.role = role
+                                    server_row.lag = lag
+                                    server_row.api_url = api_url
+                                
+                                except NoResultFound:
+                                    db.session.add(Servers(host, state, role, lag, api_url))
+                                
+                                except MultipleResultsFound:
+                                    logger.error(
+                                        "Host {} is configured multiple times".format(host))
+
+                        db.session.commit()
+                        all_nodes_updated = True
+            
+            except HTTPError as http_err:
+                logger.error(
+                        "HTTP error occurred contacting: {}. Error: {}".format(host, http_err))
+                
+            except Exception as err:
+                logger.error(
+                    "An error occurred contacting: {}. Error: {}".format(host, err))
+
+    # Retrieve the servers from the database, it has been initialized already either by conf or by the cluster query
+    servers = db.session.query(Servers).all()
+
+    for host in servers:
+        role = config.SERVER_ROLE_UNKNOWN
+        state = config.CONNECTION_STATE_UNKNOWN
+        vers = "0.0.0"
+
+        try:
+            
+            if not host.api_url:
+                api_url = "http://{}:{}/patroni".format(host.hostname, configuration["cluster"]["patroni_port"])
+            
+            else:
+                api_url = host.api_url
+            
             # attempt to contact the server and gets it config
-            response = requests.get("http://{}:{}/patroni".format(host, configuration["cluster"]["patroni_port"]))
+            response = requests.get(api_url)
 
             # If the response was successful, no Exception will be raised
             response.raise_for_status()
@@ -62,31 +204,34 @@ def update_cluster_status(configuration):
             # valid response received
             if response.status_code == 200:
                 if "role" in response.json():
-                    role = response.json()["role"]
+                    host.role = response.json()["role"]
                 else:
                     logger.error(
                         "Response did not contain a role for the host, please check the cluster")
 
                 if "state" in response.json():
-                    state = response.json()["state"]
+                    host.state = response.json()["state"]
                 else:
                     logger.error(
                         "Response did not contain a state for the host, please check the cluster")
+                
+                if "patroni" in response.json() and "version" in response.json()["patroni"]:
+                    host.version = response.json()["patroni"]["version"]
+                else:
+                    logger.error(
+                        "Response did not contain a version for the host, please check the cluster")
 
         except HTTPError as http_err:
             logger.error(
                 "HTTP error occurred contacting: {}. Error: {}".format(host, http_err))
 
-            state = config.CONNECTION_STATE_ERROR
+            host.state = config.CONNECTION_STATE_ERROR
 
         except Exception as err:
             logger.error(
                 "An error occurred contacting: {}. Error: {}".format(host, err))
 
-            state = config.CONNECTION_STATE_ERROR
-
-        db.session.query(Servers).filter(
-            Servers.hostname == host).update({"role": role, "state": state})
+            host.state = config.CONNECTION_STATE_ERROR
 
         db.session.commit()
 
@@ -251,7 +396,7 @@ def init_services(configuration):
 
     # add the defaults
     for host in configuration["cluster"]["hosts"]:
-        server = Servers(host, "unknown", "unknown")
+        server = Servers(host)
         db.session.add(server)
         db.session.commit()
 
