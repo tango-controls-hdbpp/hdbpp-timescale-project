@@ -94,12 +94,16 @@ class Datatable(db.Model):
 class Database(db.Model):
     """
     Represents general information about the database
+    
     Attributes
     ----------
+    name : str
+       Name of the database.
     size : int
        size of the database, in bytes.
 
     """
+    
     __tablename__ = 'Database'
     name = db.Column(db.String(), nullable=False, primary_key=True)
     size = db.Column(db.Integer(), nullable=False)
@@ -107,3 +111,23 @@ class Database(db.Model):
     def __init__(self, name):
         self.name = name
         self.size = 0
+
+class Attribute(db.Model):
+    """
+    Represents information about an attribute
+    
+    Attributes
+    ----------
+    name : str
+       Name of the attribute.
+    ttl_rows_deleted : int
+       Number of rows deleted on the last ttl session.
+    """
+    
+    __tablename__ = 'Attribute'
+    name = db.Column(db.String(), nullable=False, primary_key=True)
+    ttl_rows_deleted = db.Column(db.Integer(), nullable=True)
+
+    def __init__(self, name, ttl):
+        self.name = name
+        self.ttl_rows_deleted = ttl

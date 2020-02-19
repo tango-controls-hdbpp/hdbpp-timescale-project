@@ -30,6 +30,7 @@ import server.routes.status as status_endpoint
 import server.routes.servers as servers_endpoint
 import server.routes.attributes as attributes_endpoint
 import server.routes.database as database_endpoint
+import server.routes.ttl as ttl_endpoint
 
 from server.errors import InvalidUsage
 from server.errors import handle_error 
@@ -212,6 +213,9 @@ def create_app(config_name):
     api.add_resource(attributes_endpoint.AttributesTypeOrFormatCount, '/database/attributes/count/<string:att_info>')
     api.add_resource(attributes_endpoint.AttributesFormatTypeCount, '/database/attributes/count/<string:att_format>/<string:att_type>')
     
+    api.add_resource(ttl_endpoint.Attributes, '/database/ttl/attributes')
+    api.add_resource(ttl_endpoint.AttributeRowDeleted, '/database/ttl/daily_rows_deleted/<string:att_name>')
+    
     api.add_resource(attributes_endpoint.AttributesRowCount, '/database/tables/row_count/<string:att_format>/<string:att_type>')
     api.add_resource(attributes_endpoint.AttributesInterval, '/database/tables/interval/<string:att_format>/<string:att_type>')
     api.add_resource(attributes_endpoint.AttributesIntervalUnit, '/database/tables/interval/unit')
@@ -266,6 +270,7 @@ def main():
     from server.models import Servers
     from server.models import Datatable
     from server.models import Database
+    from server.models import Attribute
     db.app = app
     db.init_app(app)
     db.create_all()
