@@ -47,6 +47,7 @@ import logging
 import logging.handlers
 
 from datetime import timedelta
+from hdbpp_rest_report import post_dict_to_rest
 
 logger = logging.getLogger('hdbpp-ttl')
 
@@ -130,12 +131,13 @@ def load_config(path):
     return config
 
 
-def process_ttl(server_config, dryrun):
+def process_ttl(server_config, dryrun, processed_ttl=None):
     """
     This function opens a connection to the server and processes all ttl values in the
     att_conf table. What this means in practice is it selects all values from att_conf 
     with a valid ttl value, then runs a delete for that attributes data in its data
     table
+    The processed_ttl dict is filled with the attributes that are treated
     """
 
     # first attempt to open a connection to the database
@@ -183,8 +185,13 @@ def process_ttl(server_config, dryrun):
                         attr[2], math.ceil(int(attr[1]) / 24), attr[0]
                     )
                 )
-
-                logger.info("Deleted {} rows in table: {} for attribute: {}".format(cursor.rowcount, attr[2], attr[3]))
+                
+                deleted_rows = cursor.rowcount
+                
+                if processed_ttl is not None:
+                    processed_ttl[attr[3]] = {"ttl_rows_deleted":deleted_rows}
+                
+                logger.info("Deleted {} rows in table: {} for attribute: {}".format(deleted_rows, attr[2], attr[3]))
 
             else:
                 cursor.execute(
@@ -252,9 +259,12 @@ def run_command(args):
             for key, val in config.items():
                 start_time = time.monotonic()
                 logger.info("Processing ttl requests for configuration: {}".format(key))
-                process_ttl(val["connection"], args.dryrun)
+                processed_ttl = {}
+                process_ttl(val["connection"], args.dryrun, processed_ttl)
                 delete_time = timedelta(seconds=time.monotonic() - start_time)
                 logger.info("Processed ttl request for configuration {} in: {}".format(key, delete_time))
+                if "rest_endpoint" in val:
+                    post_dict_to_rest(val["rest_endpoint"], processed_ttl)
 
         else:
             return False
