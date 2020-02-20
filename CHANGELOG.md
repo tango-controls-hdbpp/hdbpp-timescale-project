@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added [hdbpp-cluster-reporting]
+ - Replica database lag
+
+### Changed [hdbpp-cluster-reporting]
+ - Use /cluster endpoint from patroni, if available,
+   to retrieve some of the data.
+   Check for patroni version if the endpoint exists.
+
 ## [0.1.0] - 2020-01-05
 
 ### Added [hdbpp-cluster-reporting]
