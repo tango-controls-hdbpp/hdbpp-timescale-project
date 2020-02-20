@@ -221,6 +221,7 @@ def create_app(config_name):
     api.add_resource(attributes_endpoint.AttributesCurrentSize, '/database/tables/current_size/<string:att_format>/<string:att_type>')
     api.add_resource(attributes_endpoint.AttributesSizeUnit, '/database/tables/current_size/unit')
     
+    api.add_resource(aggregates_endpoint.Aggregates, '/database/aggregates')
     api.add_resource(aggregates_endpoint.AggregatesRowCount, '/database/aggregates/row_count/<string:agg_interval>/<string:att_type>')
     api.add_resource(aggregates_endpoint.AggregatesSize, '/database/aggregates/size/<string:agg_interval>/<string:att_type>')
 

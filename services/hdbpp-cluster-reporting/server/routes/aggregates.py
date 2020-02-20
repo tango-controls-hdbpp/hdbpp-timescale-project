@@ -51,9 +51,27 @@ def get_from_db(att_format, att_type, att_interval, req):
 
     return jsonify(attributes_result[0].result)
 
+
+class Aggregates(Resource):
+    def get(self):
+        aggregates = {}
+        aggs_result = Aggregate.query.all()
+                    
+        for aggregate in aggs_result:
+            if aggregate.att_format == 'SCALAR':
+                
+                if aggregate.att_type not in aggregates:
+                    aggregates[aggregate.att_type] = []
+                
+                aggregates[aggregate.att_type].append(aggregate.agg_interval)
+        
+        return jsonify(aggregates)
+
+
 class AggregatesRowCount(Resource):
     def get(self, agg_interval, att_type):
         return get_from_db('SCALAR', att_type, agg_interval, Aggregate.agg_row_count)
+
 
 class AggregatesSize(Resource):
     def get(self, agg_interval, att_type):

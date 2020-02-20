@@ -206,11 +206,11 @@ def update_database_info(configuration):
         db.session.commit()
 
         # Retrieve all the aggregates row_count and sizes.
-        for fmt in config.DB_FORMAT:
-            if fmt is 'SCALAR':
-                for typ in config.AGG_TYPES:
+        for format in config.DB_FORMAT:
+            if format is 'SCALAR':
+                for type in config.AGG_TYPES:
                     for interval in config.AGG_INTERVAL:
-                        agg_name = 'cagg_'+fmt.lower()+'_'+typ.lower().replace('_', '')+'_'+interval
+                        agg_name = 'cagg_'+format.lower()+'_'+type.lower().replace('_', '')+'_'+interval
 
                         cursor.execute("WITH s AS ("
                                             "SELECT materialization_hypertable AS ht "
@@ -228,10 +228,10 @@ def update_database_info(configuration):
                         
                             logger.debug(("Updating parameter type {} and format {} for interval size: {}"
                                 "\n  Estimate number of rows: {}"
-                                "\n  Table size: {}").format(typ, fmt, interval, rows, agg_size))
+                                "\n  Table size: {}").format(type, format, interval, rows, agg_size))
                 
                             db.session.query(Aggregate).filter \
-                                    (Aggregate.att_format == fmt, Aggregate.att_type == typ, Aggregate.agg_interval == interval) \
+                                    (Aggregate.att_format == format, Aggregate.att_type == type, Aggregate.agg_interval == interval) \
                                 .update({"agg_row_count":rows, "agg_size":agg_size})
 
         db.session.commit()
@@ -282,12 +282,12 @@ def init_services(configuration):
     db.session.commit()
 
     # add the defaults
-    for fmt in config.DB_FORMAT:
+    for format in config.DB_FORMAT:
         # So far only scalar is supported, but keep the loop for later maybe
-        if fmt is 'SCALAR':
-            for typ in config.AGG_TYPES:
+        if format is 'SCALAR':
+            for type in config.AGG_TYPES:
                 for interval in config.AGG_INTERVAL:
-                    att = Aggregate(fmt, typ, interval)
+                    att = Aggregate(format, type, interval)
                     db.session.add(att)
                     db.session.commit()
 
