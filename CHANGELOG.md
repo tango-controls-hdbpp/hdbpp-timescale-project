@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added [hdbpp-cluster-reporting]
+ - Aggregate size
+ - Aggregate row count per type and interval
+
 ## [0.1.0] - 2020-01-05
 
 ### Added [hdbpp-cluster-reporting]
