@@ -40,6 +40,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
  - Block the version for the dependency Werkzeug as new version breaks flaskrestplus
 
+### Added [hdbpp-ttl]
+ - Report script result to rest reporting server
+
+### Added [hdbpp-cluster-reporting]
+ - PUT method for ttl reporting
+ - information from ttl
+
 ## [0.1.0] - 2020-01-05
 
 ### Added [hdbpp-cluster-reporting]
