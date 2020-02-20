@@ -384,9 +384,9 @@ def init_services(configuration):
     db.session.commit()
 
     # add the defaults
-    for fmt in config.DB_FORMAT:
-        for typ in config.DB_TYPES:
-            att = Datatable(fmt, typ)
+    for format in config.DB_FORMAT:
+        for type in config.DB_TYPES:
+            att = Datatable(format, type)
             db.session.add(att)
             db.session.commit()
 

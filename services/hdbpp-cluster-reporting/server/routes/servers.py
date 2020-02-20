@@ -53,8 +53,13 @@ class Server(Resource):
         try:
             server = models.Servers.query.filter(
                 models.Servers.hostname == host).one()
-        
-            return {"host": server.hostname, "state": server.state, "role": server.role}
+a           
+            lag = None
+            
+            if server.role != 'master' and parse_version(server.version) >= parse_version("1.6.1"):
+                lag = server.lag
+            
+            return {"host": server.hostname, "state": server.state, "role": server.role, "lag": lag}
         
         except NoResultFound:
             logger.error("Server: {} is not known to this service".format(host))
@@ -71,8 +76,13 @@ class Servers(Resource):
         servers_result = models.Servers.query.all()
 
         for server in servers_result:
+            lag = None
+            
+            if server.role != 'master' and parse_version(server.version) >= parse_version("1.6.1"):
+                lag = server.lag
+            
             servers["servers"].append(
-                {"host": server.hostname, "state": server.state, "role": server.role})
+                    {"host": server.hostname, "state": server.state, "role": server.role, "lag": lag})
 
         return jsonify(servers)
 
