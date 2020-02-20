@@ -30,7 +30,7 @@ list(APPEND LIBRARY_PATHS ${CMAKE_LIBRARY_PATH})
 # Start the project
 project(hdbpp_health_check)# VERSION ${VERSION_STRING} LANGUAGES CXX)
 
-option(ENABLE_CLANG "Enable clang code and layout analysis" ON)
+option(ENABLE_CLANG "Enable clang code and layout analysis" OFF)
 
 # arch install definitions
 include(GNUInstallDirs)

@@ -9,7 +9,7 @@ if ( ${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR} )
 endif()
 
 # Start Build Config -----------------------------------
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.11)
 set(CMAKE_SKIP_RPATH true)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_COLOR_MAKEFILE ON)
@@ -27,11 +27,12 @@ set(LIBHDBPP_PROJECT_BUILD TRUE)
 set(HDBPP_ES_VERSION "integrated-build")
 set(HDBPP_CM_VERSION "integrated-build")
 set(LIBHDBPP_VERSION "exp-refactor")
-set(EXTERNAL_PROJECT_DIR "components/external")
+set(LIBHDBPP_TIMESCALE_VERSION "project-build2")
+set(EXTERNAL_PROJECT_DIR "external")
 set(DOWNLOAD_DIR "download")
 
 # this will enable clang on all sub-compoents
-option(ENABLE_CLANG "Enable clang code and layout analysis" ON)
+option(ENABLE_CLANG "Enable clang code and layout analysis" OFF)
 
 # Code Analysis -----------------------------------
 if(ENABLE_CLANG)
@@ -52,36 +53,63 @@ if(ENABLE_CLANG)
     endif(NOT CLANG_TIDY_EXE)
 endif(ENABLE_CLANG)
 
-# configure hdbpp-es
-configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Fetch-hdbpp-es.cmake.in 
-    ${CMAKE_BINARY_DIR}/hdbpp-es-${DOWNLOAD_DIR}/CMakeLists.txt)
-
-execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" . WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/hdbpp-es-${DOWNLOAD_DIR}" )
-execute_process(COMMAND "${CMAKE_COMMAND}" --build . WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/hdbpp-es-${DOWNLOAD_DIR}" )
-
-# configure hdbpp-cm
-configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Fetch-hdbpp-cm.cmake.in 
-    ${CMAKE_BINARY_DIR}/hdbpp-cm-${DOWNLOAD_DIR}/CMakeLists.txt)
-
-execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" . WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/hdbpp-cm-${DOWNLOAD_DIR}" )
-execute_process(COMMAND "${CMAKE_COMMAND}" --build . WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/hdbpp-cm-${DOWNLOAD_DIR}" )
-
-# configure libhdbpp
-configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Fetch-libhdbpp.cmake.in 
-    ${CMAKE_BINARY_DIR}/libhdbpp-${DOWNLOAD_DIR}/CMakeLists.txt)
-    
-execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" . WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/libhdbpp-${DOWNLOAD_DIR}" )
-execute_process(COMMAND "${CMAKE_COMMAND}" --build . WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/libhdbpp-${DOWNLOAD_DIR}" )
-
-# add the various components to the project
-add_subdirectory(${EXTERNAL_PROJECT_DIR}/hdbpp-es EXCLUDE_FROM_ALL)
-add_subdirectory(${EXTERNAL_PROJECT_DIR}/hdbpp-cm EXCLUDE_FROM_ALL)
-add_subdirectory(${EXTERNAL_PROJECT_DIR}/libhdbpp EXCLUDE_FROM_ALL)
+# Find Dependencies  ---------------------
 add_subdirectory(components/hdbpp-health-check EXCLUDE_FROM_ALL)
-add_subdirectory(components/libhdbpp-timescale EXCLUDE_FROM_ALL)
+
+include(FetchContent)
+set(FETCHCONTENT_QUIET off)
+
+FetchContent_Declare(
+    hdbpp_cm
+    GIT_REPOSITORY "https://github.com/tango-controls-hdbpp/hdbpp-cm.git" 
+    GIT_TAG ${HDBPP_ES_VERSION}
+    SOURCE_DIR "${CMAKE_SOURCE_DIR}/${EXTERNAL_PROJECT_DIR}/hdbpp_cm")
+
+FetchContent_GetProperties(hdbpp_cm)
+
+if(NOT hdbpp_cm_POPULATED)
+  FetchContent_Populate(hdbpp_cm)
+  add_subdirectory(${hdbpp_cm_SOURCE_DIR} ${hdbpp_cm_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
+
+FetchContent_Declare(
+    hdbpp_es
+    GIT_REPOSITORY "https://github.com/tango-controls-hdbpp/hdbpp-es.git" 
+    GIT_TAG ${HDBPP_ES_VERSION}
+    SOURCE_DIR "${CMAKE_SOURCE_DIR}/${EXTERNAL_PROJECT_DIR}/hdbpp_es")
+
+FetchContent_GetProperties(hdbpp_es)
+
+if(NOT hdbpp_es_POPULATED)
+  FetchContent_Populate(hdbpp_es)
+  add_subdirectory(${hdbpp_es_SOURCE_DIR} ${hdbpp_es_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
+
+FetchContent_Declare(
+    libhdbpp
+    GIT_REPOSITORY "https://github.com/tango-controls-hdbpp/libhdbpp.git" 
+    GIT_TAG ${LIBHDBPP_VERSION}
+    SOURCE_DIR "${CMAKE_SOURCE_DIR}/${EXTERNAL_PROJECT_DIR}/libhdbpp")
+
+FetchContent_GetProperties(libhdbpp)
+
+if(NOT libhdbpp_POPULATED)
+  FetchContent_Populate(libhdbpp)
+  add_subdirectory(${libhdbpp_SOURCE_DIR} ${libhdbpp_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
+
+FetchContent_Declare(
+    libhdbpp_timescale
+    GIT_REPOSITORY "https://github.com/tango-controls-hdbpp/libhdbpp-timescale.git" 
+    GIT_TAG ${LIBHDBPP_TIMESCALE_VERSION}
+    SOURCE_DIR "${CMAKE_SOURCE_DIR}/${EXTERNAL_PROJECT_DIR}/libhdbpp-timescale")
+
+FetchContent_GetProperties(libhdbpp_timescale)
+
+if(NOT libhdbpp_timescale_POPULATED)
+  FetchContent_Populate(libhdbpp_timescale)
+  add_subdirectory(${libhdbpp_timescale_SOURCE_DIR} ${libhdbpp_timescale_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
 
 # update the libhdbpp project
 set_target_properties(libhdbpp_shared_library
