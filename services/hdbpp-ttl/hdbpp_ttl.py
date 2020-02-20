@@ -38,6 +38,7 @@ this script will delete dta from.
 
 import os
 import time
+import datetime
 import sys
 import argparse
 import math
@@ -47,7 +48,7 @@ import logging
 import logging.handlers
 
 from datetime import timedelta
-from hdbpp_rest_report import post_dict_to_rest
+from hdbpp_rest_report import put_dict_to_rest
 
 logger = logging.getLogger('hdbpp-ttl')
 
@@ -263,8 +264,13 @@ def run_command(args):
                 process_ttl(val["connection"], args.dryrun, processed_ttl)
                 delete_time = timedelta(seconds=time.monotonic() - start_time)
                 logger.info("Processed ttl request for configuration {} in: {}".format(key, delete_time))
+                
+                ttl_report = {"attributes":processed_ttl,
+                        "ttl_delete_duration":delete_time,
+                        "ttl_last_timestamp":datetime.datetime.now()}
+                
                 if "rest_endpoint" in val:
-                    post_dict_to_rest(val["rest_endpoint"], processed_ttl)
+                    put_dict_to_rest(val["rest_endpoint"], ttl_report)
 
         else:
             return False

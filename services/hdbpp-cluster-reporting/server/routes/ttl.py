@@ -22,8 +22,10 @@
 import logging
 
 import server.config as config
+import datetime
 from server import db as db
 from server.models import Attribute
+from server.models import Database
 from flask_restplus import Resource
 from flask import jsonify, request
 from server.errors import InvalidUsage
@@ -42,25 +44,84 @@ class Attributes(Resource):
         
         return jsonify(attributes)
 
-    def post(self):
+
+class Ttl(Resource):
+    def put(self):
         json = request.get_json()
 
         attributes = db.session.query(Attribute).all()
         
         for attribute in attributes:
-            if attribute.name in json:
-                if "ttl_rows_deleted" in json[attribute.name]:
-                    attribute.ttl_rows_deleted = json[attribute.name]["ttl_rows_deleted"]
-                    json.pop(attribute.name, None)
+            if "attributes" in json and attribute.name in json["attributes"]:
+                if "ttl_rows_deleted" in json["attributes"][attribute.name]:
+                    attribute.ttl_rows_deleted = json["attributes"][attribute.name]["ttl_rows_deleted"]
+                    json["attributes"].pop(attribute.name, None)
             
             else:
                 attribute.ttl_rows_deleted = None
         
-        for attribute, att_info in json.items():
-            if "ttl_rows_deleted" in att_info:
-                db.session.add(Attribute(attribute, att_info["ttl_rows_deleted"]))
+        if "attributes" in json:
+            for attribute, att_info in json["attributes"].items():
+                if "ttl_rows_deleted" in att_info:
+                    db.session.add(Attribute(attribute, att_info["ttl_rows_deleted"]))
         
         db.session.commit()
+
+        if "ttl_duration" in json or "ttl_last_execution" in json:
+            try:
+                database = db.session.query(Database).one()
+                
+                if "ttl_duration" in json:
+                    database.ttl_duration = json["ttl_duration"]
+                
+                if "ttl_last_execution" in json:
+                    database.ttl_last_execution = datetime.datetime.strptime(json["ttl_last_execution"], '%Y-%m-%d %H:%M:%S.%f')
+            
+            except NoResultFound:
+                logger.error(
+                    "No database defined in your system, check configuration file.")
+        
+            except MultipleResultsFound:
+                logger.error(
+                    "Multiple databases defined in your system, check configuration file.")
+        
+        db.session.commit()
+
+
+class TtlDuration(Resource):
+    def get(self):
+        try:
+            result = Database.query.with_entities(Database.ttl_duration).one()
+            
+            return jsonify(result.ttl_duration)
+        
+        except NoResultFound:
+            logger.error(
+                    "No database defined in your system, check configuration file.")
+            raise InvalidUsage("No database defined in your system, check configuration file.", 404)
+
+        except MultipleResultsFound:
+            logger.error(
+                    "Multiple databases defined in your system, check configuration file.")
+            raise InvalidUsage("Multiple databases defined in your system, check configuration file.", 404)
+        
+
+class TtlLastExecution(Resource):
+    def get(self):
+        try:
+            result = Database.query.with_entities(Database.ttl_last_execution).one()
+            
+            return jsonify(result.ttl_last_execution)
+        
+        except NoResultFound:
+            logger.error(
+                    "No database defined in your system, check configuration file.")
+            raise InvalidUsage("No database defined in your system, check configuration file.", 404)
+
+        except MultipleResultsFound:
+            logger.error(
+                    "Multiple databases defined in your system, check configuration file.")
+            raise InvalidUsage("Multiple databases defined in your system, check configuration file.", 404)
 
 
 class AttributeRowDeleted(Resource):

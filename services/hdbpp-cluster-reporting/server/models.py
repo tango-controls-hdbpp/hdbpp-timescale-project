@@ -101,12 +101,17 @@ class Database(db.Model):
        Name of the database.
     size : int
        size of the database, in bytes.
-
+    ttl_last_execution : datetime
+       Last time the ttl script ran on the database.
+    ttl_duration : int
+       duration of the last ttl script execution, in s.
     """
     
     __tablename__ = 'Database'
     name = db.Column(db.String(), nullable=False, primary_key=True)
     size = db.Column(db.Integer(), nullable=False)
+    ttl_last_execution = db.Column(db.DateTime(), nullable=True)
+    ttl_duration = db.Column(db.Integer(), nullable=True)
 
     def __init__(self, name):
         self.name = name
@@ -131,3 +136,4 @@ class Attribute(db.Model):
     def __init__(self, name, ttl):
         self.name = name
         self.ttl_rows_deleted = ttl
+

@@ -129,13 +129,45 @@ def post_dict_to_rest(api_endpoint, json_data):
     This function opens a connection to the rest server and
     send a POST message with the json_data 
     """
+    return send_dict_to_rest(api_endpoint, json_data, "POST")
+
+
+def put_dict_to_rest(api_endpoint, json_data):
+    """
+    This function opens a connection to the rest server and
+    send a PUT message with the json_data 
+    """
+    return send_dict_to_rest(api_endpoint, json_data, "PUT")
+
+
+def patch_dict_to_rest(api_endpoint, json_data):
+    """
+    This function opens a connection to the rest server and
+    send a PATCH message with the json_data 
+    """
+    return send_dict_to_rest(api_endpoint, json_data, "PATCH")
+
+
+def send_dict_to_rest(api_endpoint, json_data, method):
+    """
+    This function opens a connection to the rest server and
+    send a message with the specified method with the json_data 
+    """
 
     # We are sending json so set the header properly
     header = {"Content-Type" : "application/json"}
 
 
     # send the data
-    answer = requests.post(api_endpoint, data=json.dumps(json_data), headers=header)
+    if "PUT" == method:
+        answer = requests.put(api_endpoint, data=json.dumps(json_data, default=str), headers=header)
+    elif "POST" == method:
+        answer = requests.post(api_endpoint, data=json.dumps(json_data, default=str), headers=header)
+    elif "PATCH" == method:
+        answer = requests.patch(api_endpoint, data=json.dumps(json_data, default=str), headers=header)
+    else:
+        logger.error("Specified method {} is not meant to send data".format(method))
+        return False
     
     try:
         answer.raise_for_status()
@@ -181,7 +213,7 @@ def run_command(args):
         # we have a config file, validate the config
         if valid_config(config):
             start_time = time.monotonic()
-            logger.info("Processing rest post report for configuration: {}".format(config))
+            logger.info("Processing rest put report for configuration: {}".format(config))
             message = {}
             
             if "json_message" in config:
@@ -191,9 +223,9 @@ def run_command(args):
                 with open(config["json_file"], 'r') as fp:
                     message = json.load(fp)
             
-            post_dict_to_rest(config["api_url"]+config["endpoint"], message)
+            put_dict_to_rest(config["api_url"]+config["endpoint"], message)
             send_time = timedelta(seconds=time.monotonic() - start_time)
-            logger.info("Processed rest post report for configuration {} in: {}".format(config, send_time))
+            logger.info("Processed rest put report for configuration {} in: {}".format(config, send_time))
 
         else:
             return False
