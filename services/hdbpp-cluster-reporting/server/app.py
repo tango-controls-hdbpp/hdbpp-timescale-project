@@ -215,6 +215,9 @@ def create_app(config_name):
     api.add_resource(attributes_endpoint.AttributesTypeOrFormatCount, '/database/attributes/count/<string:att_info>')
     api.add_resource(attributes_endpoint.AttributesFormatTypeCount, '/database/attributes/count/<string:att_format>/<string:att_type>')
     
+    api.add_resource(ttl_endpoint.Ttl, '/database/ttl')
+    api.add_resource(ttl_endpoint.TtlLastExecution, '/database/ttl/last_execution')
+    api.add_resource(ttl_endpoint.TtlDuration, '/database/ttl/duration')
     api.add_resource(ttl_endpoint.Attributes, '/database/ttl/attributes')
     api.add_resource(ttl_endpoint.AttributeRowDeleted, '/database/ttl/daily_rows_deleted/<string:att_name>')
     
@@ -231,7 +234,7 @@ def create_app(config_name):
     api.add_resource(aggregates_endpoint.AggregatesSize, '/database/aggregates/size/<string:agg_interval>/<string:att_type>')
 
     api.add_resource(database_endpoint.Databases, '/databases')
-    api.add_resource(database_endpoint.DatabaseSize, '/database/size/<string:db_name>')
+    api.add_resource(database_endpoint.DatabaseSize, '/database/size')
     api.add_resource(database_endpoint.DatabaseSizeUnit, '/database/size/unit')
 
     return app
