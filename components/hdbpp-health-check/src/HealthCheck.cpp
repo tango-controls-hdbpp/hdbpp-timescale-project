@@ -69,22 +69,26 @@ std::tuple<HealthCheck::HealthCheckResult, std::string> HealthCheck::check_hosts
         rapidjson::Document document;
         document.Parse(result->body.c_str());
 
+        std::tuple<HealthCheck::HealthCheckResult, std::string> result;
+
         if (!document.IsObject() || !document["state"].IsString() || document.HasMember("state"))
-            return std::make_tuple(HealthCheckResult::ConnectionProblem, invalid_response);
+            result = std::make_tuple(HealthCheckResult::ConnectionProblem, invalid_response);
 
         // get a valid reponse, now check the cluster
         if (document["state"] == "Ok")
-            return std::make_tuple(HealthCheckResult::Ok, server_no_errors);
+            result = std::make_tuple(HealthCheckResult::Ok, server_no_errors);
 
         else if (document["state"] == "Warning")
-            return std::make_tuple(HealthCheckResult::Warning, server_warning);
+            result = std::make_tuple(HealthCheckResult::Warning, server_warning);
 
         else if (document["state"] == "Error") 
-            return std::make_tuple(HealthCheckResult::Error, server_error);
+            result = std::make_tuple(HealthCheckResult::Error, server_error);
 
         else
-            return std::make_tuple(
+            result = std::make_tuple(
                 HealthCheckResult::ConnectionProblem, "Unable to understand database cluster host state, please fix so state can be reported.");
+
+        return result;
     }
 
     return std::make_tuple(HealthCheckResult::ConnectionProblem, no_reponse);

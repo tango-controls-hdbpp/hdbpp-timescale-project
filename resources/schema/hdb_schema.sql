@@ -123,8 +123,6 @@ CREATE TABLE IF NOT EXISTS att_conf (
 );
 
 COMMENT ON TABLE att_conf is 'Attribute Configuration Table';
-CREATE INDEX IF NOT EXISTS att_conf_att_conf_id_idx ON att_conf (att_conf_id);
-CREATE INDEX IF NOT EXISTS att_conf_att_conf_type_id_idx ON att_conf (att_conf_type_id);
 
 -------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS att_history_event (
@@ -147,7 +145,6 @@ CREATE TABLE IF NOT EXISTS att_history (
 );
 
 COMMENT ON TABLE att_history is 'Attribute Configuration Events History Table';
-CREATE INDEX IF NOT EXISTS att_history_att_conf_id_inx ON att_history (att_conf_id);
 
 -------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS att_parameter (
@@ -180,7 +177,6 @@ CREATE TABLE IF NOT EXISTS att_error_desc (
 );
 
 COMMENT ON TABLE att_error_desc IS 'Error Description Table';
-CREATE INDEX IF NOT EXISTS att_error_desc_att_error_desc_id_idx ON att_error_desc (att_error_desc_id);
 
 -------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS att_scalar_devboolean (

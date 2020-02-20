@@ -38,4 +38,4 @@ lib/
 .settings
 
 # Custom stuff
-external/
+components/external/

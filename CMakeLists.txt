@@ -27,7 +27,7 @@ set(LIBHDBPP_PROJECT_BUILD TRUE)
 set(HDBPP_ES_VERSION "integrated-build")
 set(HDBPP_CM_VERSION "integrated-build")
 set(LIBHDBPP_VERSION "exp-refactor")
-set(EXTERNAL_PROJECT_DIR "external")
+set(EXTERNAL_PROJECT_DIR "components/external")
 set(DOWNLOAD_DIR "download")
 
 # this will enable clang on all sub-compoents
@@ -80,7 +80,8 @@ execute_process(COMMAND "${CMAKE_COMMAND}" --build . WORKING_DIRECTORY "${CMAKE_
 add_subdirectory(${EXTERNAL_PROJECT_DIR}/hdbpp-es EXCLUDE_FROM_ALL)
 add_subdirectory(${EXTERNAL_PROJECT_DIR}/hdbpp-cm EXCLUDE_FROM_ALL)
 add_subdirectory(${EXTERNAL_PROJECT_DIR}/libhdbpp EXCLUDE_FROM_ALL)
-add_subdirectory(device-servers/hdbpp-health-check EXCLUDE_FROM_ALL)
+add_subdirectory(components/hdbpp-health-check EXCLUDE_FROM_ALL)
+add_subdirectory(components/libhdbpp-timescale EXCLUDE_FROM_ALL)
 
 # update the libhdbpp project
 set_target_properties(libhdbpp_shared_library
@@ -108,9 +109,21 @@ set_target_properties(hdbpp_health_check
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 
+set_target_properties(libhdbpp_timescale_shared_library
+    PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+
 # now create a phoney target that can build the entire project
 add_custom_target(project)
-add_dependencies(project libhdbpp_shared_library hdbpp_es hdbpp_cm hdbpp_health_check)
+
+add_dependencies(project 
+    libhdbpp_shared_library 
+    libhdbpp_timescale_shared_library 
+    hdbpp_es 
+    hdbpp_cm 
+    hdbpp_health_check)
 
 set_target_properties(project
     PROPERTIES

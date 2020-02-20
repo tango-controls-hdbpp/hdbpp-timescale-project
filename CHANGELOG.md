@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 * Added hdbpp-health-check device server
 
+### Chanaged [device-servers]
+
+* Cleaned up Clang warnings for HdbppHealthCheck.
+
+### Chanaged [schema]
+
+* Removed some duplicate indexes
+
 ### Added [general]
 
 * Updated create-test-database help display.
