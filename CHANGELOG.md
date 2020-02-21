@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added [hdbpp-cluster-reporting]
+ - Aggregate size
+ - Aggregate row count per type and interval
+
 ### Added [decimation]
  - Schema for the aggregates view for scalar data.
    aggregates avg, min, max, stddev over a year.
@@ -16,6 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed [hdbpp-cluster-reporting]
  - Block the version for the dependency Werkzeug as new
    version breaks flaskrestplus
+
 
 ## [0.1.0] - 2020-01-05
 

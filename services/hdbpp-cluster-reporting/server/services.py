@@ -32,6 +32,7 @@ from server import db as db
 from server.models import Servers
 from server.models import Database
 from server.models import Datatable
+from server.models import Aggregate
 from apscheduler.schedulers.background import BackgroundScheduler
 
 logger = logging.getLogger(config.LOGGER_NAME)
@@ -203,6 +204,37 @@ def update_database_info(configuration):
                         .update({"att_row_count":rows, "att_interval":interval, "att_size":table_size, "att_current_chunk_size":chunk_size})
 
         db.session.commit()
+
+        # Retrieve all the aggregates row_count and sizes.
+        for format in config.DB_FORMAT:
+            if format is 'SCALAR':
+                for type in config.AGG_TYPES:
+                    for interval in config.AGG_INTERVAL:
+                        agg_name = 'cagg_'+format.lower()+'_'+type.lower().replace('_', '')+'_'+interval
+
+                        cursor.execute("WITH s AS ("
+                                            "SELECT materialization_hypertable AS ht "
+                                            "FROM timescaledb_information.continuous_aggregates "
+                                            "WHERE view_name='"+agg_name+"'::regclass"
+                                        ") "
+                                        "SELECT total_bytes, row_estimate "
+                                        "FROM hypertable_relation_size((SELECT ht FROM s)), "
+                                        "hypertable_approximate_row_count((SELECT ht FROM s));")
+                        
+                        sizes = cursor.fetchall()
+                        for result in sizes:
+                            rows = result[1]
+                            agg_size = result[0]
+                        
+                            logger.debug(("Updating parameter type {} and format {} for interval size: {}"
+                                "\n  Estimate number of rows: {}"
+                                "\n  Table size: {}").format(type, format, interval, rows, agg_size))
+                
+                            db.session.query(Aggregate).filter \
+                                    (Aggregate.att_format == format, Aggregate.att_type == type, Aggregate.agg_interval == interval) \
+                                .update({"agg_row_count":rows, "agg_size":agg_size})
+
+        db.session.commit()
         connection.commit()
         cursor.close()
     
@@ -244,6 +276,20 @@ def init_services(configuration):
             att = Datatable(fmt, typ)
             db.session.add(att)
             db.session.commit()
+
+    # clear the aggregate db
+    db.session.query(Aggregate).delete()
+    db.session.commit()
+
+    # add the defaults
+    for format in config.DB_FORMAT:
+        # So far only scalar is supported, but keep the loop for later maybe
+        if format is 'SCALAR':
+            for type in config.AGG_TYPES:
+                for interval in config.AGG_INTERVAL:
+                    att = Aggregate(format, type, interval)
+                    db.session.add(att)
+                    db.session.commit()
 
     # clear the cluster status and reset with defaults
     db.session.query(Servers).delete()
