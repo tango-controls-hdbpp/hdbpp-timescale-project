@@ -1,0 +1,6 @@
+[submodule "device-servers/hdbpp-health-check/thirdparty/cpp-httplib"]
+	path = device-servers/hdbpp-health-check/thirdparty/cpp-httplib
+	url = https://github.com/yhirose/cpp-httplib.git
+[submodule "device-servers/hdbpp-health-check/thirdparty/rapidjson"]
+	path = device-servers/hdbpp-health-check/thirdparty/rapidjson
+	url = https://github.com/Tencent/rapidjson.git

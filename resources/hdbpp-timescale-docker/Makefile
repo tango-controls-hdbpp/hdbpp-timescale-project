@@ -1,4 +1,5 @@
 NAME=hdbpp-timescale
+TIMESCALEDB_VER=1.6.0
 PG_VER=pg11
 
 default: image
@@ -6,7 +7,7 @@ default: image
 build-files/.built: Dockerfile
 	mkdir -p build-files/
 	cp -rf ../schema/ build-files/
-	docker build --build-arg PG_VERSION=$(PG_VER) -t $(NAME):latest .
+	docker build --build-arg PG_VERSION=$(PG_VER) --build-arg TDB_VERSION=${TIMESCALEDB_VER} -t $(NAME):latest .
 	touch build-files/.built
 
 lint:

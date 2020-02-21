@@ -19,6 +19,8 @@
 -- along with libhdb++timescale.  If not, see <http://www.gnu.org/licenses/>.
 -- -----------------------------------------------------------------------------
 
+-- Create the hdb database and use it
+CREATE DATABASE hdb;
 \c hdb
 
 -- Add the timescaledb extension (Important)
@@ -68,7 +70,7 @@ INSERT INTO att_conf_type (type, type_num) VALUES
 ('DEV_BOOLEAN', 1),('DEV_SHORT', 2),('DEV_LONG', 3),('DEV_FLOAT', 4),
 ('DEV_DOUBLE', 5),('DEV_USHORT', 6),('DEV_ULONG', 7),('DEV_STRING', 8),
 ('DEV_STATE', 19),('DEV_UCHAR',22),('DEV_LONG64', 23),('DEV_ULONG64', 24),
-('DEV_ENCODED', 28),('DEV_ENUM', 30) ON CONFLICT (type, type_num) DO NOTHING;
+('DEV_ENCODED', 28),('DEV_ENUM', 30);
 
 -- Mappings for ths Tango Data Format Type (used in att_conf)
 CREATE TABLE IF NOT EXISTS att_conf_format (
@@ -81,7 +83,7 @@ CREATE TABLE IF NOT EXISTS att_conf_format (
 COMMENT ON TABLE att_conf_format is 'Attribute format type';
 
 INSERT INTO att_conf_format (format, format_num) VALUES
-('SCALAR', 0),('SPECTRUM', 1),('IMAGE', 2) ON CONFLICT (format, format_num) DO NOTHING;
+('SCALAR', 0),('SPECTRUM', 1),('IMAGE', 2);
 
 -- Mappings for the Tango Data Write Type (used in att_conf)
 CREATE TABLE IF NOT EXISTS att_conf_write (
@@ -94,7 +96,7 @@ CREATE TABLE IF NOT EXISTS att_conf_write (
 COMMENT ON TABLE att_conf_write is 'Attribute write type';
 
 INSERT INTO att_conf_write (write, write_num) VALUES
-('READ', 0),('READ_WITH_WRITE', 1),('WRITE', 2),('READ_WRITE', 3) ON CONFLICT (write, write_num) DO NOTHING;
+('READ', 0),('READ_WITH_WRITE', 1),('WRITE', 2),('READ_WRITE', 3);
 
 -- The att_conf table contains the primary key for all data tables, the
 -- att_conf_id. Expanded on the normal hdb++ tables since we add information
@@ -121,8 +123,6 @@ CREATE TABLE IF NOT EXISTS att_conf (
 );
 
 COMMENT ON TABLE att_conf is 'Attribute Configuration Table';
-CREATE INDEX IF NOT EXISTS att_conf_att_conf_id_idx ON att_conf (att_conf_id);
-CREATE INDEX IF NOT EXISTS att_conf_att_conf_type_id_idx ON att_conf (att_conf_type_id);
 
 -------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS att_history_event (
@@ -145,7 +145,6 @@ CREATE TABLE IF NOT EXISTS att_history (
 );
 
 COMMENT ON TABLE att_history is 'Attribute Configuration Events History Table';
-CREATE INDEX IF NOT EXISTS att_history_att_conf_id_inx ON att_history (att_conf_id);
 
 -------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS att_parameter (
@@ -178,7 +177,6 @@ CREATE TABLE IF NOT EXISTS att_error_desc (
 );
 
 COMMENT ON TABLE att_error_desc IS 'Error Description Table';
-CREATE INDEX IF NOT EXISTS att_error_desc_att_error_desc_id_idx ON att_error_desc (att_error_desc_id);
 
 -------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS att_scalar_devboolean (
