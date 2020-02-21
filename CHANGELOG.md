@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 * Cleaned up Clang warnings for HdbppHealthCheck.
 
-### Chanaged [schema]
+### Changed [schema]
 
 * Removed some duplicate indexes
 

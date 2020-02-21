@@ -68,8 +68,8 @@ FetchContent_Declare(
 FetchContent_GetProperties(hdbpp_cm)
 
 if(NOT hdbpp_cm_POPULATED)
-  FetchContent_Populate(hdbpp_cm)
-  add_subdirectory(${hdbpp_cm_SOURCE_DIR} ${hdbpp_cm_BINARY_DIR} EXCLUDE_FROM_ALL)
+    FetchContent_Populate(hdbpp_cm)
+    add_subdirectory(${hdbpp_cm_SOURCE_DIR} ${hdbpp_cm_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
 
 FetchContent_Declare(
@@ -81,8 +81,8 @@ FetchContent_Declare(
 FetchContent_GetProperties(hdbpp_es)
 
 if(NOT hdbpp_es_POPULATED)
-  FetchContent_Populate(hdbpp_es)
-  add_subdirectory(${hdbpp_es_SOURCE_DIR} ${hdbpp_es_BINARY_DIR} EXCLUDE_FROM_ALL)
+    FetchContent_Populate(hdbpp_es)
+    add_subdirectory(${hdbpp_es_SOURCE_DIR} ${hdbpp_es_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
 
 FetchContent_Declare(
@@ -94,8 +94,8 @@ FetchContent_Declare(
 FetchContent_GetProperties(libhdbpp)
 
 if(NOT libhdbpp_POPULATED)
-  FetchContent_Populate(libhdbpp)
-  add_subdirectory(${libhdbpp_SOURCE_DIR} ${libhdbpp_BINARY_DIR} EXCLUDE_FROM_ALL)
+    FetchContent_Populate(libhdbpp)
+    add_subdirectory(${libhdbpp_SOURCE_DIR} ${libhdbpp_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
 
 FetchContent_Declare(
@@ -107,8 +107,8 @@ FetchContent_Declare(
 FetchContent_GetProperties(libhdbpp_timescale)
 
 if(NOT libhdbpp_timescale_POPULATED)
-  FetchContent_Populate(libhdbpp_timescale)
-  add_subdirectory(${libhdbpp_timescale_SOURCE_DIR} ${libhdbpp_timescale_BINARY_DIR} EXCLUDE_FROM_ALL)
+    FetchContent_Populate(libhdbpp_timescale)
+    add_subdirectory(${libhdbpp_timescale_SOURCE_DIR} ${libhdbpp_timescale_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
 
 # update the libhdbpp project

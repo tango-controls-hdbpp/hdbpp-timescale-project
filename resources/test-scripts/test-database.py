@@ -190,7 +190,7 @@ def data(type, data_requested):
         elif type is 28:
             raise Exception("Unsupported type - Encoded")
 
-        elif type is 9:
+        elif type is 29:
             raise Exception("Unsupported type - Enum")
 
     # for a scalar, the requested number is 1, so return the actual value
