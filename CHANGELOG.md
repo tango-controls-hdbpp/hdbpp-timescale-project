@@ -9,11 +9,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added [hdbpp-cluster-reporting]
  - Replica database lag
+ - Aggregate size
+ - Aggregate row count per type and interval
 
 ### Changed [hdbpp-cluster-reporting]
  - Use /cluster endpoint from patroni, if available,
    to retrieve some of the data.
    Check for patroni version if the endpoint exists.
+
+### Added [decimation]
+ - Schema for the aggregates view for scalar data.
+   aggregates avg, min, max, stddev over a year.
+   for floating point data, nan and infinity values are
+   counted and not taken into account
+
+### Fixed [hdbpp-cluster-reporting]
+ - Block the version for the dependency Werkzeug as new
+   version breaks flaskrestplus
+
 
 ## [0.1.0] - 2020-01-05
 

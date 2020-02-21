@@ -116,6 +116,41 @@ class Datatable(db.Model):
     def __repr__(self):
         return "<Data table %r.%r>" % self.att_format, self.att_type
 
+class Aggregate(db.Model):
+    """
+    Represents information about an aggregate view in the database
+
+    Attributes
+    ----------
+    att_type : str
+        type of the attributes from this table
+    att_format : str
+        format of the attributes (Scalar or Spectrum)
+    agg_interval : str
+        interval this aggregate is running on
+    agg_row_count : int
+        An estimate of the number of lines for this format and type and interval
+    agg_size : int
+        Total size of the table, in bytes for this format and type and interval
+    """
+
+    __tablename__ = 'Aggregate'
+    att_type = db.Column(db.String(), nullable=False, primary_key=True)
+    att_format = db.Column(db.String(), nullable=False, primary_key=True)
+    agg_interval = db.Column(db.String(), nullable=False, primary_key=True)
+    agg_row_count = db.Column(db.Integer, nullable=False)
+    agg_size = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, att_format, att_type, agg_interval):
+        self.att_type = att_type
+        self.att_format = att_format
+        self.agg_interval = agg_interval
+        self.agg_row_count = 0
+        self.agg_size = 0
+
+    def __repr__(self):
+        return "<Aggregate view %r.%r: %r>" % self.att_format, self.att_type, self.agg_interval
+
 class Database(db.Model):
     """
     Represents general information about the database

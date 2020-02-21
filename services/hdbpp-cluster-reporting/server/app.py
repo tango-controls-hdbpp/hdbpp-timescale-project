@@ -29,6 +29,7 @@ import server.services as services
 import server.routes.status as status_endpoint
 import server.routes.servers as servers_endpoint
 import server.routes.attributes as attributes_endpoint
+import server.routes.aggregates as aggregates_endpoint
 import server.routes.database as database_endpoint
 
 from server.errors import InvalidUsage
@@ -221,6 +222,10 @@ def create_app(config_name):
     api.add_resource(attributes_endpoint.AttributesCurrentSize, '/database/tables/current_size/<string:att_format>/<string:att_type>')
     api.add_resource(attributes_endpoint.AttributesSizeUnit, '/database/tables/current_size/unit')
     
+    api.add_resource(aggregates_endpoint.Aggregates, '/database/aggregates')
+    api.add_resource(aggregates_endpoint.AggregatesRowCount, '/database/aggregates/row_count/<string:agg_interval>/<string:att_type>')
+    api.add_resource(aggregates_endpoint.AggregatesSize, '/database/aggregates/size/<string:agg_interval>/<string:att_type>')
+
     api.add_resource(database_endpoint.Databases, '/databases')
     api.add_resource(database_endpoint.DatabaseSize, '/database/size/<string:db_name>')
     api.add_resource(database_endpoint.DatabaseSizeUnit, '/database/size/unit')
@@ -267,6 +272,7 @@ def main():
     from server.models import Servers
     from server.models import Datatable
     from server.models import Database
+    from server.models import Aggregate
     db.app = app
     db.init_app(app)
     db.create_all()
