@@ -110,28 +110,6 @@ def valid_config(config):
                 logger.error("No user defined in 'connection' section. Please check the config file is valid")
                 return False
 
-        if "schedule" not in val:
-            logger.error("Missing section 'connection' in config file. Please check the config file is valid")
-            return False
-
-        else:
-            if "window" not in val["schedule"]:
-                logger.error("No window defined in 'connection' section. Please check the config file is valid")
-                return False
-
-            if len(val["schedule"]["window"].split()) == 2:
-                schedule = val["schedule"]["window"].split()
-
-                try:
-                    i = int(schedule[0])
-                except ValueError:
-                    logger.error("The schedule must be of the format: NUMBER PERIOD example: 28 days")
-                    return False
-
-                if schedule[1] != "days" and schedule[1] != "hours" and schedule[1] != "week":
-                    logger.error("The schedule period supports hours/days/weeks")
-                    return False
-
     return True
 
 
@@ -200,7 +178,7 @@ def write_config(path, config):
     logger.info("Written config file: {}".format(path))
 
 
-def reorder_table(table_name, server_config, schedule, ordered_chunks):
+def reorder_table(table_name, server_config, ordered_chunks):
     """
     Perform a reorder chunks request on the given table name on the given
     server config. This function will open a connection, perform the action then
@@ -209,7 +187,6 @@ def reorder_table(table_name, server_config, schedule, ordered_chunks):
     Arguments:
         table_name : str -- name of the table to reorder the chunks for
         server_config : dict -- dictionary of values from the config file that defines the server
-        schedule : dict -- dictionary of keys from the config that defines the reorder schedule
         ordered_chunks : list -- list of chunks that have already been ordered
 
     Returns:
@@ -241,14 +218,14 @@ def reorder_table(table_name, server_config, schedule, ordered_chunks):
     try:
         start_time = time.monotonic()
         cursor = connection.cursor()
-        logger.debug("Fetching the last '{}' of chunks....".format(schedule["window"]))
+        logger.debug("Fetching all chunks except the last....")
 
         # ensure we are clustering on the composite index
         cursor.execute("ALTER TABLE {} CLUSTER ON {}{};".format(table_name, table_name, idx_postfix))
 
         # get the config window of chunks to be reordered, we pass the window from the
         # configuration directly into the SQL, this is why its format is strictly enforced.
-        cursor.execute("SELECT show_chunks('{}', newer_than => now() - interval '{}', older_than => now());".format(table_name, schedule["window"]))
+        cursor.execute("SELECT show_chunks('{}', older_than => now());".format(table_name))
         chunks = cursor.fetchall()
         logger.debug("Fetched {} chunk(s)".format(len(chunks)))
 
@@ -326,13 +303,14 @@ def run_command(args):
             # each root entry in the config file
             for key, val in config.items():
                 start_time = time.monotonic()
-                logger.info("Processing reorder chunks configuration: {} with schedule: {}".format(key, val["schedule"]))
+                logger.info("Processing reorder chunks configuration: {}".format(key))
 
                 for table in tables:
                     if ordered_chunks is not None:
                         if ordered_chunks[table] is None:
                             ordered_chunks[table] = []
-                        if not reorder_table(table, val["connection"], val["schedule"], ordered_chunks[table]):
+                        
+                        if not reorder_table(table, val["connection"], ordered_chunks[table]):
                             write_config(args.ordered_chunks, ordered_chunks)
                             logger.error("Breaking reorder tables attempt due to previous error")
                             return False

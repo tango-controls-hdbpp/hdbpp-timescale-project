@@ -56,10 +56,15 @@ key = Config.SECRET_KEY
 
 LOGGER_NAME = "hdbpp_cluster_reporting"
 version_major = 0
-version_minor = 1
+version_minor = 2
 version_patch = 0
 
-# Constands used in some places, make it easier to modify the strings later
+# Constants used in some places, make it easier to modify the strings later
 CONNECTION_STATE_ERROR = "connection error"
 CONNECTION_STATE_UNKNOWN = "unknown"
 SERVER_ROLE_UNKNOWN = "unknown"
+#Supported types and format, the one not listed there will generate errors on queries.
+DB_TYPES = ['DEV_BOOLEAN', 'DEV_SHORT', 'DEV_LONG', 'DEV_FLOAT', 'DEV_DOUBLE', 'DEV_USHORT', 'DEV_ULONG', 'DEV_STRING', 'DEV_STATE', 'DEV_UCHAR', 'DEV_LONG64', 'DEV_ULONG64']
+DB_FORMAT = ['SCALAR', 'SPECTRUM']
+AGG_TYPES = ['DEV_SHORT', 'DEV_LONG', 'DEV_FLOAT', 'DEV_DOUBLE', 'DEV_USHORT', 'DEV_ULONG', 'DEV_LONG64', 'DEV_ULONG64']
+AGG_INTERVAL = ['1min', '10min', '1hour', '8hour', '1day']

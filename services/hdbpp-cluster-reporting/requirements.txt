@@ -6,3 +6,6 @@ requests
 Flask-RestPlus
 Flask-SQLAlchemy
 gunicorn
+psycopg2-binary
+packaging
+Werkzeug < 1.0.0
