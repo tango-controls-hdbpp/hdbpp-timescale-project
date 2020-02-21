@@ -53,7 +53,7 @@ class Server(Resource):
         try:
             server = models.Servers.query.filter(
                 models.Servers.hostname == host).one()
-a           
+
             lag = None
             
             if server.role != 'master' and parse_version(server.version) >= parse_version("1.6.1"):
