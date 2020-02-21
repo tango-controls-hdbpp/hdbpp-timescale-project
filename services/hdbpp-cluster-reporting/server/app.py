@@ -206,6 +206,7 @@ def create_app(config_name):
     api.add_resource(servers_endpoint.Server, '/servers/server/<string:host>')
     api.add_resource(servers_endpoint.ServerState, '/servers/server/state/<string:host>')
     api.add_resource(servers_endpoint.ServerRole, '/servers/server/role/<string:host>')
+    api.add_resource(servers_endpoint.ServerLag, '/servers/server/lag/<string:host>')
 
     api.add_resource(attributes_endpoint.AttributesType, '/database/attributes/type')
     api.add_resource(attributes_endpoint.AttributesFormat, '/database/attributes/format')

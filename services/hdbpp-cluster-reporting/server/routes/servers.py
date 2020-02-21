@@ -26,6 +26,10 @@ import server.models as models
 
 from flask_restplus import Resource
 from flask import jsonify, abort
+from server.errors import InvalidUsage
+from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import MultipleResultsFound
+from packaging.version import parse as parse_version
 
 logger = logging.getLogger(config.LOGGER_NAME)
 
@@ -46,18 +50,24 @@ class Hosts(Resource):
 
 class Server(Resource):
     def get(self, host):
-        server = models.Servers.query.filter(
-            models.Servers.hostname == host).all()
+        try:
+            server = models.Servers.query.filter(
+                models.Servers.hostname == host).one()
+a           
+            lag = None
+            
+            if server.role != 'master' and parse_version(server.version) >= parse_version("1.6.1"):
+                lag = server.lag
+            
+            return {"host": server.hostname, "state": server.state, "role": server.role, "lag": lag}
+        
+        except NoResultFound:
+            logger.error("Server: {} is not known to this service".format(host))
+            raise InvalidUsage("Server: {} is not known to this service".format(host))
 
-        if len(server) < 1:
-            logger.error("Server: {} is not known to this service".format(server))
-            abort(404)
-
-        if len(server) > 1:
-            logger.error("Server: {} return to many results. Unexpected error.".format(server))
-            abort(404)
-
-        return {"host": server[0].hostname, "state": server[0].state, "role": server[0].role}
+        except MultipleResultsFound:
+            logger.error("Server: {} return to many results. Unexpected error.".format(host))
+            raise InvalidUsage("Server: {} return to many results. Unexpected error.".format(host))
 
 
 class Servers(Resource):
@@ -66,39 +76,71 @@ class Servers(Resource):
         servers_result = models.Servers.query.all()
 
         for server in servers_result:
+            lag = None
+            
+            if server.role != 'master' and parse_version(server.version) >= parse_version("1.6.1"):
+                lag = server.lag
+            
             servers["servers"].append(
-                {"host": server.hostname, "state": server.state, "role": server.role})
+                    {"host": server.hostname, "state": server.state, "role": server.role, "lag": lag})
 
         return jsonify(servers)
 
 
 class ServerRole(Resource):
     def get(self, host):
-        server = models.Servers.query.filter(
-            models.Servers.hostname == host).all()
+        try:
+            server = models.Servers.query.filter(
+                    models.Servers.hostname == host).one()
+        
+            return {"role": server.role}
+        
+        except NoResultFound:
+            logger.error("Server: {} is not known to this service".format(host))
+            raise InvalidUsage("Server: {} is not known to this service".format(host))
 
-        if len(server) < 1:
-            logger.error("Server: {} is not known to this service".format(server))
-            abort(404)
-
-        if len(server) > 1:
-            logger.error("Server: {} returns to many results. Unexpected error.".format(server))
-            abort(404)
-
-        return {"role": server[0].role}
+        except MultipleResultsFound:
+            logger.error("Server: {} return to many results. Unexpected error.".format(host))
+            raise InvalidUsage("Server: {} return to many results. Unexpected error.".format(host))
 
 
 class ServerState(Resource):
     def get(self, host):
-        server = models.Servers.query.filter(
-            models.Servers.hostname == host).all()
+        try:
+            server = models.Servers.query.filter(
+                models.Servers.hostname == host).one()
 
-        if len(server) < 1:
-            logger.error("Server: {} is not known to this service".format(server))
-            abort(404)
+            return {"state": server.state}
 
-        if len(server) > 1:
-            logger.error("Server: {} returns to many results. Unexpected error.".format(server))
-            abort(404)
+        except NoResultFound:
+            logger.error("Server: {} is not known to this service".format(host))
+            raise InvalidUsage("Server: {} is not known to this service".format(host))
 
-        return {"state": server[0].state}
+        except MultipleResultsFound:
+            logger.error("Server: {} return to many results. Unexpected error.".format(host))
+            raise InvalidUsage("Server: {} return to many results. Unexpected error.".format(host))
+
+
+class ServerLag(Resource):
+    def get(self, host):
+        try:
+            server = models.Servers.query.filter(
+                models.Servers.hostname == host).one()
+
+            if server.role == 'master':
+                logger.error("Server: {} is master, it doesn't lag".format(host))
+                raise InvalidUsage("Server: {} is master, it doesn't lag".format(host))
+            
+            if parse_version(server.version) < parse_version("1.6.1"):
+                logger.error("Server: {} version is too old {}. ({} expected)".format(host, server.version, "1.6.1"))
+                raise InvalidUsage("Server: {} version is too old {}. ({} expected)".format(host, server.version, "1.6.1"))
+            
+            return {"state": server.lag}
+
+        except NoResultFound:
+            logger.error("Server: {} is not known to this service".format(host))
+            raise InvalidUsage("Server: {} is not known to this service".format(host))
+
+        except MultipleResultsFound:
+            logger.error("Server: {} return to many results. Unexpected error.".format(host))
+            raise InvalidUsage("Server: {} return to many results. Unexpected error.".format(host))
