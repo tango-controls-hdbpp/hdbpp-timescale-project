@@ -165,6 +165,16 @@ class Database(db.Model):
        Last time the ttl script ran on the database.
     ttl_duration : int
        duration of the last ttl script execution, in s.
+    backup_last_id : str
+       id of the last backup.
+    backup_duration : int
+       duration of the last backup execution, in s.
+    backup_last_execution : int
+       time of the end of the last backup execution.
+    backup_size : int
+       size of the last backup, in bytes.
+    backup_error : str
+       error message, if any, of the last backup.
     """
     
     __tablename__ = 'Database'
@@ -172,10 +182,17 @@ class Database(db.Model):
     size = db.Column(db.Integer(), nullable=False)
     ttl_last_execution = db.Column(db.DateTime(), nullable=True)
     ttl_duration = db.Column(db.Integer(), nullable=True)
+    backup_last_id = db.Column(db.String(), nullable=True)
+    backup_duration = db.Column(db.Integer(), nullable=True)
+    backup_last_execution = db.Column(db.Integer(), nullable=True)
+    backup_size = db.Column(db.Integer(), nullable=True)
+    backup_error = db.Column(db.String(), nullable=False)
 
     def __init__(self, name):
         self.name = name
         self.size = 0
+        self.backup_error = ""
+
 
 class Attribute(db.Model):
     """

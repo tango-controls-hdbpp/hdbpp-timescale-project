@@ -32,6 +32,7 @@ import server.routes.attributes as attributes_endpoint
 import server.routes.aggregates as aggregates_endpoint
 import server.routes.database as database_endpoint
 import server.routes.ttl as ttl_endpoint
+import server.routes.backup as backup_endpoint
 
 from server.errors import InvalidUsage
 from server.errors import handle_error 
@@ -237,6 +238,14 @@ def create_app(config_name):
     api.add_resource(database_endpoint.DatabaseSize, '/database/size')
     api.add_resource(database_endpoint.DatabaseSizeUnit, '/database/size/unit')
 
+    api.add_resource(backup_endpoint.Backup, '/database/backup')
+    api.add_resource(backup_endpoint.BackupLastExecution, '/database/backup/last_execution')
+    api.add_resource(backup_endpoint.BackupDuration, '/database/backup/duration')
+    api.add_resource(backup_endpoint.BackupId, '/database/backup/last_id')
+    api.add_resource(backup_endpoint.BackupSize, '/database/backup/size')
+    api.add_resource(backup_endpoint.BackupSizeUnit, '/database/backup/size/unit')
+    api.add_resource(backup_endpoint.BackupError, '/database/backup/error')
+    
     return app
 
 

@@ -282,7 +282,7 @@ def main() -> bool:
     parser = argparse.ArgumentParser(description="HDB TimscaleDb ttl service script")
     parser.add_argument("-v", "--version", action="store_true", help="version information")
     parser.add_argument("-d", "--debug", action="store_true", help="debug output for development")
-    parser.add_argument("-c", "--config", default="/etc/hdb/reorder.conf", help="config file to use")
+    parser.add_argument("-c", "--config", default="/etc/hdb/hdbpp_ttl.conf", help="config file to use")
     parser.add_argument("--validate", action="store_true", help="validate the given config file")
     parser.add_argument("--syslog", action="store_true", help="send output to syslog")
     parser.add_argument("--dryrun", action="store_true", help="do not actually do the delete, just simulate it")

@@ -31,6 +31,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
  - Replica database lag
  - Aggregate size
  - Aggregate row count per type and interval
+ - PUT method for barman reporting
+ - information from barman
+ - barman hook script to report to reporting tool
+ - PUT method for ttl reporting
+ - information from ttl
 
 ### Changed [hdbpp-cluster-reporting]
 
@@ -42,10 +47,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added [hdbpp-ttl]
  - Report script result to rest reporting server
-
-### Added [hdbpp-cluster-reporting]
- - PUT method for ttl reporting
- - information from ttl
 
 ## [0.1.0] - 2020-01-05
 
