@@ -351,13 +351,17 @@ def update_database_info(configuration):
         db.session.commit()
 
         # Retrieve all the aggregates row_count and sizes.
-        for format in config.DB_FORMAT:
-            if format is 'SCALAR':
-                for type in config.AGG_TYPES:
-                    for interval in config.AGG_INTERVAL:
-                        agg_name = 'cagg_'+format.lower()+'_'+type.lower().replace('_', '')+'_'+interval
-
-                        cursor.execute("WITH s AS ("
+        for format_query in db.session.query(Aggregate.att_format.label('format')).distinct().all():
+            
+            if format_query.format == 'SCALAR':
+                
+                for type_query in db.session.query(Aggregate.att_type.label('type')).distinct().all():
+                    
+                    for interval_query in db.session.query(Aggregate.agg_interval.label('interval')).distinct().all():
+                        agg_name = 'cagg_'+format_query.format.lower()+'_'+type_query.type.lower().replace('_', '')+'_'+interval_query.interval
+                        
+                        try:
+                            cursor.execute("WITH s AS ("
                                             "SELECT materialization_hypertable AS ht "
                                             "FROM timescaledb_information.continuous_aggregates "
                                             "WHERE view_name='"+agg_name+"'::regclass"
@@ -366,18 +370,28 @@ def update_database_info(configuration):
                                         "FROM hypertable_relation_size((SELECT ht FROM s)), "
                                         "hypertable_approximate_row_count((SELECT ht FROM s));")
                         
-                        sizes = cursor.fetchall()
-                        for result in sizes:
-                            rows = result[1]
-                            agg_size = result[0]
+                            sizes = cursor.fetchall()
+                            for result in sizes:
+                                rows = result[1]
+                                agg_size = result[0]
                         
-                            logger.debug(("Updating parameter type {} and format {} for interval size: {}"
-                                "\n  Estimate number of rows: {}"
-                                "\n  Table size: {}").format(type, format, interval, rows, agg_size))
+                                logger.debug(("Updating parameter type {} and format {} for interval size: {}"
+                                    "\n  Estimate number of rows: {}"
+                                    "\n  Table size: {}").format(type_query.type, format_query.format, interval_query.interval, rows, agg_size))
                 
-                            db.session.query(Aggregate).filter \
-                                    (Aggregate.att_format == format, Aggregate.att_type == type, Aggregate.agg_interval == interval) \
-                                .update({"agg_row_count":rows, "agg_size":agg_size})
+                                db.session.query(Aggregate).filter \
+                                        (Aggregate.att_format == format_query.format, Aggregate.att_type == type_query.type, Aggregate.agg_interval == interval_query.interval) \
+                                    .update({"agg_row_count":rows, "agg_size":agg_size})
+                        
+                        except psycopg2.Error as e:
+                            # Check for errors if the database does not exist
+                            if e.pgcode == '42P01':
+                                logger.debug("Parameter aggregate for type {} and format {} is not present for interval {}".format(type_query.type, format_query.format, interval_query.interval))
+                                
+                                # then remove it from the database as it is not present
+                                db.session.query(Aggregate).filter \
+                                        (Aggregate.att_format == format_query.format, Aggregate.att_type == type_query.type, Aggregate.agg_interval == interval_query.interval) \
+                                        .delete()
 
         db.session.commit()
         connection.commit()
