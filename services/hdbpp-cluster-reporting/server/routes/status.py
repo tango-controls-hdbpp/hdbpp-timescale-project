@@ -36,12 +36,15 @@ class ServerHealth(Resource):
         # a single result
         for server in servers_result:
             if server.state == config.CONNECTION_STATE_ERROR:
-                return {"state": "Error"}
+                return {"state": "Error"
+                        , "message": "An error occured while connecting to the database {}".format(server.hostname)}
 
             if server.state == config.CONNECTION_STATE_UNKNOWN:
-                return {"state": "Warning"}
+                return {"state": "Warning"
+                        , "message": "Connection state to {} is unknown.".format(server.hostname)}
 
             if server.role == config.SERVER_ROLE_UNKNOWN:
-                return {"state": "Warning"}
+                return {"state": "Warning"
+                        , "message": "Cannot retrieve the role of {}.".format(server.hostname)}
 
         return {"state": "Ok"}

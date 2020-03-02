@@ -69,26 +69,33 @@ std::tuple<HealthCheck::HealthCheckResult, std::string> HealthCheck::check_hosts
         rapidjson::Document document;
         document.Parse(result->body.c_str());
 
-        std::tuple<HealthCheck::HealthCheckResult, std::string> result;
+        if (!document.IsObject() || !document.HasMember("state") || !document["state"].IsString())
+            return std::make_tuple(HealthCheckResult::ConnectionProblem, invalid_response);
 
-        if (!document.IsObject() || !document["state"].IsString() || document.HasMember("state"))
-            result = std::make_tuple(HealthCheckResult::ConnectionProblem, invalid_response);
+        // Retrieve the error message if there is any
+        std::string error_message;
+        if (document.HasMember("message") && document["message"].IsString())
+            error_message = "\n" + std::string(document["message"].GetString());
+	
+        else
+            error_message = "";
 
         // get a valid reponse, now check the cluster
+        std::tuple<HealthCheck::HealthCheckResult, std::string> ret;
         if (document["state"] == "Ok")
-            result = std::make_tuple(HealthCheckResult::Ok, server_no_errors);
+            ret = std::make_tuple(HealthCheckResult::Ok, server_no_errors + error_message);
 
         else if (document["state"] == "Warning")
-            result = std::make_tuple(HealthCheckResult::Warning, server_warning);
+            ret = std::make_tuple(HealthCheckResult::Warning, server_warning + error_message);
 
         else if (document["state"] == "Error") 
-            result = std::make_tuple(HealthCheckResult::Error, server_error);
+            ret = std::make_tuple(HealthCheckResult::Error, server_error + error_message);
 
         else
-            result = std::make_tuple(
-                HealthCheckResult::ConnectionProblem, "Unable to understand database cluster host state, please fix so state can be reported.");
+            ret = std::make_tuple(
+                HealthCheckResult::ConnectionProblem, server_bad_response + error_message);
 
-        return result;
+        return ret;
     }
 
     return std::make_tuple(HealthCheckResult::ConnectionProblem, no_reponse);
