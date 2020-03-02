@@ -22,27 +22,40 @@
 import logging
 
 import server.config as config
-import server.models as models
+from server.models import Database
 from flask_restplus import Resource
 from flask import jsonify
+from server.errors import InvalidUsage
+from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import MultipleResultsFound
+
 
 logger = logging.getLogger(config.LOGGER_NAME)
 
 class Databases(Resource):
     def get(self):
         databases = []
-        results = models.Database.query.with_entities(models.Database.name)
+        results = Database.query.with_entities(Database.name)
 
         for res in results:
             databases.append(res.name)
         
         return jsonify(databases)
 
-class DatabaseSize(Resource):
-    def get(self, db_name):
-        result = models.Database.query.with_entities(models.Database.size).filter(models.Database.name == db_name)
-        return jsonify(result[0].size)
 
-class DatabaseSizeUnit(Resource):
+class DatabaseSize(Resource):
     def get(self):
-        return jsonify("bytes")
+        try:
+            result = Database.query.with_entities(Database.size).one()
+            return jsonify({'size':result.size, 'unit':"bytes"})
+
+        except NoResultFound:
+            logger.error(
+                    "No database defined in your system, check configuration file.")
+            raise InvalidUsage("No database defined in your system, check configuration file.", 404)
+        
+        except MultipleResultsFound:
+            logger.error(
+                    "Multiple databases defined in your system, check configuration file.")
+            raise InvalidUsage("Multiple databases defined in your system, check configuration file.", 404)
+

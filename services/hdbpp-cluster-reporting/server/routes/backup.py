@@ -44,7 +44,7 @@ def get_from_db(req):
     try:
         query = Database.query.with_entities(req.label("result")).one()
             
-        return jsonify(query.result)
+        return query.result
         
     except NoResultFound:
         logger.error(
@@ -93,35 +93,30 @@ class Backup(Resource):
 class BackupDuration(Resource):
     def get(self):
         
-        return get_from_db(Database.backup_duration)
+        return jsonify(get_from_db(Database.backup_duration))
         
 
 class BackupLastExecution(Resource):
     def get(self):
         
-        return get_from_db(Database.backup_last_execution)
+        return jsonify(get_from_db(Database.backup_last_execution))
 
 
 class BackupId(Resource):
     def get(self):
         
-        return get_from_db(Database.backup_last_id)
+        return jsonify(get_from_db(Database.backup_last_id))
 
 
 class BackupError(Resource):
     def get(self):
         
-        return get_from_db(Database.backup_error)
+        return jsonify(get_from_db(Database.backup_error))
 
 
 class BackupSize(Resource):
     def get(self):
-        
-        return get_from_db(Database.backup_size)
-
-
-class BackupSizeUnit(Resource):
-    def get(self):
-        
-        return jsonify('bytes')
+        result = {'unit': "bytes"}
+        result['size'] = get_from_db(Database.backup_size)
+        return jsonify(result)
 

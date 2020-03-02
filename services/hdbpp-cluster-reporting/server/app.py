@@ -177,6 +177,11 @@ def config_logging(args):
     else:
         logger.setLevel(logging.INFO)
 
+def set_cors_headers(response):
+    header = response.headers
+    header['Access-Control-Allow-Origin'] = '*'
+    return response
+
 
 def create_app(config_name):
     """
@@ -191,6 +196,7 @@ def create_app(config_name):
 
     # start flask with blueprints
     blueprint = Blueprint('api', __name__)
+#    blueprint.after_request(set_cors_headers)
     api = Api(blueprint)
 
     app = Flask(__name__)
@@ -224,26 +230,21 @@ def create_app(config_name):
     
     api.add_resource(attributes_endpoint.AttributesRowCount, '/database/tables/row_count/<string:att_format>/<string:att_type>')
     api.add_resource(attributes_endpoint.AttributesInterval, '/database/tables/interval/<string:att_format>/<string:att_type>')
-    api.add_resource(attributes_endpoint.AttributesIntervalUnit, '/database/tables/interval/unit')
     api.add_resource(attributes_endpoint.AttributesSize, '/database/tables/size/<string:att_format>/<string:att_type>')
-    api.add_resource(attributes_endpoint.AttributesSizeUnit, '/database/tables/size/unit')
     api.add_resource(attributes_endpoint.AttributesCurrentSize, '/database/tables/current_size/<string:att_format>/<string:att_type>')
-    api.add_resource(attributes_endpoint.AttributesSizeUnit, '/database/tables/current_size/unit')
     
     api.add_resource(aggregates_endpoint.Aggregates, '/database/aggregates')
-    api.add_resource(aggregates_endpoint.AggregatesRowCount, '/database/aggregates/row_count/<string:agg_interval>/<string:att_type>')
-    api.add_resource(aggregates_endpoint.AggregatesSize, '/database/aggregates/size/<string:agg_interval>/<string:att_type>')
+    api.add_resource(aggregates_endpoint.AggregatesRowCount, '/database/aggregates/row_count/<string:att_type>/<string:agg_interval>')
+    api.add_resource(aggregates_endpoint.AggregatesSize, '/database/aggregates/size/<string:att_type>/<string:agg_interval>')
 
     api.add_resource(database_endpoint.Databases, '/databases')
     api.add_resource(database_endpoint.DatabaseSize, '/database/size')
-    api.add_resource(database_endpoint.DatabaseSizeUnit, '/database/size/unit')
 
     api.add_resource(backup_endpoint.Backup, '/database/backup')
     api.add_resource(backup_endpoint.BackupLastExecution, '/database/backup/last_execution')
     api.add_resource(backup_endpoint.BackupDuration, '/database/backup/duration')
     api.add_resource(backup_endpoint.BackupId, '/database/backup/last_id')
     api.add_resource(backup_endpoint.BackupSize, '/database/backup/size')
-    api.add_resource(backup_endpoint.BackupSizeUnit, '/database/backup/size/unit')
     api.add_resource(backup_endpoint.BackupError, '/database/backup/error')
     
     return app
