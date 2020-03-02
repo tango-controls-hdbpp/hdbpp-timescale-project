@@ -196,7 +196,7 @@ def create_app(config_name):
 
     # start flask with blueprints
     blueprint = Blueprint('api', __name__)
-#    blueprint.after_request(set_cors_headers)
+    blueprint.after_request(set_cors_headers)
     api = Api(blueprint)
 
     app = Flask(__name__)
