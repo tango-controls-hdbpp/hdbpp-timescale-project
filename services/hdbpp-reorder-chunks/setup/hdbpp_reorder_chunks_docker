@@ -1,2 +1,2 @@
 # /etc/cron.d/hdbpp_services: crontab entries for the hdbpp_services script
-0 0 * * * root /usr/local/bin/python3 /usr/src/service/hdbpp_reorder_chunks.py -c /etc/hdb/hdbpp_reorder_chunks.conf > /proc/1/fd/1 2>/proc/1/fd/2
+0 0 * * * root /usr/local/bin/python3 /usr/src/service/hdbpp_reorder_chunks.py -c /etc/hdb/hdbpp_reorder_chunks.conf -o /var/lib/hdb/chunks.conf > /proc/1/fd/1 2>/proc/1/fd/2
