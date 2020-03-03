@@ -52,10 +52,12 @@ class DatabaseSize(Resource):
         except NoResultFound:
             logger.error(
                     "No database defined in your system, check configuration file.")
-            raise InvalidUsage("No database defined in your system, check configuration file.", 404)
+
+            raise InvalidUsage("No database defined in your system, check configuration file.", 500)
         
         except MultipleResultsFound:
             logger.error(
                     "Multiple databases defined in your system, check configuration file.")
-            raise InvalidUsage("Multiple databases defined in your system, check configuration file.", 404)
+
+            raise InvalidUsage("Multiple databases defined in your system, check configuration file.", 500)
 

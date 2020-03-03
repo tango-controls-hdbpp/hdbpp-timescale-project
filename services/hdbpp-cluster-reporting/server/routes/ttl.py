@@ -34,6 +34,9 @@ from sqlalchemy.orm.exc import MultipleResultsFound
 
 logger = logging.getLogger(config.LOGGER_NAME)
 
+NO_DATABASE_ERROR="No database defined in your system, check configuration file."
+MULTIPLE_DATABASE_ERROR="Multiple databases defined in your system, check configuration file."
+
 class Attributes(Resource):
     def get(self):
         attributes = []
@@ -78,12 +81,14 @@ class Ttl(Resource):
                     database.ttl_last_execution = datetime.datetime.strptime(json["ttl_last_execution"], '%Y-%m-%d %H:%M:%S.%f')
             
             except NoResultFound:
-                logger.error(
-                    "No database defined in your system, check configuration file.")
+                logger.error(NO_DATABASE_ERROR)
+
+                raise InvalidUsage(NO_DATABASE_ERROR, 500)
         
             except MultipleResultsFound:
-                logger.error(
-                    "Multiple databases defined in your system, check configuration file.")
+                logger.error(MULTIPLE_DATABASE_ERROR)
+                
+                raise InvalidUsage(MULTIPLE_DATABASE_ERROR, 500)
         
         db.session.commit()
 
@@ -96,14 +101,14 @@ class TtlDuration(Resource):
             return jsonify(result.ttl_duration)
         
         except NoResultFound:
-            logger.error(
-                    "No database defined in your system, check configuration file.")
-            raise InvalidUsage("No database defined in your system, check configuration file.", 404)
+            logger.error(NO_DATABASE_ERROR)
 
+            raise InvalidUsage(NO_DATABASE_ERROR, 500)
+        
         except MultipleResultsFound:
-            logger.error(
-                    "Multiple databases defined in your system, check configuration file.")
-            raise InvalidUsage("Multiple databases defined in your system, check configuration file.", 404)
+            logger.error(MULTIPLE_DATABASE_ERROR)
+                
+            raise InvalidUsage(MULTIPLE_DATABASE_ERROR, 500)
         
 
 class TtlLastExecution(Resource):
@@ -114,14 +119,14 @@ class TtlLastExecution(Resource):
             return jsonify(result.ttl_last_execution)
         
         except NoResultFound:
-            logger.error(
-                    "No database defined in your system, check configuration file.")
-            raise InvalidUsage("No database defined in your system, check configuration file.", 404)
+            logger.error(NO_DATABASE_ERROR)
 
+            raise InvalidUsage(NO_DATABASE_ERROR, 500)
+        
         except MultipleResultsFound:
-            logger.error(
-                    "Multiple databases defined in your system, check configuration file.")
-            raise InvalidUsage("Multiple databases defined in your system, check configuration file.", 404)
+            logger.error(MULTIPLE_DATABASE_ERROR)
+                
+            raise InvalidUsage(MULTIPLE_DATABASE_ERROR, 500)
 
 
 class AttributeRowDeleted(Resource):
@@ -130,13 +135,16 @@ class AttributeRowDeleted(Resource):
             result = Attribute.query.with_entities(Attribute.ttl_rows_deleted).filter(Attribute.name == att_name).one()
             
             if result.ttl_rows_deleted is None:
-                logger.error(
-                        "Attribute {} was not processed last time ttl script was executed".format(att_name))
-                raise InvalidUsage("Attribute {} was not processed last time ttl script was executed".format(att_name), 404)
+                message = "Attribute {} was not processed last time ttl script was executed".format(att_name)
+                logger.error(message)
+                
+                raise InvalidUsage(message, 404)
             
             return jsonify(result.ttl_rows_deleted)
         
         except NoResultFound:
-            logger.error("Attribute: {} is not configured for ttl".format(att_name))
-            raise InvalidUsage("Attribute: {} is not configured for ttl".format(att_name))
+            message = "Attribute: {} is not configured for ttl".format(att_name)
+            logger.error(message)
+            
+            raise InvalidUsage(message)
 

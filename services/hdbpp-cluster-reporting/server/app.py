@@ -196,7 +196,7 @@ def create_app(config_name):
 
     # start flask with blueprints
     blueprint = Blueprint('api', __name__)
-#    blueprint.after_request(set_cors_headers)
+    blueprint.after_request(set_cors_headers)
     api = Api(blueprint)
 
     app = Flask(__name__)
@@ -228,6 +228,7 @@ def create_app(config_name):
     api.add_resource(ttl_endpoint.Attributes, '/database/ttl/attributes')
     api.add_resource(ttl_endpoint.AttributeRowDeleted, '/database/ttl/daily_rows_deleted/<string:att_name>')
     
+    api.add_resource(attributes_endpoint.Attributes, '/database/tables')
     api.add_resource(attributes_endpoint.AttributesRowCount, '/database/tables/row_count/<string:att_format>/<string:att_type>')
     api.add_resource(attributes_endpoint.AttributesInterval, '/database/tables/interval/<string:att_format>/<string:att_type>')
     api.add_resource(attributes_endpoint.AttributesSize, '/database/tables/size/<string:att_format>/<string:att_type>')
