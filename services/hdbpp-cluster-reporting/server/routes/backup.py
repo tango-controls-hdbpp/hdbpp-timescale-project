@@ -57,6 +57,34 @@ def get_from_db(req):
         raise InvalidUsage("Multiple databases defined in your system, check configuration file.", 404)
         
 
+class Health(Resource):
+    def get(self):
+        try:
+            result = Database.query.with_entities(Database.backup_last_execution).one()
+            
+            ## status check to ensure that the backup was executed in the last day
+            if not result.backup_last_execution:
+                return {"state": "Warning"
+                        , "message": "The backup was never executed."}
+
+            if datetime.datetime.now() - datetime.timedelta(days=7) > result.backup_last_execution:
+                return {"state": "Warning"
+                        , "message": "The backup was last executed on {}.".format(result.backup_last_execution)}
+            
+            return {"state": "Ok"
+                    , "message": "The backup was last executed on {}.".format(result.backup_last_execution)}
+        
+        except NoResultFound:
+            logger.error(NO_DATABASE_ERROR)
+
+            raise InvalidUsage(NO_DATABASE_ERROR, 500)
+        
+        except MultipleResultsFound:
+            logger.error(MULTIPLE_DATABASE_ERROR)
+                
+            raise InvalidUsage(MULTIPLE_DATABASE_ERROR, 500)
+
+
 class Backup(Resource):
     def put(self):
         json = request.get_json()
