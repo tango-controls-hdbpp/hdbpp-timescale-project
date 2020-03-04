@@ -131,7 +131,7 @@ class AttributesSizeUnit(Resource):
 
 class AttributesInterval(Resource):
     def get(self, att_format, att_type):
-        result = {'unit': "ns"}
+        result = {'unit': "us"}
         result['interval'] = get_from_db(att_format, att_type, Datatable.att_interval)
         return jsonify(result)
 
