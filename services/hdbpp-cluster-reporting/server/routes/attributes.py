@@ -48,12 +48,28 @@ def get_from_db(att_format, att_type, req):
             .with_entities(req.label('result')) \
             .filter(Datatable.att_type == att_type, Datatable.att_format == att_format)
 
-    return jsonify(attributes_result[0].result)
+    return attributes_result[0].result
+
+
+class Attributes(Resource):
+    def get(self):
+        attributes = {}
+        atts_result = Datatable.query.all()
+        
+        for attribute in atts_result:
+            if attribute.att_format not in attributes:
+                attributes[attribute.att_format] = []
+            
+            attributes[attribute.att_format].append(attribute.att_type)
+
+        return jsonify(attributes)
+
 
 class AttributesCount(Resource):
     def get(self):
         attributes_result = Datatable.query.with_entities(func.sum(Datatable.att_count).label('c'))
         return jsonify(attributes_result[0].c)
+
 
 class AttributesTypeOrFormatCount(Resource):
     def get(self, att_info):
@@ -77,13 +93,16 @@ class AttributesTypeOrFormatCount(Resource):
         
         return jsonify(attributes_result[0].c)
 
+
 class AttributesFormat(Resource):
     def get(self):
         return jsonify(config.DB_FORMAT)
 
+
 class AttributesType(Resource):
     def get(self):
         return jsonify(config.DB_TYPES)
+
 
 class AttributesFormatCount(Resource):
     def get(self, att_format):
@@ -94,31 +113,44 @@ class AttributesFormatCount(Resource):
 
         return jsonify(attributes_result[0].c)
 
+
 class AttributesFormatTypeCount(Resource):
     def get(self, att_format, att_type):
-        return get_from_db(att_format, att_type, Datatable.att_count)
+        return jsonify(get_from_db(att_format, att_type, Datatable.att_count))
+
 
 class AttributesIntervalUnit(Resource):
     def get(self):
         return jsonify("us")
 
+
 class AttributesSizeUnit(Resource):
     def get(self):
         return jsonify("bytes")
 
+
 class AttributesInterval(Resource):
     def get(self, att_format, att_type):
-        return get_from_db(att_format, att_type, Datatable.att_interval)
+        result = {'unit': "ns"}
+        result['interval'] = get_from_db(att_format, att_type, Datatable.att_interval)
+        return jsonify(result)
+
 
 class AttributesRowCount(Resource):
     def get(self, att_format, att_type):
-        return get_from_db(att_format, att_type, Datatable.att_row_count)
+        return jsonify(get_from_db(att_format, att_type, Datatable.att_row_count))
+
 
 class AttributesSize(Resource):
     def get(self, att_format, att_type):
-        return get_from_db(att_format, att_type, Datatable.att_size)
+        result = {'unit': "bytes"}
+        result['size'] = get_from_db(att_format, att_type, Datatable.att_size)
+        return jsonify(result)
+
 
 class AttributesCurrentSize(Resource):
     def get(self, att_format, att_type):
-        return get_from_db(att_format, att_type, Datatable.att_current_chunk_size)
+        result = {'unit': "bytes"}
+        result['size'] = get_from_db(att_format, att_type, Datatable.att_current_chunk_size)
+        return jsonify(result)
 

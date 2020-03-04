@@ -49,7 +49,7 @@ def get_from_db(att_format, att_type, att_interval, req):
             .with_entities(req.label('result')) \
             .filter(Aggregate.att_type == att_type, Aggregate.att_format == att_format, Aggregate.agg_interval == att_interval)
 
-    return jsonify(attributes_result[0].result)
+    return attributes_result[0].result
 
 
 class Aggregates(Resource):
@@ -69,11 +69,13 @@ class Aggregates(Resource):
 
 
 class AggregatesRowCount(Resource):
-    def get(self, agg_interval, att_type):
-        return get_from_db('SCALAR', att_type, agg_interval, Aggregate.agg_row_count)
+    def get(self, att_type, agg_interval):
+        return jsonify(get_from_db('SCALAR', att_type, agg_interval, Aggregate.agg_row_count))
 
 
 class AggregatesSize(Resource):
-    def get(self, agg_interval, att_type):
-        return get_from_db('SCALAR', att_type, agg_interval, Aggregate.agg_size)
+    def get(self, att_type, agg_interval):
+        result = {'unit':"bytes"}
+        result['size'] = get_from_db('SCALAR', att_type, agg_interval, Aggregate.agg_size)
+        return jsonify(result)
 
