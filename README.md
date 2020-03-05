@@ -6,17 +6,22 @@
   - [Cloning](#Cloning)
   - [Overview](#Overview)
     - [services/*](#services)
-    - [device-servers/*](#device-servers)
+    - [components/*](#components)
     - [resources/*](#resources)
     - [external/*](#external)
+    - [doc/*](#doc)
+  - [Building](#Building)
+  - [Deployment](#Deployment)
   - [Version Table](#Version-Table)
   - [License](#License)
 
-This repository is a work in progress, call back soon....
+The hdbpp timescale project is a Tango Control system archival backend. The project includes all additional services required by the project, and consolidates various generic components into a single fetch and build cmake system.
+
+Additional documentation is stored in the doc folder, and indexed on its [README](doc/README.md)
 
 ## Cloning 
 
-This project contains several other projects as dependencies. Currently the project is configured to express its dependencies as sub-modules. To successfully clone the project and all its dependencies use the following git command:
+This project contains several other projects as dependencies. Currently the project is configured to express any dependencies as sub-modules. To successfully clone the project and all its dependencies use the following git command:
 
 ```bash
 git clone --recurse-submodules https://github.com/tango-controls-hdbpp/hdbpp-timescale-project.git
@@ -24,23 +29,48 @@ git clone --recurse-submodules https://github.com/tango-controls-hdbpp/hdbpp-tim
 
 ## Overview
 
-This project consolidates several other hdbpp projects into a single repository, and acts as a location to store all support tools and services for the hdbpp project based on TimescaleDb. Brief overview of the modules:
+Brief overview of the modules:
 
 ### services/*
 
 Contains various services deployed to assist in running the hdbpp database cluster operation. Its recommended to use the Docker images to ease deployment.
 
-### device-servers/*
+### components/*
 
-This is also the location for any TimescaleDb centric device servers.
+Contains any applications or device servers required by the project
 
 ### resources/*
 
-Project resources. Including the HDB++ schema, TimescaleDB HDB++ Docker images, test scripts that can allow a user to test the project quickly.
+Project resources. Including the HDB++ schema, TimescaleDB HDB++ Docker images, test scripts that can allow a user to test the project quickly, and any other additional item that may help the user in deploying, testing or running the system.
 
 ### external/*
 
-This directory will be created at CMake configuration time and will contain the external dependencies for the complete build. These are hdbpp-es, hdbpp-cm, and libhdbpp.
+This directory will be created at CMake configuration time and will contain the external dependencies for the complete build. These are currently hdbpp-es, hdbpp-cm, libhdbpp and libhdbpp-timescale.
+
+### doc/*
+
+Project documentation
+
+## Building
+
+The project contains a consolidated build system to fetch build all required external dependencies. These are currently:
+
+ - [hdbpp-es](https://github.com/tango-controls-hdbpp/hdbpp-es)
+ - [hdbpp-cm](https://github.com/tango-controls-hdbpp/hdbpp-cm)
+ - [libhdbpp](https://github.com/tango-controls-hdbpp/libhdbpp)
+ - [libhdbpp-timescale](https://github.com/tango-controls-hdbpp/libhdbpp-timescale)
+
+See the [build](doc/build.md) guide in the doc folder on how to build the project and its external dependencies.
+
+The various services are python scripts, these can be deployed as a script, or a built as Docker images with the supplied build system. Each service comes with a short README on how to build and deploy it:
+
+ - [hdbpp-cluster-reporting](hdbpp-cluster-reporting/README.md)
+ - [hdbpp-reorder-chunks](hdbpp-reorder-chunks/README.md)
+ - [hdbpp-ttl](hdbpp-ttl/README.md)
+
+## Deployment
+
+See the [deployment](doc/deployment.md) guide in the doc folder on how to deploy the various elements of the project. This does not cover setting up a Tango Control HDB++ archival system, see the official documentations [here](https://tango-controls.readthedocs.io/en/latest) on complete system deployment.
 
 ## Version Table
 

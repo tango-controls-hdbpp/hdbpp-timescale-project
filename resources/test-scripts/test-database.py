@@ -286,6 +286,7 @@ def order_chunks(connection, table_name, span):
     Having filled the table we data, we order the chunks for optimal query speed
     """
 
+    connection.autocommit = True
     cursor = connection.cursor()
 
     if verbose:
@@ -293,6 +294,7 @@ def order_chunks(connection, table_name, span):
 
     # ensure we are clustering on the composite index
     cursor.execute("ALTER TABLE {} CLUSTER ON {}{};".format(table_name, table_name, idx_postfix))
+    cursor.execute("CLUSTER {};".format(table_name))
 
     # get the config window of chunks to be reordered
     cursor.execute("SELECT show_chunks('{}', newer_than => interval '{}');".format(table_name, span))
@@ -311,6 +313,7 @@ def order_chunks(connection, table_name, span):
 
     connection.commit()
     cursor.close()
+    connection.autocommit = False
 
 
 def truncate_tables(connection):

@@ -12,9 +12,9 @@
   - [Configuration](#Configuration)
   - [License](#License)
 
-This project provides a means to ensure the timescale database data is kept in the optimal query order. To ensure the data can be queried quickly on an attribute basis, it is ordered by att_conf_id and data_time, this is not the same as the insert order, which is data_time (since its received in real time). Without reordering the data, the query performance is seriously degraded.
+This service provides a means to ensure the timescale database data is kept in the optimal query order. To ensure the data can be queried quickly on an attribute basis, it is ordered by att_conf_id and data_time, this is not the same as the insert order, which is data_time (since its received in real time). Without reordering the data, the query performance is seriously degraded.
 
-To achieve this reordering, we run a simple script that reorders the last X days of chunks (default is 28). It is recommended this script is run every day at midnight to ensure any data inserted over the last day is optimised. It should not be necessary to run the script more often, but it is possible if the scenario requires it.
+To achieve this reordering, we run this script daily to detect and reorder chunks that have previously not been reordered. It creates a log of all chunks processed, so it does not repeatedly process the same chunks.
 
 It is recommended (and pre-configured) to run in the evening, when the system is not being heavily used.
 
@@ -45,14 +45,14 @@ The Docker image is designed to allow the user to mount the configuration file t
 
 Build and deploy the Docker image:
 
-```
+```bash
 cd docker
 make
 ```
 
 If using a Docker registry then the Makefile can push the image to your registry (remember to update docker commands to include your registry address):
 
-```
+```bash
 export DOCKER_REGISTRY=<your registry here>
 make push
 ```
@@ -73,21 +73,26 @@ cp setup/chunks.conf /var/lib/hdb/chunks.conf
 
 Then run the container with the config file mounted to /etc/hdb/hdbpp_reorder_chunks.conf and the reordered chunk list file mounted to /var/lib/hdb/chunks.conf (add the registry name if required):
 
-```
-docker run -d -v /etc/hdb/hdbpp_reorder_chunks.conf:/etc/hdb/hdbpp_reorder_chunks.conf:ro /var/lib/hdb/chunks.conf:/var/lib/hdb/chunks.conf:rw --rm --name hdbpp_reorder_chunks hdbpp-reorder-chunks
+```bash
+docker run -d \
+  -v /etc/hdb/hdbpp_reorder_chunks.conf:/etc/hdb/hdbpp_reorder_chunks.conf:ro \
+  -v /var/lib/hdb/chunks.conf:/var/lib/hdb/chunks.conf:rw \
+  --rm \
+  --name hdbpp_reorder_chunks \
+  hdbpp-reorder-chunks
 ```
 
 #### Validation
 
 To check if the job is scheduled:
 
-```
+```bash
 docker exec -ti hdbpp_reorder_chunks bash -c "crontab -l"
 ```
 
 To check if the cron service is running:
 
-```
+```bash
 docker exec -ti hdbpp_reorder_chunks bash -c "grep cron"
 ```
 
@@ -95,7 +100,7 @@ docker exec -ti hdbpp_reorder_chunks bash -c "grep cron"
 
 Check log output from the cron job and ensure you see data being reordered on a daily basis:
 
-```
+```bash
 docker logs hdbpp_reorder_chunks
 ```
 
@@ -103,7 +108,7 @@ docker logs hdbpp_reorder_chunks
 
 If deploying directly, the Python requirements must be met:
 
-```
+```bash
 pip install -r requirements.txt
 ```
 

@@ -9,8 +9,6 @@
       - [Logs](#Logs)
     - [Direct (Untested)](#Direct-Untested)
       - [Logs](#Logs-1)
-      - [Validation](#Validation)
-      - [Logs](#Logs-2)
   - [Configuration](#Configuration)
   - [License](#License)
 
@@ -20,7 +18,7 @@ This is a Python/Flash based server to summarise various data points about a hdb
 
 ## Dependencies
 
-Following Python dependencies are required for direct deployment:
+Following Python dependencies are required for direct deployment or development:
 
 * pyyaml
 * apscheduler
@@ -46,7 +44,7 @@ If the server is deployed as configured (port 10666), then the Rest API can be f
 http://localhost:10666/api/v1/
 ```
 
-Since this is still run as a development version, then a Swagger web page will be presented and it will be possible to query the various endpoints. When the prodcution release is finalised and deployed, this feature will only be available in development builds.
+Since this is still run as a development version, then a Swagger web page will be presented and it will be possible to query the various endpoints. When the production release is finalised and deployed, this feature will only be available in development builds.
 
 ## Deployment
 
@@ -77,17 +75,25 @@ mkdir -p /etc/hdb
 cp setup/hdbpp_cluster_reporting.conf /etc/hdb/hdbpp_cluster_reporting.conf
 ```
 
-Then run the container with the config file mounted to /etc/hdb/hdbpp_cluster_reporting.conf (add the registry name if required):
+Prepare some persistent storage on the host system:
+
+```bash
+mkdir -p /var/lib/hdbpp-cluster-reporting
+```
+
+Then run the container with the config file and storage mounted as volumes (add the registry name if required):
 
 ```
 docker run -d \
-    -v /etc/hdb/hdbpp_cluster_reporting.conf:/etc/hdb/hdbpp_cluster_reporting.conf:ro \
-    -v /var/lib/hdbpp-cluster-reporting:/var/lib/hdbpp-cluster-reporting \
-    -p 10666:10666 -p 8008:8008 \
-    --rm \
-    --name hdbpp_cluster_reporting \
-    hdbpp-cluster-reporting
+  -v /etc/hdb/hdbpp_cluster_reporting.conf:/etc/hdb/hdbpp_cluster_reporting.conf:ro \
+  -v /var/lib/hdbpp-cluster-reporting:/var/lib/hdbpp-cluster-reporting \
+  -p 10666:10666 -p 8008:8008 \
+  --rm \
+  --name hdbpp_cluster_reporting \
+  hdbpp-cluster-reporting
 ```
+
+For testing purposes, or if not required, the persistent storage may be left out.
 
 #### Logs
 
@@ -119,6 +125,12 @@ Copy the example config into place and customize it:
 ```bash
 mkdir -p /etc/hdb
 cp setup/hdbpp_cluster_reporting.conf /etc/hdb/hdbpp_cluster_reporting.conf
+```
+
+Prepare some persistent storage on the host system:
+
+```bash
+mkdir -p /var/lib/hdbpp-cluster-reporting
 ```
 
 Now setup a process manager, i.e. supervisord to run the server. The run command should look something like this:

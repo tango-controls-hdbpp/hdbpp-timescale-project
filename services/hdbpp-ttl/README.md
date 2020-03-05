@@ -45,14 +45,14 @@ The Docker image is designed to allow the user to mount the configuration file t
 
 Build and deploy the Docker image:
 
-```
+```bash
 cd docker
 make
 ```
 
 If using a Docker registry then the Makefile can push the image to your registry (remember to update docker commands to include your registry address):
 
-```
+```bash
 export DOCKER_REGISTRY=<your registry here>
 make push
 ```
@@ -66,21 +66,25 @@ cp setup/hdbpp_ttl.conf /etc/hdb/hdbpp_ttl.conf
 
 Then run the container with the config file mounted to /etc/hdb/hdbpp_ttl.conf (add the registry name if required):
 
-```
-docker run -d -v /etc/hdb/hdbpp_ttl.conf:/etc/hdb/hdbpp_ttl.conf:ro --rm --name hdbpp_ttl hdbpp-ttl
+```bash
+docker run -d \
+  -v /etc/hdb/hdbpp_ttl.conf:/etc/hdb/hdbpp_ttl.conf:ro \
+  --rm \
+  --name hdbpp_ttl \
+  hdbpp-ttl
 ```
 
 #### Validation
 
 To check if the job is scheduled:
 
-```
+```bash
 docker exec -ti hdbpp_reorder_chunks bash -c "crontab -l"
 ```
 
 To check if the cron service is running:
 
-```
+```bash
 docker exec -ti hdbpp_reorder_chunks bash -c "grep cron"
 ```
 
@@ -96,7 +100,7 @@ docker logs hdbpp_ttl
 
 If deploying directly, the Python requirements must be met:
 
-```
+```bash
 pip install -r requirements.txt
 ```
 
