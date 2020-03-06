@@ -6,7 +6,7 @@ General information about deploying this project.
   - [About](#About)
   - [Building and Deployment](#Building-and-Deployment)
   - [DB Schema](#DB-Schema)
-  - [Configuration](#Configuration)
+  - [Testing Resources](#Testing-Resources)
 
 ## About
 
@@ -14,13 +14,13 @@ The overview is in the main project [README](../README.md).
 
 ## Building and Deployment
 
-* Instructions on using the consolidated build system [here](build.md).
-* Guidelines on deploying components [here](deployment.md).
+- Instructions on using the consolidated build system [here](build.md).
+- Guidelines on deploying components [here](deployment.md).
 
 ## DB Schema
 
-* [Schema](db-schema-config.md) guidelines and setup.
+- Guidelines and setup of the schema is detailed [here](db-schema-config.md)
 
-## Configuration
+## Testing Resources
 
-* [Configuration](configuration.md) parameter details.
+- Some information on deploying a test system can be found [here](test-resources.md)

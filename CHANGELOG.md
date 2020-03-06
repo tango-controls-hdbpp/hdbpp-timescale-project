@@ -7,65 +7,73 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.2.0] - 2020-03-06
+
 ### Added [general]
 
- - Added a CMake project build system that can build all required elements for deployment. External elements are downloaded to external/
- - Added hdbpp-health-check device server to the components.
-
-### Changed [resources]
-
- - Renamed create-test-database -> test-database
- - Updated test-database help display.
-
-### Changed [schema]
-
- - Removed some duplicate indexes
- - Schema for the aggregates view for scalar data. Aggregates avg, min, max, stddev over a year. For floating point data, nan and infinity values are counted and not taken into account
- 
-### Changed [hdbpp-timescale-docker]
-
- - Updated to TimescaleDB version 1.6
+- Added a CMake project build system that can build all required elements for deployment. External elements are downloaded to external/
+- Added hdbpp-health-check device server to the components.
+- Improved the documents
 
 ### Added [hdbpp-cluster-reporting]
 
- - endpoints for a basic health check on ttl, backup, tables chunk sizes
- - Replica database lag
- - Aggregate size
- - Aggregate row count per type and interval
- - PUT method for barman reporting
- - information from barman
- - barman hook script to report to reporting tool
- - PUT method for ttl reporting
- - information from ttl
+- endpoints for a basic health check on ttl, backup, tables chunk sizes
+- Replica database lag
+- Aggregate size
+- Aggregate row count per type and interval
+- PUT method for barman reporting
+- information from barman
+- barman hook script to report to reporting tool
+- PUT method for ttl reporting
+- information from ttl
+
+### Added [hdbpp-ttl]
+
+- Report script result to rest reporting server
+
+### Changed [resources]
+
+- Renamed create-test-database -> test-database
+- Updated test-database help display.
+
+### Changed [schema]
+
+- Removed some duplicate indexes
+- Schema for the aggregates view for scalar data. Aggregates avg, min, max, stddev over a year. For floating point data, nan and infinity values are counted and not taken into account
+
+### Changed [hdbpp-timescale-docker]
+
+- Updated to TimescaleDB version 1.6
 
 ### Changed [hdbpp-cluster-reporting]
 
- - Use /cluster endpoint from patroni, if available, to retrieve some of the data. Check for patroni version if the endpoint exists.
+- Use /cluster endpoint from patroni, if available, to retrieve some of the data. Check for patroni version if the endpoint exists.
 
 ### Fixed [hdbpp-cluster-reporting]
 
- - Block the version for the dependency Werkzeug as new version breaks flaskrestplus
+- Block the version for the dependency Werkzeug as new version breaks flaskrestplus
 
-### Added [hdbpp-ttl]
- - Report script result to rest reporting server
+### Fixed [resources]
+
+- test-database script was not clustering tables after data insert.
 
 ## [0.1.0] - 2020-01-05
 
 ### Added [hdbpp-cluster-reporting]
 
- - Database size
- - Attributes count, per type and format
- - Tables size
- - Last chunk size
- - Chunk interval size
- - Tables row count
+- Database size
+- Attributes count, per type and format
+- Tables size
+- Last chunk size
+- Chunk interval size
+- Tables row count
 
 ### Changed [hdbpp-reorder-chunks]
 
- - Do not reorder last chunk
- - Nor the already ordered chunks 
+- Do not reorder last chunk
+- Nor the already ordered chunks 
 
 ### Removed [hdbpp-reorder-chunks]
 
- - Schedule window, we keep track of ordered chunks
+- Schedule window, we keep track of ordered chunks
 
