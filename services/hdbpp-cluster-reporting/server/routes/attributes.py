@@ -30,6 +30,43 @@ from server.errors import InvalidUsage
 
 logger = logging.getLogger(config.LOGGER_NAME)
 
+def get_bytes(size):
+    """
+    Helper function to convert a size given in standard units (1G for example)
+    to bytes.
+    
+    Arguments:
+        size: str
+        string representation of the size
+
+    Returns:
+        int -- the size in bytes
+    """
+   
+    standard_size = ['K', 'M', 'G', 'T']
+    init = size
+    num = ""
+    
+    while size and size[0:1].isdigit() or size[0:1] == '.':
+        num += size[0]
+        size = size[1:]
+    
+    num = float(num)
+    first_letter = size.strip()[:1]
+    pow_idx = -1;
+    
+    for index, prefix in enumerate(standard_size):
+        if first_letter.upper() == prefix:
+            pow_idx = index
+            break
+    
+    if pow_idx < 0:
+        logger.error("Could not convert {} to bytes.".format(init))
+        return num
+
+    return int(num * 1024 ** (pow_idx+1))
+
+
 def get_from_db(att_format, att_type, req):
     """
     Generic function that just grabs the data from the database according
@@ -50,6 +87,33 @@ def get_from_db(att_format, att_type, req):
 
     return attributes_result[0].result
 
+class Health(Resource):
+
+    def __init__(self, *args, **kwargs):
+        self.levels = {}
+        self.levels['error_bytes']=get_bytes(kwargs['error'])
+        self.levels['warning_bytes']=get_bytes(kwargs['warning'])
+        self.levels['error_readable']=kwargs['error']
+        self.levels['warning_readable']=kwargs['warning']
+        
+    def get(self):
+        atts_result = Datatable.query.all()
+            
+        ## status check to ensure that the last chunk is not too big
+        for attribute in atts_result:
+            if attribute.att_current_chunk_size > self.levels['error_bytes']:
+                return {"state": "Error"
+                        , "message": "The last chunk for attributes {} of format {} is bigger than {}." \
+                                .format(attribute.att_type, attribute.att_format, self.levels['error_readable'])}
+            
+            if attribute.att_current_chunk_size > self.levels['warning_bytes']:
+                return {"state": "Warning"
+                        , "message": "The last chunk for attributes {} of format {} is bigger than {}." \
+                                .format(attribute.att_type, attribute.att_format, self.levels['warning_readable'])}
+
+        return {"state": "Ok"
+                , "message": "The last chunks sizes are smaller than {}.".format(self.levels['warning_readable'])}
+        
 
 class Attributes(Resource):
     def get(self):

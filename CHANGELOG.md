@@ -9,25 +9,26 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added [general]
 
-- Added a CMake project build system that can build all required elements for deployment. External elements are downloaded to external/
-- Added hdbpp-health-check device server to the components.
+ - Added a CMake project build system that can build all required elements for deployment. External elements are downloaded to external/
+ - Added hdbpp-health-check device server to the components.
 
 ### Changed [resources]
 
-- Renamed create-test-database -> test-database
-- Updated test-database help display.
+ - Renamed create-test-database -> test-database
+ - Updated test-database help display.
 
 ### Changed [schema]
 
-- Removed some duplicate indexes
-- Schema for the aggregates view for scalar data. Aggregates avg, min, max, stddev over a year. For floating point data, nan and infinity values are counted and not taken into account
+ - Removed some duplicate indexes
+ - Schema for the aggregates view for scalar data. Aggregates avg, min, max, stddev over a year. For floating point data, nan and infinity values are counted and not taken into account
  
 ### Changed [hdbpp-timescale-docker]
 
-- Updated to TimescaleDB version 1.6
+ - Updated to TimescaleDB version 1.6
 
 ### Added [hdbpp-cluster-reporting]
 
+ - endpoints for a basic health check on ttl, backup, tables chunk sizes
  - Replica database lag
  - Aggregate size
  - Aggregate row count per type and interval

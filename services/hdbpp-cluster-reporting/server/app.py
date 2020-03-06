@@ -26,7 +26,6 @@ import yaml
 
 import server.config as config
 import server.services as services
-import server.routes.status as status_endpoint
 import server.routes.servers as servers_endpoint
 import server.routes.attributes as attributes_endpoint
 import server.routes.aggregates as aggregates_endpoint
@@ -156,6 +155,16 @@ def set_config_defaults(configuration):
     if configuration["database"]["update_interval"] == None:
         configuration["database"]["update_interval"] = 600
 
+    if not configuration["limits"]:
+        configuration["limits"] = {}
+
+    if not configuration["limits"]["error"]:
+        configuration["limits"]["error"] = '40G'
+
+    if not configuration["limits"]["warning"]:
+        configuration["limits"]["warning"] = '20G'
+
+
 def config_logging(args):
     """
     Configure the logging system based on the args
@@ -182,8 +191,7 @@ def set_cors_headers(response):
     header['Access-Control-Allow-Origin'] = '*'
     return response
 
-
-def create_app(config_name):
+def create_app(config_name, configuration):
     """
     Create the flask app and return it
 
@@ -207,8 +215,11 @@ def create_app(config_name):
 
     app.register_blueprint(blueprint, url_prefix='/api/v1')
 
+    # Retrieve the warning and error levels from the configuration
+    levels = {'error': configuration['limits']['error'], 'warning':configuration['limits']['warning']}
+
     # create the routes
-    api.add_resource(status_endpoint.ServerHealth, '/health/servers')
+    api.add_resource(servers_endpoint.Health, '/health/servers')
     api.add_resource(servers_endpoint.Servers, '/servers')
     api.add_resource(servers_endpoint.Hosts, '/servers/hosts')
     api.add_resource(servers_endpoint.Server, '/servers/server/<string:host>')
@@ -222,12 +233,14 @@ def create_app(config_name):
     api.add_resource(attributes_endpoint.AttributesTypeOrFormatCount, '/database/attributes/count/<string:att_info>')
     api.add_resource(attributes_endpoint.AttributesFormatTypeCount, '/database/attributes/count/<string:att_format>/<string:att_type>')
     
+    api.add_resource(ttl_endpoint.Health, '/health/database/ttl')
     api.add_resource(ttl_endpoint.Ttl, '/database/ttl')
     api.add_resource(ttl_endpoint.TtlLastExecution, '/database/ttl/last_execution')
     api.add_resource(ttl_endpoint.TtlDuration, '/database/ttl/duration')
     api.add_resource(ttl_endpoint.Attributes, '/database/ttl/attributes')
     api.add_resource(ttl_endpoint.AttributeRowDeleted, '/database/ttl/daily_rows_deleted/<string:att_name>')
     
+    api.add_resource(attributes_endpoint.Health, '/health/database/tables', resource_class_kwargs=levels)
     api.add_resource(attributes_endpoint.Attributes, '/database/tables')
     api.add_resource(attributes_endpoint.AttributesRowCount, '/database/tables/row_count/<string:att_format>/<string:att_type>')
     api.add_resource(attributes_endpoint.AttributesInterval, '/database/tables/interval/<string:att_format>/<string:att_type>')
@@ -241,6 +254,7 @@ def create_app(config_name):
     api.add_resource(database_endpoint.Databases, '/databases')
     api.add_resource(database_endpoint.DatabaseSize, '/database/size')
 
+    api.add_resource(backup_endpoint.Health, '/health/database/backup')
     api.add_resource(backup_endpoint.Backup, '/database/backup')
     api.add_resource(backup_endpoint.BackupLastExecution, '/database/backup/last_execution')
     api.add_resource(backup_endpoint.BackupDuration, '/database/backup/duration')
@@ -285,7 +299,7 @@ def main():
     print(mode)
 
     # now create the flask app
-    app = create_app(mode)
+    app = create_app(mode, configuration)
 
     from server.models import Servers
     from server.models import Datatable
