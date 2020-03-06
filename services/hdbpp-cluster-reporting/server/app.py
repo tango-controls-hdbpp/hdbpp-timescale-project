@@ -31,6 +31,8 @@ import server.routes.servers as servers_endpoint
 import server.routes.attributes as attributes_endpoint
 import server.routes.aggregates as aggregates_endpoint
 import server.routes.database as database_endpoint
+import server.routes.ttl as ttl_endpoint
+import server.routes.backup as backup_endpoint
 
 from server.errors import InvalidUsage
 from server.errors import handle_error 
@@ -175,6 +177,11 @@ def config_logging(args):
     else:
         logger.setLevel(logging.INFO)
 
+def set_cors_headers(response):
+    header = response.headers
+    header['Access-Control-Allow-Origin'] = '*'
+    return response
+
 
 def create_app(config_name):
     """
@@ -189,6 +196,7 @@ def create_app(config_name):
 
     # start flask with blueprints
     blueprint = Blueprint('api', __name__)
+    blueprint.after_request(set_cors_headers)
     api = Api(blueprint)
 
     app = Flask(__name__)
@@ -214,22 +222,32 @@ def create_app(config_name):
     api.add_resource(attributes_endpoint.AttributesTypeOrFormatCount, '/database/attributes/count/<string:att_info>')
     api.add_resource(attributes_endpoint.AttributesFormatTypeCount, '/database/attributes/count/<string:att_format>/<string:att_type>')
     
+    api.add_resource(ttl_endpoint.Ttl, '/database/ttl')
+    api.add_resource(ttl_endpoint.TtlLastExecution, '/database/ttl/last_execution')
+    api.add_resource(ttl_endpoint.TtlDuration, '/database/ttl/duration')
+    api.add_resource(ttl_endpoint.Attributes, '/database/ttl/attributes')
+    api.add_resource(ttl_endpoint.AttributeRowDeleted, '/database/ttl/daily_rows_deleted/<string:att_name>')
+    
+    api.add_resource(attributes_endpoint.Attributes, '/database/tables')
     api.add_resource(attributes_endpoint.AttributesRowCount, '/database/tables/row_count/<string:att_format>/<string:att_type>')
     api.add_resource(attributes_endpoint.AttributesInterval, '/database/tables/interval/<string:att_format>/<string:att_type>')
-    api.add_resource(attributes_endpoint.AttributesIntervalUnit, '/database/tables/interval/unit')
     api.add_resource(attributes_endpoint.AttributesSize, '/database/tables/size/<string:att_format>/<string:att_type>')
-    api.add_resource(attributes_endpoint.AttributesSizeUnit, '/database/tables/size/unit')
     api.add_resource(attributes_endpoint.AttributesCurrentSize, '/database/tables/current_size/<string:att_format>/<string:att_type>')
-    api.add_resource(attributes_endpoint.AttributesSizeUnit, '/database/tables/current_size/unit')
     
     api.add_resource(aggregates_endpoint.Aggregates, '/database/aggregates')
-    api.add_resource(aggregates_endpoint.AggregatesRowCount, '/database/aggregates/row_count/<string:agg_interval>/<string:att_type>')
-    api.add_resource(aggregates_endpoint.AggregatesSize, '/database/aggregates/size/<string:agg_interval>/<string:att_type>')
+    api.add_resource(aggregates_endpoint.AggregatesRowCount, '/database/aggregates/row_count/<string:att_type>/<string:agg_interval>')
+    api.add_resource(aggregates_endpoint.AggregatesSize, '/database/aggregates/size/<string:att_type>/<string:agg_interval>')
 
     api.add_resource(database_endpoint.Databases, '/databases')
-    api.add_resource(database_endpoint.DatabaseSize, '/database/size/<string:db_name>')
-    api.add_resource(database_endpoint.DatabaseSizeUnit, '/database/size/unit')
+    api.add_resource(database_endpoint.DatabaseSize, '/database/size')
 
+    api.add_resource(backup_endpoint.Backup, '/database/backup')
+    api.add_resource(backup_endpoint.BackupLastExecution, '/database/backup/last_execution')
+    api.add_resource(backup_endpoint.BackupDuration, '/database/backup/duration')
+    api.add_resource(backup_endpoint.BackupId, '/database/backup/last_id')
+    api.add_resource(backup_endpoint.BackupSize, '/database/backup/size')
+    api.add_resource(backup_endpoint.BackupError, '/database/backup/error')
+    
     return app
 
 
@@ -273,6 +291,7 @@ def main():
     from server.models import Datatable
     from server.models import Database
     from server.models import Aggregate
+    from server.models import Attribute
     db.app = app
     db.init_app(app)
     db.create_all()
