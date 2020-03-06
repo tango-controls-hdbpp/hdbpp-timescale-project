@@ -37,6 +37,35 @@ logger = logging.getLogger(config.LOGGER_NAME)
 NO_DATABASE_ERROR="No database defined in your system, check configuration file."
 MULTIPLE_DATABASE_ERROR="Multiple databases defined in your system, check configuration file."
 
+
+class Health(Resource):
+    def get(self):
+        try:
+            result = Database.query.with_entities(Database.ttl_last_execution).one()
+            
+            ## status check to ensure that the ttl was executed in the last day
+            if not result.ttl_last_execution:
+                return {"state": "Warning"
+                        , "message": "The ttl was never executed."}
+
+            if datetime.datetime.now() - datetime.timedelta(days=1) > result.ttl_last_execution:
+                return {"state": "Warning"
+                        , "message": "The ttl was last executed on {}.".format(result.ttl_last_execution)}
+            
+            return {"state": "Ok"
+                    , "message": "The ttl was last executed on {}.".format(result.ttl_last_execution)}
+        
+        except NoResultFound:
+            logger.error(NO_DATABASE_ERROR)
+
+            raise InvalidUsage(NO_DATABASE_ERROR, 500)
+        
+        except MultipleResultsFound:
+            logger.error(MULTIPLE_DATABASE_ERROR)
+                
+            raise InvalidUsage(MULTIPLE_DATABASE_ERROR, 500)
+
+
 class Attributes(Resource):
     def get(self):
         attributes = []

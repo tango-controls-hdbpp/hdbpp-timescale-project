@@ -36,6 +36,29 @@ logger = logging.getLogger(config.LOGGER_NAME)
 # Server service and status related endpoints to allow the querying of
 # the cluster or individual servers within it
 
+class Health(Resource):
+    def get(self):
+        servers_result = models.Servers.query.all()
+
+        # this is a simple staus check, based on the state of the
+        # servers. We may expand this in future to be more complex,
+        # but its not easy to compress the cluster status down into
+        # a single result
+        for server in servers_result:
+            if server.state == config.CONNECTION_STATE_ERROR:
+                return {"state": "Error"
+                        , "message": "An error occured while connecting to the database {}".format(server.hostname)}
+
+            if server.state == config.CONNECTION_STATE_UNKNOWN:
+                return {"state": "Warning"
+                        , "message": "Connection state to {} is unknown.".format(server.hostname)}
+
+            if server.role == config.SERVER_ROLE_UNKNOWN:
+                return {"state": "Warning"
+                        , "message": "Cannot retrieve the role of {}.".format(server.hostname)}
+        
+        return {"state": "Ok"}
+
 
 class Hosts(Resource):
     def get(self):
