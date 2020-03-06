@@ -23,11 +23,12 @@ project(hdbpp-timescale-project)
 # produced here, and test against it if they are run from the build folder
 set(LIBHDBPP_PROJECT_BUILD TRUE)
 
-# component versions that will be pulled on building
+# component versions that will be pulled on building. This can be a commit number, a branch name or a tag.
 set(HDBPP_ES_VERSION "integrated-build")
 set(HDBPP_CM_VERSION "integrated-build")
 set(LIBHDBPP_VERSION "exp-refactor")
 set(LIBHDBPP_TIMESCALE_VERSION "project-build2")
+
 set(EXTERNAL_PROJECT_DIR "external")
 set(DOWNLOAD_DIR "download")
 
@@ -111,7 +112,7 @@ if(NOT libhdbpp_timescale_POPULATED)
     add_subdirectory(${libhdbpp_timescale_SOURCE_DIR} ${libhdbpp_timescale_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
 
-# update the libhdbpp project
+# Redirect all binary artifacts to the build directory, to simplify testing
 set_target_properties(libhdbpp_shared_library
     PROPERTIES
         ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
@@ -130,7 +131,6 @@ set_target_properties(hdbpp_cm
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 
-# update the hdbpp-health-check project
 set_target_properties(hdbpp_health_check
     PROPERTIES
         ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
