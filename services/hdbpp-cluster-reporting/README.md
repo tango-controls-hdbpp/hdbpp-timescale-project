@@ -95,6 +95,12 @@ docker run -d \
 
 For testing purposes, or if not required, the persistent storage may be left out.
 
+To clean an existing build:
+
+```bash
+make clean
+```
+
 #### Logs
 
 Check log output from the cron job and ensure you see data being removed:

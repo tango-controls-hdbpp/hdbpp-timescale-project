@@ -4,12 +4,13 @@
 
 - [hdbpp-timescale-project](#hdbpp-timescale-project)
   - [Cloning](#Cloning)
+  - [Versioning](#Versioning)
   - [Overview](#Overview)
-    - [services/*](#services)
-    - [components/*](#components)
-    - [resources/*](#resources)
-    - [external/*](#external)
-    - [doc/*](#doc)
+    - [services](#services)
+    - [components](#components)
+    - [resources](#resources)
+    - [external](#external)
+    - [doc](#doc)
   - [Building](#Building)
   - [Deployment](#Deployment)
   - [Version Table](#Version-Table)
@@ -17,7 +18,7 @@
 
 The hdbpp timescale project is a Tango Control system archival backend. The project includes all additional services required by the project, and consolidates various generic components into a single fetch and build cmake system.
 
-Additional documentation is stored in the doc folder, and indexed on its [README](doc/README.md)
+Additional documentation is stored in the doc folder, and indexed on its [README](doc/)
 
 Some of the information assumes familiarity with TimescaleDb terms and technologies. Please to TimescaleDb [documentation](www.timescaledb.com) for more information.
 
@@ -29,27 +30,31 @@ This project contains several other projects as dependencies. Currently the proj
 git clone --recurse-submodules https://github.com/tango-controls-hdbpp/hdbpp-timescale-project.git
 ```
 
+## Versioning
+
+The project is tagged with a version. 
+
 ## Overview
 
 Brief overview of the modules:
 
-### services/*
+### services
 
 Contains various services deployed to assist in running the hdbpp database cluster operation. Its recommended to use the Docker images to ease deployment.
 
-### components/*
+### components
 
 Contains any applications or device servers required by the project
 
-### resources/*
+### resources
 
 Project resources. Including the HDB++ schema, TimescaleDB HDB++ Docker images, test scripts that can allow a user to test the project quickly, and any other additional item that may help the user in deploying, testing or running the system.
 
-### external/*
+### external
 
 This directory will be created at CMake configuration time and will contain the external dependencies for the complete build. These are currently hdbpp-es, hdbpp-cm, libhdbpp and libhdbpp-timescale.
 
-### doc/*
+### doc
 
 Project documentation
 
@@ -61,6 +66,15 @@ The project contains a consolidated build system to fetch build all required ext
  - [hdbpp-cm](https://github.com/tango-controls-hdbpp/hdbpp-cm)
  - [libhdbpp](https://github.com/tango-controls-hdbpp/libhdbpp)
  - [libhdbpp-timescale](https://github.com/tango-controls-hdbpp/libhdbpp-timescale)
+
+The CMakeLists.txt file defines the tag or branch for each of these projects the build system will fetch and build. It currently uses the following tags/branchs:
+
+| Component | Tag/Branch |
+|------|-----|
+| hdbpp-es | integrated-build |
+| hdbpp-cm | integrated-build |
+| libhdbpp | exp-refactor |
+| libhdbpp-timescale | project-build2 |
 
 See the [build](doc/build.md) guide in the doc folder on how to build the project and its external dependencies.
 

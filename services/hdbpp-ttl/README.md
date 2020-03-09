@@ -74,6 +74,12 @@ docker run -d \
   hdbpp-ttl
 ```
 
+To clean an existing build:
+
+```bash
+make clean
+```
+
 #### Validation
 
 To check if the job is scheduled:

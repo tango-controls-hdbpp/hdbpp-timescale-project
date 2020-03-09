@@ -82,6 +82,12 @@ docker run -d \
   hdbpp-reorder-chunks
 ```
 
+To clean an existing build:
+
+```bash
+make clean
+```
+
 #### Validation
 
 To check if the job is scheduled:

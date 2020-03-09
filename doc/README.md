@@ -1,6 +1,6 @@
 # Table of Contents
 
-General information about deploying this project.
+General information about the hdbpp-timescale-project
 
 - [Table of Contents](#Table-of-Contents)
   - [About](#About)
@@ -10,17 +10,17 @@ General information about deploying this project.
 
 ## About
 
-The overview is in the main project [README](../README.md).
+The overview is in the main project folder [README](../README.md).
 
 ## Building and Deployment
 
-- Instructions on using the consolidated build system [here](build.md).
+- Instructions for both building the binary components and the docker images are in the build guide [here](build.md).
 - Guidelines on deploying components [here](deployment.md).
 
 ## DB Schema
 
-- Guidelines and setup of the schema is detailed [here](db-schema-config.md)
+- Guidelines and setup of the schema is detailed [here](db-schema-config.md).
 
 ## Testing Resources
 
-- Some information on deploying a test system can be found [here](test-resources.md)
+- Some information on deploying a test system can be found [here](testing-resources.md)
