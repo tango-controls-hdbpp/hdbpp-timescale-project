@@ -10,6 +10,7 @@
     - [Build Flags](#Build-Flags)
       - [Standard CMake Flags](#Standard-CMake-Flags)
       - [Project Flags](#Project-Flags)
+    - [Further Reading](#Further-Reading)
   - [Docker Images For Services](#Docker-Images-For-Services)
     - [Dependencies](#Dependencies-1)
     - [Building](#Building-1)
@@ -101,6 +102,17 @@ The following is a list of common useful CMake flags and their use:
 | Flag | Setting | Default | Description |
 |------|-----|-----|-----|
 | ENABLE_CLANG | ON/OFF | OFF | Clang code static analysis, readability, and cppcore guideline enforcement for any component that supports it|
+
+### Further Reading
+
+Each fetched components repository has a detailed README with additional information not covered here. If you wish to build components individually, see the components README:
+
+- [hdbpp-es](https://github.com/tango-controls-hdbpp/hdbpp-es)
+- [hdbpp-cm](https://github.com/tango-controls-hdbpp/hdbpp-cm)
+- [libhdbpp](https://github.com/tango-controls-hdbpp/libhdbpp)
+- [libhdbpp-timescale](https://github.com/tango-controls-hdbpp/libhdbpp-timescale)
+
+
 
 ## Docker Images For Services
 

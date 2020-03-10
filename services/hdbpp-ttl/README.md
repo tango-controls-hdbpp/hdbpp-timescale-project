@@ -12,11 +12,14 @@
   - [Configuration](#Configuration)
   - [License](#License)
 
-In the hdbpp database schema each attribute defines a field to implement a time to live for each attributes data. Since TimescaleDb does not offer this type of feature, it has been implemented separately as this small python script. Deleting data from the database takes advantage of TimescaleDb's ability to efficiently delete data across its chunked hyper-tables, and only lock the chunks and not the entire table while the operation is carried out.
+In the hdbpp database schema each attribute defines a field to implement a time to live flag. Since TimescaleDb does not offer this type of feature, it has been implemented separately as this small python script. Deleting data from the database takes advantage of TimescaleDb's ability to efficiently delete data across its chunked hyper-tables, and only lock the chunks and not the entire table while the operation is carried out. 
 
 The script will remove data older than the time to live value, and this is calculated from midnight yesterday. For example, a time to live of 1 day would preserve all of yesterdays data, what ever time it is run today. A time to live of 2 days would preserve yesterday and the day before yesterday, what ever time it is run.
 
-It is recommended (and pre-configured) to run in the evening, when the system is not being heavily used.
+Import notes:
+
+- It is recommended (and pre-configured) to run in the evening, when the system is not being heavily used.
+- Ensure the TimescaleDb deployment has adequate auto vacuum workers (or ensure timescaledb-tune was used to assist in tuning the deployment)
 
 A single deployment of the script can manage multiple databases or database clusters if it is configured correctly. See the configuration file.
 

@@ -12,6 +12,8 @@
     - [external](#external)
     - [doc](#doc)
   - [Building](#Building)
+    - [Internal Components](#Internal-Components)
+    - [External Components](#External-Components)
   - [Deployment](#Deployment)
   - [Version Table](#Version-Table)
   - [License](#License)
@@ -60,12 +62,22 @@ Project documentation
 
 ## Building
 
+The build system will build both external and in project dependencies.
+
+### Internal Components
+
+A single Device Server is hosted by the project:
+
+- hdbpp-health-check - A simple device server that reports some alarm state information. Acts as an potential error feedback point into the Tango Control system,
+
+### External Components
+
 The project contains a consolidated build system to fetch build all required external dependencies. These are currently:
 
- - [hdbpp-es](https://github.com/tango-controls-hdbpp/hdbpp-es)
- - [hdbpp-cm](https://github.com/tango-controls-hdbpp/hdbpp-cm)
- - [libhdbpp](https://github.com/tango-controls-hdbpp/libhdbpp)
- - [libhdbpp-timescale](https://github.com/tango-controls-hdbpp/libhdbpp-timescale)
+- [hdbpp-es](https://github.com/tango-controls-hdbpp/hdbpp-es)
+- [hdbpp-cm](https://github.com/tango-controls-hdbpp/hdbpp-cm)
+- [libhdbpp](https://github.com/tango-controls-hdbpp/libhdbpp)
+- [libhdbpp-timescale](https://github.com/tango-controls-hdbpp/libhdbpp-timescale)
 
 The CMakeLists.txt file defines the tag or branch for each of these projects the build system will fetch and build. It currently uses the following tags/branchs:
 
@@ -80,13 +92,13 @@ See the [build](doc/build.md) guide in the doc folder on how to build the projec
 
 The various services are python scripts, these can be deployed as a script, or a built as Docker images with the supplied build system. Each service comes with a short README on how to build and deploy it:
 
- - [hdbpp-cluster-reporting](hdbpp-cluster-reporting/README.md)
- - [hdbpp-reorder-chunks](hdbpp-reorder-chunks/README.md)
- - [hdbpp-ttl](hdbpp-ttl/README.md)
+- [hdbpp-cluster-reporting](hdbpp-cluster-reporting/README.md)
+- [hdbpp-reorder-chunks](hdbpp-reorder-chunks/README.md)
+- [hdbpp-ttl](hdbpp-ttl/README.md)
 
 ## Deployment
 
-See the [deployment](doc/deployment.md) guide in the doc folder on how to deploy the various elements of the project. This does not cover setting up a Tango Control HDB++ archival system, see the official documentations [here](https://tango-controls.readthedocs.io/en/latest) on complete system deployment.
+See the [deployment](doc/deployment.md) guide in the doc folder on how to deploy the various elements of the project. This does not cover setting up a Tango Control HDB++ archival system, see the official documentations [here](https://tango-controls.readthedocs.io/en/latest) on complete HDB++ system deployment.
 
 ## Version Table
 

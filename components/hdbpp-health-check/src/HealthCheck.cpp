@@ -74,6 +74,7 @@ std::tuple<HealthCheck::HealthCheckResult, std::string> HealthCheck::check_hosts
 
         // Retrieve the error message if there is any
         std::string error_message;
+        
         if (document.HasMember("message") && document["message"].IsString())
             error_message = "\n" + std::string(document["message"].GetString());
 	
@@ -82,6 +83,7 @@ std::tuple<HealthCheck::HealthCheckResult, std::string> HealthCheck::check_hosts
 
         // get a valid reponse, now check the cluster
         std::tuple<HealthCheck::HealthCheckResult, std::string> ret;
+
         if (document["state"] == "Ok")
             ret = std::make_tuple(HealthCheckResult::Ok, server_no_errors + error_message);
 
