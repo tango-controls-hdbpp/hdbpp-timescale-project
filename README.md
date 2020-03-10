@@ -92,9 +92,9 @@ See the [build](doc/build.md) guide in the doc folder on how to build the projec
 
 The various services are python scripts, these can be deployed as a script, or a built as Docker images with the supplied build system. Each service comes with a short README on how to build and deploy it:
 
-- [hdbpp-cluster-reporting](hdbpp-cluster-reporting/README.md)
-- [hdbpp-reorder-chunks](hdbpp-reorder-chunks/README.md)
-- [hdbpp-ttl](hdbpp-ttl/README.md)
+- [hdbpp-cluster-reporting](services/hdbpp-cluster-reporting)
+- [hdbpp-reorder-chunks](services/hdbpp-reorder-chunks)
+- [hdbpp-ttl](services/hdbpp-ttl)
 
 ## Deployment
 

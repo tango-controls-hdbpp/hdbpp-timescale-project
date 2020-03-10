@@ -17,7 +17,7 @@ Some of the information assumes familiarity with TimescaleDb terms and technolog
 
 ## Hypperchunk Sizes
 
-The [schema](../db-schema/schema.sql) file has default values set for all hyper table chunk sizes. It is assumed initial deployment data load will be smaller than the final fully operational system, so chunk sizes are as follows:
+The [schema](../resources/db-schema/hdb_schema.sql) file has default values set for all hyper table chunk sizes. It is assumed initial deployment data load will be smaller than the final fully operational system, so chunk sizes are as follows:
 
 - 28 days for all data tables, except:
 - 14 days for att_scalar_devdouble, since this appears to be used more often than other tables.

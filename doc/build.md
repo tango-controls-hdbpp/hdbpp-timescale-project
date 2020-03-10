@@ -66,11 +66,11 @@ cmake -DCMAKE_PREFIX_PATH=/non/standard/tango/install/location ..
 ...
 ```
 
-The consoldiated build system updates the binary output for each compoent to be the build directly. When builing the entire project, all binaries will be under 'build'.
+The consolidated build system updates the binary output for each component to be the build directly. When building the entire project, all binaries will be under 'build'.
 
 #### Building Components Individually
 
-It is possible to build the various components individually (incluing externally fetched ones). To see the available targets, use make as follows:
+It is possible to build the various components individually (including externally fetched ones). To see the available targets, use make as follows:
 
 ```bash
 make help

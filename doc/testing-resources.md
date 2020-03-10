@@ -68,8 +68,8 @@ psql -U postgres -d hdb -a -f hdb_ext_aggregates.sql
 
 All services can be deployed against the hdbpp-timescale-docker Docker image. If deploying test test system all on a single server, the default configuration for each service should be enough to bring up the service. Review each services README for more details on how to deploy:
 
-- [hdbpp-cluster-reporting](hdbpp-cluster-reporting/README.md)
-- [hdbpp-reorder-chunks](hdbpp-reorder-chunks/README.md)
-- [hdbpp-ttl](hdbpp-ttl/README.md)
+- [hdbpp-cluster-reporting](../services/hdbpp-cluster-reporting)
+- [hdbpp-reorder-chunks](../services/hdbpp-reorder-chunks)
+- [hdbpp-ttl](../services/hdbpp-ttl)
 
 Docker deployment recommended.

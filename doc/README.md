@@ -10,7 +10,7 @@ General information about the hdbpp-timescale-project
 
 ## About
 
-The overview is in the main project folder [README](../README.md).
+The overview is in the main project folder [README](../).
 
 ## Building and Deployment
 
