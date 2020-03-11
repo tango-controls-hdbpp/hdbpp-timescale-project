@@ -85,8 +85,8 @@ public:
 	Tango::DevLong	restAPIPort;
 	//	RestAPIRootUrl:	Root url to prefix RestAPI requests with.
 	string	restAPIRootUrl;
-	//	EnableHostCheck:	Enable reading of the host health status from the cluster reporting Rest server.
-	Tango::DevBoolean	enableHostCheck;
+	//	EndpointList:	List of endpoints for the host health status from the cluster reporting Rest server.
+	vector<string>	endpointList;
 
 
 //	Constructors and destructors

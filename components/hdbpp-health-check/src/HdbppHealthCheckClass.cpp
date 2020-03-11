@@ -261,11 +261,14 @@ void HdbppHealthCheckClass::set_default_property()
 	}
 	else
 		add_wiz_dev_prop(prop_name, prop_desc);
-	prop_name = "EnableHostCheck";
-	prop_desc = "Enable reading of the host health status from the cluster reporting Rest server.";
-	prop_def  = "false";
+	prop_name = "EndpointList";
+	prop_desc = "List of endpoints for the host health status from the cluster reporting Rest server.";
+	prop_def  = "/health/servers\n/health/database/backup\n/health/database/tables\n/health/database/ttl";
 	vect_data.clear();
-	vect_data.push_back("false");
+	vect_data.push_back("/health/servers");
+	vect_data.push_back("/health/database/backup");
+	vect_data.push_back("/health/database/tables");
+	vect_data.push_back("/health/database/ttl");
 	if (prop_def.length()>0)
 	{
 		Tango::DbDatum	data(prop_name);

@@ -28,6 +28,22 @@
 namespace HdbppHealthCheck_ns
 {
 
+HealthCheck::HealthCheckResult HealthCheck::to_healthcheck_result(const std::string& state) const
+{
+    if (state == "Ok")
+        return HealthCheckResult::Ok;
+
+    else if (state == "Warning")
+        return HealthCheckResult::Warning;
+
+    else if (state == "Error")
+        return HealthCheckResult::Error;
+    
+    else 
+        return HealthCheckResult::ConnectionProblem;
+
+}
+
 //=============================================================================
 //=============================================================================
 bool HealthCheck::configure_rest_server_address(const std::string &host, int port, const std::string &root_url)
@@ -43,7 +59,7 @@ bool HealthCheck::configure_rest_server_address(const std::string &host, int por
     httplib::Client cli(_host, _port);
     auto url = _root_url + "/";
     auto result = cli.Get(url.c_str());
-
+    
     return !(result == nullptr);
 }
 
@@ -54,53 +70,60 @@ std::tuple<HealthCheck::HealthCheckResult, std::string> HealthCheck::check_hosts
     assert(!_host.empty());
     assert(!_root_url.empty());
 
-    if (!_hosts_check_enabled)
+    if (_health_endpoints.empty())
         Tango::Except::throw_exception("Bad Configuration", 
-            "Attempting to check hosts when it has not been configured", (const char *)__func__);
+            "Attempting to check hosts when no endpoints have been configured", (const char *)__func__);
+
+    std::string error_message = "";
+    HealthCheckResult health_result = HealthCheckResult::Ok;
+    std::tuple<HealthCheck::HealthCheckResult, std::string> ret;
 
     // contact the cluster reporting server and request the server
     // health status
     httplib::Client cli(_host, _port);
-    auto url = _root_url + "/health/servers";
-    auto result = cli.Get(url.c_str());
-    
-    if (result && result->status == 200) 
+    for(auto it = _health_endpoints.cbegin(); it != _health_endpoints.cend(); ++it)
     {
-        rapidjson::Document document;
-        document.Parse(result->body.c_str());
-
-        if (!document.IsObject() || !document.HasMember("state") || !document["state"].IsString())
-            return std::make_tuple(HealthCheckResult::ConnectionProblem, invalid_response);
-
-        // Retrieve the error message if there is any
-        std::string error_message;
+        auto url = _root_url + *it;
+        auto result = cli.Get(url.c_str());
         
-        if (document.HasMember("message") && document["message"].IsString())
-            error_message = "\n" + std::string(document["message"].GetString());
-	
+        if (result && result->status == 200) 
+        {
+            rapidjson::Document document;
+            document.Parse(result->body.c_str());
+
+            if (!document.IsObject() || !document.HasMember("state") || !document["state"].IsString())
+                return std::make_tuple(HealthCheckResult::ConnectionProblem, invalid_response);
+
+            // Retrieve the error message if there is any
+            if (document.HasMember("message") && document["message"].IsString())
+                error_message += "\n" + std::string(document["message"].GetString());
+            
+            // get a valid reponse, now check the cluster
+            std::string state = std::string(document["state"].GetString());
+            HealthCheck::HealthCheckResult res = to_healthcheck_result(state);
+            if(res > health_result)
+                health_result = res;
+        }
+        
         else
-            error_message = "";
-
-        // get a valid reponse, now check the cluster
-        std::tuple<HealthCheck::HealthCheckResult, std::string> ret;
-
-        if (document["state"] == "Ok")
+            return std::make_tuple(HealthCheckResult::ConnectionProblem, no_reponse);
+    }
+    switch(health_result)
+    {
+        case Ok:
             ret = std::make_tuple(HealthCheckResult::Ok, server_no_errors + error_message);
-
-        else if (document["state"] == "Warning")
+            break;
+        case Warning:
             ret = std::make_tuple(HealthCheckResult::Warning, server_warning + error_message);
-
-        else if (document["state"] == "Error") 
+            break;
+        case Error:
             ret = std::make_tuple(HealthCheckResult::Error, server_error + error_message);
-
-        else
+            break;
+        default:
             ret = std::make_tuple(
                 HealthCheckResult::ConnectionProblem, server_bad_response + error_message);
-
-        return ret;
     }
-
-    return std::make_tuple(HealthCheckResult::ConnectionProblem, no_reponse);
+    return ret;
 }
 
 } // namespace HdbppHealthCheck_ns
