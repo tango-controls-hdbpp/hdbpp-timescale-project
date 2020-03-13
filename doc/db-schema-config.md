@@ -59,19 +59,23 @@ Note the SUPERUSER role will be stripped after the tables are set up.
 
 ### Table Creation - Mandatory (Using hdb_schema.sql)
 
-Now import the schema.sql as the hdb_admin user. From pqsl:
+Now import the hdb_schema.sql as the hdb_admin user. From pqsl:
 
 ```bash
-psql -U hdb_admin -h HOST -p PORT-f schema.sql  -d template1
+psql -U hdb_admin -h HOST -p PORT-f hdb_schema.sql  -d template1
 ```
 
 Note: we use database template1 since hdb_admin currently has no database to connect to.
 
 We should now have a hdb database owned by hdb_admin.
 
-### Roles - Recommended (Using hdb_users.sql)
+### Roles - Recommended (Using hdb_roles.sql)
 
 Next we need to set up the users (this may require some improvements, pull requests welcome). Connect as a superuser and create two roles using hdb_roles.sql
+
+```
+\i hdb_roles.sql
+```
 
 ### Users - Optional (Using hdb_ext_users.sql)
 
