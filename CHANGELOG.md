@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Change [hdbpp-ttl]
+
+* Docker image now includes all dependencies
+* Main script processes new config section in .conf file for rest access
+
 ## [0.2.0] - 2020-03-06
 
 ### Added [general]

@@ -64,21 +64,7 @@ def valid_config(config):
         bool -- True on success, False otherwise
     """
 
-    if len(config) == 0:
-        logger.error("Invalid config file, no values loaded. Please check the config file is valid")
-        return False
-
-    if "api_url" not in config:
-        logger.error("Missing element 'api_url' in config file. Please check the config file is valid")
-        return False
-
-    if "endpoint" not in config:
-        logger.error("Missing element 'endpoint' in config file. Please check the config file is valid")
-        return False
-    
-    if "json_message" not in config and "json_file" not in config:
-        logger.error("No message to send, please provide 'json_message' or 'json_file'. Please check the config file is valid")
-        return False
+    # nothing to do right now....
 
     return True
 
@@ -91,14 +77,14 @@ def add_defaults_to_config(config):
         config : dict -- Configuration
     """
 
+    if "enable" not in config:
+        config["enable"] = False
+
     if "api_url" not in config:
         config["api_url"] = "http://localhost:10666/api/v1"
     
     if "endpoint" not in config:
-        config["endpoint"] = "/database/ttl/attributes"
-    
-    if "json_message" not in config and "json_file" not in config:
-        config["json_message"] = "{}"
+        config["endpoint"] = "/database/ttl"
 
 
 def load_config(path):

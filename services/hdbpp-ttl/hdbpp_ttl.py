@@ -46,9 +46,9 @@ import psycopg2
 import yaml
 import logging
 import logging.handlers
+import hdbpp_rest_report as reporting
 
 from datetime import timedelta
-from hdbpp_rest_report import put_dict_to_rest
 
 logger = logging.getLogger('hdbpp-ttl')
 
@@ -83,6 +83,13 @@ def valid_config(config):
                 logger.error("No user defined in 'connection' section. Please check the config file is valid")
                 return False
 
+        if "rest_endpoint" not in val:
+            logger.error("Missing section 'rest_endpoint' in config file. Please check the config file is valid")
+            return False
+
+        if not reporting.valid_config(val["rest_endpoint"]):
+            return False
+
     return True
 
 
@@ -106,6 +113,8 @@ def add_defaults_to_config(config):
 
         if "database" not in val["connection"]:
             val["database"] = "hdb"
+
+        reporting.add_defaults_to_config(val["rest_endpoint"])
 
 
 def load_config(path):
@@ -186,12 +195,12 @@ def process_ttl(server_config, dryrun, processed_ttl=None):
                         attr[2], math.ceil(int(attr[1]) / 24), attr[0]
                     )
                 )
-                
+
                 deleted_rows = cursor.rowcount
-                
+
                 if processed_ttl is not None:
-                    processed_ttl[attr[3]] = {"ttl_rows_deleted":deleted_rows}
-                
+                    processed_ttl[attr[3]] = {"ttl_rows_deleted": deleted_rows}
+
                 logger.info("Deleted {} rows in table: {} for attribute: {}".format(deleted_rows, attr[2], attr[3]))
 
             else:
@@ -203,7 +212,6 @@ def process_ttl(server_config, dryrun, processed_ttl=None):
 
                 result = cursor.fetchone()
                 logger.info("{} rows would be deleted in table: {} for attribute: {}".format(result[0], attr[2], attr[3]))
-
 
         connection.commit()
         cursor.close()
@@ -257,6 +265,10 @@ def run_command(args):
 
         # we have a config file, validate the config
         if valid_config(config):
+
+            # ensure all defaults met
+            add_defaults_to_config(config)
+
             for key, val in config.items():
                 start_time = time.monotonic()
                 logger.info("Processing ttl requests for configuration: {}".format(key))
@@ -264,13 +276,14 @@ def run_command(args):
                 process_ttl(val["connection"], args.dryrun, processed_ttl)
                 delete_time = timedelta(seconds=time.monotonic() - start_time)
                 logger.info("Processed ttl request for configuration {} in: {}".format(key, delete_time))
-                
-                ttl_report = {"attributes":processed_ttl,
-                        "ttl_delete_duration":delete_time,
-                        "ttl_last_timestamp":datetime.datetime.now()}
-                
-                if "rest_endpoint" in val:
-                    put_dict_to_rest(val["rest_endpoint"], ttl_report)
+
+                ttl_report = {"attributes": processed_ttl,
+                              "ttl_delete_duration": delete_time,
+                              "ttl_last_timestamp": datetime.datetime.now()}
+
+                if val["rest_endpoint"]["enable"] is True:
+                    reporting.put_dict_to_rest(
+                        val["rest_endpoint"]["api_url"] +  val["rest_endpoint"]["endpoint"], ttl_report)
 
         else:
             return False

@@ -7,6 +7,7 @@ build-files/.built: Dockerfile
 	cp ../requirements.txt build-files
 	cp -rf ../setup build-files/
 	cp ../hdbpp_ttl.py build-files/
+	cp ../hdbpp_rest_report.py build-files/
 	docker build -t ${NAME} .
 	touch build-files/.built
 

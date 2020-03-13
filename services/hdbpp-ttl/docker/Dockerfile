@@ -9,7 +9,7 @@ RUN mkdir -p /usr/src/service
 WORKDIR /usr/src/service
 
 # copy the various parts of the server across, including a basic config file
-COPY build-files/requirements.txt build-files/hdbpp_ttl.py ./ 
+COPY build-files/requirements.txt build-files/hdbpp_ttl.py build-files/hdbpp_rest_report.py ./ 
 COPY build-files/setup/hdbpp_ttl.conf /etc/hdb/hdbpp_ttl.conf
 COPY build-files/setup/hdbpp_ttl_docker /etc/cron.d/hdbpp_ttl
      
