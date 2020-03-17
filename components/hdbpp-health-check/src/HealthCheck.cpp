@@ -101,6 +101,7 @@ std::tuple<HealthCheck::HealthCheckResult, std::string> HealthCheck::check_hosts
             // get a valid reponse, now check the cluster
             std::string state = std::string(document["state"].GetString());
             HealthCheck::HealthCheckResult res = to_healthcheck_result(state);
+            
             if(res > health_result)
                 health_result = res;
         }
@@ -108,6 +109,7 @@ std::tuple<HealthCheck::HealthCheckResult, std::string> HealthCheck::check_hosts
         else
             return std::make_tuple(HealthCheckResult::ConnectionProblem, no_reponse);
     }
+    
     switch(health_result)
     {
         case Ok:
