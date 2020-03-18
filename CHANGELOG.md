@@ -12,6 +12,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 * Docker image now includes all dependencies
 * Main script processes new config section in .conf file for rest access
 
+### Added [hdbpp-health-check]
+
+- Check on more than 1 health endpoints.
+- Configure the endpoints through a device server property.
+
 ## [0.2.0] - 2020-03-06
 
 ### Added [general]
