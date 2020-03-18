@@ -47,7 +47,7 @@ create type double_agg_input as (
 -- Function to compute the aggregates from the new values and old aggregates
 -- result.
 -- It computes the result for an array of input and return a table so that it 
--- can be used in a FROM clause
+-- can be used in a FROM clause
 CREATE OR REPLACE FUNCTION compute_element_agg(inp_arr double_agg_input[]
     ) RETURNS SETOF RECORD as $$
 
@@ -868,7 +868,7 @@ DECLARE
 BEGIN
 
     -- Increment error count if needed
-    IF new_row.att_error_desc_id THEN
+    IF new_row.att_error_desc_id > 0 THEN
         count_err = 1;
     ELSE
         count_err = 0;
@@ -1063,7 +1063,7 @@ DECLARE
 BEGIN
 
     -- Increment error count if needed
-    IF new_row.att_error_desc_id THEN
+    IF new_row.att_error_desc_id > 0 THEN
         count_err = 1;
     ELSE
         count_err = 0;
@@ -1241,7 +1241,7 @@ DECLARE
 BEGIN
 
     -- Increment error count if needed
-    IF new_row.att_error_desc_id THEN
+    IF new_row.att_error_desc_id > 0 THEN
         count_err = 1;
     ELSE
         count_err = 0;
@@ -1347,7 +1347,7 @@ DECLARE
 BEGIN
 
     -- Increment error count if needed
-    IF new_row.att_error_desc_id THEN
+    IF new_row.att_error_desc_id > 0 THEN
         count_err = 1;
     ELSE
         count_err = 0;
@@ -1453,7 +1453,7 @@ DECLARE
 BEGIN
 
     -- Increment error count if needed
-    IF new_row.att_error_desc_id THEN
+    IF new_row.att_error_desc_id > 0 THEN
         count_err = 1;
     ELSE
         count_err = 0;
@@ -1559,7 +1559,7 @@ DECLARE
 BEGIN
 
     -- Increment error count if needed
-    IF new_row.att_error_desc_id THEN
+    IF new_row.att_error_desc_id > 0 THEN
         count_err = 1;
     ELSE
         count_err = 0;
@@ -1665,7 +1665,7 @@ DECLARE
 BEGIN
 
     -- Increment error count if needed
-    IF new_row.att_error_desc_id THEN
+    IF new_row.att_error_desc_id > 0 THEN
         count_err = 1;
     ELSE
         count_err = 0;
@@ -1771,7 +1771,7 @@ DECLARE
 BEGIN
 
     -- Increment error count if needed
-    IF new_row.att_error_desc_id THEN
+    IF new_row.att_error_desc_id > 0 THEN
         count_err = 1;
     ELSE
         count_err = 0;
@@ -1891,9 +1891,19 @@ BEGIN
             )
             SELECT state.count, state.count_errors,
             state.count_r, state.count_nan_r, state.avg_r, 
-            state.min_r, state.max_r, array_agg(sqrt(stddev_r/(count_r))),
+            state.min_r, state.max_r, array_agg(CASE
+                WHEN count_r=0 THEN NULL
+                WHEN count_r=1 THEN 0
+                ELSE sqrt(stddev_r/(count_r))
+                END
+                ),
             state.count_w, state.count_nan_w, state.avg_w, 
-            state.min_w, state.max_w, array_agg(sqrt(stddev_w/(count_w)))
+            state.min_w, state.max_w, array_agg(CASE
+                WHEN count_r=0 THEN NULL
+                WHEN count_r=1 THEN 0
+                ELSE sqrt(stddev_w/(count_w))
+                END
+                )
             INTO result FROM arrays;
 
         return result;
@@ -1927,9 +1937,18 @@ BEGIN
             )
             SELECT state.count, state.count_errors,
             state.count_r, state.count_nan_r, state.avg_r, 
-            state.min_r, state.max_r, array_agg(sqrt(stddev_r/(count_r))),
+            state.min_r, state.max_r, array_agg(CASE
+                WHEN count_r=0 THEN NULL
+                WHEN count_r=1 THEN 0
+                ELSE sqrt(stddev_r/(count_r))
+                END
+                ),
             state.count_w, state.count_nan_w, state.avg_w, 
-            state.min_w, state.max_w, array_agg(sqrt(stddev_w/(count_w)))
+            state.min_w, state.max_w, array_agg(CASE
+                WHEN count_r=0 THEN NULL
+                WHEN count_r=1 THEN 0
+                ELSE sqrt(stddev_w/(count_w))
+                END)
             INTO result FROM arrays;
 
         return result;
@@ -1963,9 +1982,18 @@ BEGIN
             )
             SELECT state.count, state.count_errors,
             state.count_r, state.avg_r, 
-            state.min_r, state.max_r, array_agg(sqrt(stddev_r/(count_r))),
+            state.min_r, state.max_r, array_agg(CASE
+                WHEN count_r=0 THEN NULL
+                WHEN count_r=1 THEN 0
+                ELSE sqrt(stddev_r/(count_r))
+                END
+                ),
             state.count_w, state.avg_w, 
-            state.min_w, state.max_w, array_agg(sqrt(stddev_w/(count_w)))
+            state.min_w, state.max_w, array_agg(CASE
+                WHEN count_r=0 THEN NULL
+                WHEN count_r=1 THEN 0
+                ELSE sqrt(stddev_w/(count_w))
+                END)
             INTO result FROM arrays;
 
         return result;
@@ -1999,9 +2027,18 @@ BEGIN
             )
             SELECT state.count, state.count_errors,
             state.count_r, state.avg_r, 
-            state.min_r, state.max_r, array_agg(sqrt(stddev_r/(count_r))),
+            state.min_r, state.max_r, array_agg(CASE
+                WHEN count_r=0 THEN NULL
+                WHEN count_r=1 THEN 0
+                ELSE sqrt(stddev_r/(count_r))
+                END
+                ),
             state.count_w, state.avg_w, 
-            state.min_w, state.max_w, array_agg(sqrt(stddev_w/(count_w)))
+            state.min_w, state.max_w, array_agg(CASE
+                WHEN count_r=0 THEN NULL
+                WHEN count_r=1 THEN 0
+                ELSE sqrt(stddev_w/(count_w))
+                END)
             INTO result FROM arrays;
 
         return result;
@@ -2035,9 +2072,18 @@ BEGIN
             )
             SELECT state.count, state.count_errors,
             state.count_r, state.avg_r, 
-            state.min_r, state.max_r, array_agg(sqrt(stddev_r/(count_r))),
+            state.min_r, state.max_r, array_agg(CASE
+                WHEN count_r=0 THEN NULL
+                WHEN count_r=1 THEN 0
+                ELSE sqrt(stddev_r/(count_r))
+                END
+                ),
             state.count_w, state.avg_w, 
-            state.min_w, state.max_w, array_agg(sqrt(stddev_w/(count_w)))
+            state.min_w, state.max_w, array_agg(CASE
+                WHEN count_r=0 THEN NULL
+                WHEN count_r=1 THEN 0
+                ELSE sqrt(stddev_w/(count_w))
+                END)
             INTO result FROM arrays;
 
         return result;
@@ -2071,9 +2117,18 @@ BEGIN
             )
             SELECT state.count, state.count_errors,
             state.count_r, state.avg_r, 
-            state.min_r, state.max_r, array_agg(sqrt(stddev_r/(count_r))),
+            state.min_r, state.max_r, array_agg(CASE
+                WHEN count_r=0 THEN NULL
+                WHEN count_r=1 THEN 0
+                ELSE sqrt(stddev_r/(count_r))
+                END
+                ),
             state.count_w, state.avg_w, 
-            state.min_w, state.max_w, array_agg(sqrt(stddev_w/(count_w)))
+            state.min_w, state.max_w, array_agg(CASE
+                WHEN count_r=0 THEN NULL
+                WHEN count_r=1 THEN 0
+                ELSE sqrt(stddev_w/(count_w))
+                END)
             INTO result FROM arrays;
 
         return result;
@@ -2107,9 +2162,18 @@ BEGIN
             )
             SELECT state.count, state.count_errors,
             state.count_r, state.avg_r, 
-            state.min_r, state.max_r, array_agg(sqrt(stddev_r/(count_r))),
+            state.min_r, state.max_r, array_agg(CASE
+                WHEN count_r=0 THEN NULL
+                WHEN count_r=1 THEN 0
+                ELSE sqrt(stddev_r/(count_r))
+                END
+                ),
             state.count_w, state.avg_w, 
-            state.min_w, state.max_w, array_agg(sqrt(stddev_w/(count_w)))
+            state.min_w, state.max_w, array_agg(CASE
+                WHEN count_r=0 THEN NULL
+                WHEN count_r=1 THEN 0
+                ELSE sqrt(stddev_w/(count_w))
+                END)
             INTO result FROM arrays;
 
         return result;
@@ -2143,9 +2207,18 @@ BEGIN
             )
             SELECT state.count, state.count_errors,
             state.count_r, state.avg_r, 
-            state.min_r, state.max_r, array_agg(sqrt(stddev_r/(count_r))),
+            state.min_r, state.max_r, array_agg(CASE
+                WHEN count_r=0 THEN NULL
+                WHEN count_r=1 THEN 0
+                ELSE sqrt(stddev_r/(count_r))
+                END
+                ),
             state.count_w, state.avg_w, 
-            state.min_w, state.max_w, array_agg(sqrt(stddev_w/(count_w)))
+            state.min_w, state.max_w, array_agg(CASE
+                WHEN count_r=0 THEN NULL
+                WHEN count_r=1 THEN 0
+                ELSE sqrt(stddev_w/(count_w))
+                END)
             INTO result FROM arrays;
 
         return result;
