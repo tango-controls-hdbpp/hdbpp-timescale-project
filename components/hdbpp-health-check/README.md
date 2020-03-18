@@ -79,6 +79,12 @@ Once deployed, this Device Server requires several properties to be set correctl
 - RestAPIHost - The hostname of the server hosting the hdbpp-cluster-reporting Rest API.
 - RestAPIPort - The port to access the hdbpp-cluster-reporting Rest API, default is 10666.
 - RestAPIRootUrl - The root path of the endpoints. Default is /api/v1.
+- EnpointList - The list of endpoints to check on the rest api. 
+  Default is:
+  - /health/database/backup
+  - /health/database/tables
+  - /health/database/ttl
+  - /health/servers
 
 Without these, the hdbpp-health-check will not be able to connect and communicate with the Rest API.
 

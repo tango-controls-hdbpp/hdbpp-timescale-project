@@ -70,6 +70,7 @@ public:
         // occurs when the HealthCheck class can not connect to the reporting
         // server
         ConnectionProblem
+        
     };
 
     // this function attempts to configure the connect to the rest server and
@@ -78,18 +79,20 @@ public:
 
     // Database host checks. These checks are basically to detect
     // if a server is down or in an unusual state
-    void enable_host_checks(bool enable) { _hosts_check_enabled = enable; }
+    void configure_health_endpoints(const std::vector<std::string> &endpoints) { _health_endpoints= endpoints; }
     std::tuple<HealthCheck::HealthCheckResult, std::string> check_hosts() const;
 
 private:
 
-    // check flags
-    bool _hosts_check_enabled = false;
+    // check list
+    std::vector<std::string> _health_endpoints;
 
     // Rest server to source data from
     std::string _root_url;
     std::string _host;
     int _port;
+    
+    HealthCheckResult to_healthcheck_result(const std::string &state) const;
 };
 
 } // namespace HdbppHealthCheck_ns

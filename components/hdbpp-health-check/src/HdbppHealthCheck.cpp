@@ -161,7 +161,7 @@ void HdbppHealthCheck::init_device()
     }
     else
     {
-        health_check.enable_host_checks(enableHostCheck);
+        health_check.configure_health_endpoints(endpointList);
 
         // start the the health check thread
         run_health_check = true;
@@ -195,7 +195,7 @@ void HdbppHealthCheck::get_device_property()
 	dev_prop.push_back(Tango::DbDatum("RestAPIHost"));
 	dev_prop.push_back(Tango::DbDatum("RestAPIPort"));
 	dev_prop.push_back(Tango::DbDatum("RestAPIRootUrl"));
-	dev_prop.push_back(Tango::DbDatum("EnableHostCheck"));
+	dev_prop.push_back(Tango::DbDatum("EndpointList"));
 
 	//	is there at least one property to be read ?
 	if (dev_prop.size()>0)
@@ -243,16 +243,16 @@ void HdbppHealthCheck::get_device_property()
 		//	And try to extract RestAPIRootUrl value from database
 		if (dev_prop[i].is_empty()==false)	dev_prop[i]  >>  restAPIRootUrl;
 
-		//	Try to initialize EnableHostCheck from class property
+		//	Try to initialize EndpointList from class property
 		cl_prop = ds_class->get_class_property(dev_prop[++i].name);
-		if (cl_prop.is_empty()==false)	cl_prop  >>  enableHostCheck;
+		if (cl_prop.is_empty()==false)	cl_prop  >>  endpointList;
 		else {
-			//	Try to initialize EnableHostCheck from default device value
+			//	Try to initialize EndpointList from default device value
 			def_prop = ds_class->get_default_device_property(dev_prop[i].name);
-			if (def_prop.is_empty()==false)	def_prop  >>  enableHostCheck;
+			if (def_prop.is_empty()==false)	def_prop  >>  endpointList;
 		}
-		//	And try to extract EnableHostCheck value from database
-		if (dev_prop[i].is_empty()==false)	dev_prop[i]  >>  enableHostCheck;
+		//	And try to extract EndpointList value from database
+		if (dev_prop[i].is_empty()==false)	dev_prop[i]  >>  endpointList;
 
 	}
 
@@ -348,7 +348,7 @@ void HdbppHealthCheck::health_check_thread()
 
     while (run_health_check)
     {
-        if (enableHostCheck)
+        if (!endpointList.empty())
         {
             auto result = health_check.check_hosts();
 
