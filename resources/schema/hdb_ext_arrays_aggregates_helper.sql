@@ -927,8 +927,8 @@ BEGIN
         IF CARDINALITY(state.avg_r) != CARDINALITY(new_row.value_r) or CARDINALITY(state.avg_w) != CARDINALITY(new_row.value_w)
         THEN
             SELECT 0, 0,
-            ARRAY[]::integer[], ARRAY[]::integer, ARRAY[]::float8[], ARRAY[]::float8[], ARRAY[]::float8[], ARRAY[]::float8[],
-            ARRAY[]::integer[], ARRAY[]::integer, ARRAY[]::float8[], ARRAY[]::float8[], ARRAY[]::float8[], ARRAY[]::float8[]
+            ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::float8[], ARRAY[]::float8[], ARRAY[]::float8[],
+            ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::float8[], ARRAY[]::float8[], ARRAY[]::float8[]
             INTO result;
         ELSE
 
@@ -1122,8 +1122,8 @@ BEGIN
         IF CARDINALITY(state.avg_r) != CARDINALITY(new_row.value_r) or CARDINALITY(state.avg_w) != CARDINALITY(new_row.value_w)
         THEN
             SELECT 0, 0,
-            ARRAY[]::integer[], ARRAY[]::integer, ARRAY[]::float8[], ARRAY[]::real[], ARRAY[]::real[], ARRAY[]::float8[],
-            ARRAY[]::integer[], ARRAY[]::integer, ARRAY[]::float8[], ARRAY[]::real[], ARRAY[]::real[], ARRAY[]::float8[]
+            ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::real[], ARRAY[]::real[], ARRAY[]::float8[],
+            ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::real[], ARRAY[]::real[], ARRAY[]::float8[]
             INTO result;
         ELSE
 
