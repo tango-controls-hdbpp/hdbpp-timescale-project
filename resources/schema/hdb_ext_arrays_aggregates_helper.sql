@@ -894,8 +894,18 @@ BEGIN
                     WHEN read='-Infinity'::float8 THEN 1 
                     ELSE 0 
                 END
-            ), array_agg(read::decimal), array_agg(read), array_agg(read), array_agg(
+            ), array_agg(
+                CASE
+                    WHEN read='NaN'::float8 THEN NULL
+                    WHEN read='Infinity'::float8 THEN NULL
+                    WHEN read='-Infinity'::float8 THEN NULL
+                    ELSE read::decimal
+                END
+            ), array_agg(read), array_agg(read), array_agg(
                 CASE 
+                    WHEN read='NaN'::float8 THEN NULL
+                    WHEN read='Infinity'::float8 THEN NULL
+                    WHEN read='-Infinity'::float8 THEN NULL
                     WHEN read IS NOT NULL THEN 0 
                     ELSE read
                 END
@@ -915,8 +925,18 @@ BEGIN
                     WHEN write='-Infinity'::float8 THEN 1 
                     ELSE 0 
                 END
-            ), array_agg(write::decimal), array_agg(write), array_agg(write), array_agg(
+            ), array_agg(
+                CASE
+                    WHEN write='NaN'::float8 THEN NULL
+                    WHEN write='Infinity'::float8 THEN NULL
+                    WHEN write='-Infinity'::float8 THEN NULL
+                    ELSE write::decimal
+                END
+            ), array_agg(write), array_agg(write), array_agg(
                 CASE 
+                    WHEN write='NaN'::float8 THEN NULL
+                    WHEN write='Infinity'::float8 THEN NULL
+                    WHEN write='-Infinity'::float8 THEN NULL
                     WHEN write IS NOT NULL THEN 0 
                     ELSE write
                 END
@@ -1089,8 +1109,18 @@ BEGIN
                     WHEN read='-Infinity'::float8 THEN 1 
                     ELSE 0 
                 END
-            ), array_agg(read::decimal), array_agg(read), array_agg(read), array_agg(
+            ), array_agg(
+                CASE
+                    WHEN read='NaN'::float8 THEN NULL
+                    WHEN read='Infinity'::float8 THEN NULL
+                    WHEN read='-Infinity'::float8 THEN NULL
+                    ELSE read::decimal
+                END
+            ), array_agg(read), array_agg(read), array_agg(
                 CASE 
+                    WHEN read='NaN'::float8 THEN NULL
+                    WHEN read='Infinity'::float8 THEN NULL
+                    WHEN read='-Infinity'::float8 THEN NULL
                     WHEN read IS NOT NULL THEN 0 
                     ELSE read
                 END
@@ -1110,8 +1140,18 @@ BEGIN
                     WHEN write='-Infinity'::float8 THEN 1 
                     ELSE 0 
                 END
-            ), array_agg(write::decimal), array_agg(write), array_agg(write), array_agg(
+            ), array_agg(
+                CASE
+                    WHEN write='NaN'::float8 THEN NULL
+                    WHEN write='Infinity'::float8 THEN NULL
+                    WHEN write='-Infinity'::float8 THEN NULL
+                    ELSE write::decimal
+                END
+            ), array_agg(write), array_agg(write), array_agg(
                 CASE 
+                    WHEN write='NaN'::float8 THEN NULL
+                    WHEN write='Infinity'::float8 THEN NULL
+                    WHEN write='-Infinity'::float8 THEN NULL
                     WHEN write IS NOT NULL THEN 0 
                     ELSE write
                 END
