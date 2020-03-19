@@ -32,16 +32,16 @@ create type double_agg_input as (
     value_w double precision,
     count_r integer,
     count_nan_r integer,
-    avg_r double precision,
+    avg_r decimal,
     min_r double precision,
     max_r double precision,
-    stddev_r double precision,
+    stddev_r decimal,
     count_w integer,
     count_nan_w integer,
-    avg_w double precision,
+    avg_w decimal,
     min_w double precision,
     max_w double precision,
-    stddev_w double precision
+    stddev_w decimal
 );
 
 -- Function to compute the aggregates from the new values and old aggregates
@@ -58,28 +58,28 @@ DECLARE
     value_w double precision;
     count_r integer;
     count_nan_r integer;
-    avg_r double precision;
+    avg_r decimal;
     min_r double precision;
     max_r double precision;
-    stddev_r double precision;
+    stddev_r decimal;
     count_w integer;
     count_nan_w integer;
-    avg_w double precision;
+    avg_w decimal;
     min_w double precision;
     max_w double precision;
-    stddev_w double precision;
+    stddev_w decimal;
     n_count_r integer;
     n_count_nan_r integer;
-    n_avg_r double precision;
+    n_avg_r decimal;
     n_min_r double precision;
     n_max_r double precision;
-    n_stddev_r double precision;
+    n_stddev_r decimal;
     n_count_w integer;
     n_count_nan_w integer;
-    n_avg_w double precision;
+    n_avg_w decimal;
     n_min_w double precision;
     n_max_w double precision;
-    n_stddev_w double precision;
+    n_stddev_w decimal;
 
 BEGIN
     FOREACH inp IN ARRAY inp_arr
@@ -154,7 +154,7 @@ BEGIN
             THEN
                 n_avg_r = value_r;
             ELSE
-                n_avg_r = avg_r + (value_r-avg_r)/(count_r+1.);
+                n_avg_r = avg_r + (value_r-avg_r)/(count_r+1.)::decimal;
             END IF;
         
             n_min_r = LEAST(value_r, min_r);
@@ -254,16 +254,16 @@ create type double_array_agg_state as (
 	count_errors integer,
         count_r integer[],
         count_nan_r integer[],
-	avg_r double precision[],
+	avg_r decimal[],
         min_r double precision[],
         max_r double precision[],
-	stddev_r double precision[],
+	stddev_r decimal[],
         count_w integer[],
         count_nan_w integer[],
-	avg_w double precision[],
+	avg_w decimal[],
         min_w double precision[],
         max_w double precision[],
-	stddev_w double precision[]
+	stddev_w decimal[]
 );
 
 create type float_array_agg_state as (
@@ -271,106 +271,106 @@ create type float_array_agg_state as (
 	count_errors integer,
         count_r integer[],
         count_nan_r integer[],
-	avg_r double precision[],
+	avg_r decimal[],
         min_r real[],
         max_r real[],
-	stddev_r double precision[],
+	stddev_r decimal[],
         count_w integer[],
         count_nan_w integer[],
-	avg_w double precision[],
+	avg_w decimal[],
         min_w real[],
         max_w real[],
-	stddev_w double precision[]
+	stddev_w decimal[]
 );
 
 create type long_array_agg_state as (
 	count integer,
 	count_errors integer,
         count_r integer[],
-	avg_r double precision[],
+	avg_r decimal[],
         min_r integer[],
         max_r integer[],
-	stddev_r double precision[],
+	stddev_r decimal[],
         count_w integer[],
-	avg_w double precision[],
+	avg_w decimal[],
         min_w integer[],
         max_w integer[],
-	stddev_w double precision[]
+	stddev_w decimal[]
 );
 
 create type long64_array_agg_state as (
 	count integer,
 	count_errors integer,
         count_r integer[],
-	avg_r double precision[],
+	avg_r decimal[],
         min_r bigint[],
         max_r bigint[],
-	stddev_r double precision[],
+	stddev_r decimal[],
         count_w integer[],
-	avg_w double precision[],
+	avg_w decimal[],
         min_w bigint[],
         max_w bigint[],
-	stddev_w double precision[]
+	stddev_w decimal[]
 );
 
 create type short_array_agg_state as (
 	count integer,
 	count_errors integer,
         count_r integer[],
-	avg_r double precision[],
+	avg_r decimal[],
         min_r smallint[],
         max_r smallint[],
-	stddev_r double precision[],
+	stddev_r decimal[],
         count_w integer[],
-	avg_w double precision[],
+	avg_w decimal[],
         min_w smallint[],
         max_w smallint[],
-	stddev_w double precision[]
+	stddev_w decimal[]
 );
 
 create type ulong_array_agg_state as (
 	count integer,
 	count_errors integer,
         count_r integer[],
-	avg_r double precision[],
+	avg_r decimal[],
         min_r ulong[],
         max_r ulong[],
-	stddev_r double precision[],
+	stddev_r decimal[],
         count_w integer[],
-	avg_w double precision[],
+	avg_w decimal[],
         min_w ulong[],
         max_w ulong[],
-	stddev_w double precision[]
+	stddev_w decimal[]
 );
 
 create type ulong64_array_agg_state as (
 	count integer,
 	count_errors integer,
         count_r integer[],
-	avg_r double precision[],
+	avg_r decimal[],
         min_r ulong64[],
         max_r ulong64[],
-	stddev_r double precision[],
+	stddev_r decimal[],
         count_w integer[],
-	avg_w double precision[],
+	avg_w decimal[],
         min_w ulong64[],
         max_w ulong64[],
-	stddev_w double precision[]
+	stddev_w decimal[]
 );
 
 create type ushort_array_agg_state as (
 	count integer,
 	count_errors integer,
         count_r integer[],
-	avg_r double precision[],
+	avg_r decimal[],
         min_r ushort[],
         max_r ushort[],
-	stddev_r double precision[],
+	stddev_r decimal[],
         count_w integer[],
-	avg_w double precision[],
+	avg_w decimal[],
         min_w ushort[],
         max_w ushort[],
-	stddev_w double precision[]
+	stddev_w decimal[]
 );
 
 -- Function to combine to aggregate state into a new one
@@ -401,8 +401,8 @@ BEGIN
     -- if there is a discrepancy in the arrays sizes
     IF CARDINALITY(state1.avg_r) != CARDINALITY(state2.avg_r) OR CARDINALITY(state1.avg_w) != CARDINALITY(state2.avg_w) THEN
         SELECT 0, 0,
-        ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::float8[], ARRAY[]::float8[], ARRAY[]::float8[],
-        ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::float8[], ARRAY[]::float8[], ARRAY[]::float8[]
+        ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::float8[], ARRAY[]::float8[], ARRAY[]::decimal[],
+        ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::float8[], ARRAY[]::float8[], ARRAY[]::decimal[]
         INTO result;
     ELSE
 	
@@ -461,8 +461,8 @@ BEGIN
     -- if there is a discrepancy in the arrays sizes
     IF CARDINALITY(state1.avg_r) != CARDINALITY(state2.avg_r) OR CARDINALITY(state1.avg_w) != CARDINALITY(state2.avg_w) THEN
         SELECT 0, 0,
-        ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::real[], ARRAY[]::real[], ARRAY[]::float8[],
-        ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::real[], ARRAY[]::real[], ARRAY[]::float8[]
+        ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::real[], ARRAY[]::real[], ARRAY[]::decimal[],
+        ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::real[], ARRAY[]::real[], ARRAY[]::decimal[]
         INTO result;
     ELSE
 	
@@ -521,8 +521,8 @@ BEGIN
     -- if there is a discrepancy in the arrays sizes
     IF CARDINALITY(state1.avg_r) != CARDINALITY(state2.avg_r) OR CARDINALITY(state1.avg_w) != CARDINALITY(state2.avg_w) THEN
         SELECT 0, 0,
-        ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::float8[],
-        ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::float8[]
+        ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::decimal[],
+        ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::decimal[]
         INTO result;
     ELSE
 	
@@ -581,8 +581,8 @@ BEGIN
     -- if there is a discrepancy in the arrays sizes
     IF CARDINALITY(state1.avg_r) != CARDINALITY(state2.avg_r) OR CARDINALITY(state1.avg_w) != CARDINALITY(state2.avg_w) THEN
         SELECT 0, 0,
-        ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::bigint[], ARRAY[]::bigint[], ARRAY[]::float8[],
-        ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::bigint[], ARRAY[]::bigint[], ARRAY[]::float8[]
+        ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::bigint[], ARRAY[]::bigint[], ARRAY[]::decimal[],
+        ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::bigint[], ARRAY[]::bigint[], ARRAY[]::decimal[]
         INTO result;
     ELSE
 	
@@ -641,8 +641,8 @@ BEGIN
     -- if there is a discrepancy in the arrays sizes
     IF CARDINALITY(state1.avg_r) != CARDINALITY(state2.avg_r) OR CARDINALITY(state1.avg_w) != CARDINALITY(state2.avg_w) THEN
         SELECT 0, 0,
-        ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::smallint[], ARRAY[]::smallint[], ARRAY[]::float8[],
-        ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::smallint[], ARRAY[]::smallint[], ARRAY[]::float8[]
+        ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::smallint[], ARRAY[]::smallint[], ARRAY[]::decimal[],
+        ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::smallint[], ARRAY[]::smallint[], ARRAY[]::decimal[]
         INTO result;
     ELSE
 	
@@ -701,8 +701,8 @@ BEGIN
     -- if there is a discrepancy in the arrays sizes
     IF CARDINALITY(state1.avg_r) != CARDINALITY(state2.avg_r) OR CARDINALITY(state1.avg_w) != CARDINALITY(state2.avg_w) THEN
         SELECT 0, 0,
-        ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::ulong[], ARRAY[]::ulong[], ARRAY[]::float8[],
-        ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::ulong[], ARRAY[]::ulong[], ARRAY[]::float8[]
+        ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::ulong[], ARRAY[]::ulong[], ARRAY[]::decimal[],
+        ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::ulong[], ARRAY[]::ulong[], ARRAY[]::decimal[]
         INTO result;
     ELSE
 	
@@ -761,8 +761,8 @@ BEGIN
     -- if there is a discrepancy in the arrays sizes
     IF CARDINALITY(state1.avg_r) != CARDINALITY(state2.avg_r) OR CARDINALITY(state1.avg_w) != CARDINALITY(state2.avg_w) THEN
         SELECT 0, 0,
-        ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::ulong64[], ARRAY[]::ulong64[], ARRAY[]::float8[],
-        ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::ulong64[], ARRAY[]::ulong64[], ARRAY[]::float8[]
+        ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::ulong64[], ARRAY[]::ulong64[], ARRAY[]::decimal[],
+        ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::ulong64[], ARRAY[]::ulong64[], ARRAY[]::decimal[]
         INTO result;
     ELSE
 	
@@ -821,8 +821,8 @@ BEGIN
     -- if there is a discrepancy in the arrays sizes
     IF CARDINALITY(state1.avg_r) != CARDINALITY(state2.avg_r) OR CARDINALITY(state1.avg_w) != CARDINALITY(state2.avg_w) THEN
         SELECT 0, 0,
-        ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::ushort[], ARRAY[]::ushort[], ARRAY[]::float8[],
-        ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::ushort[], ARRAY[]::ushort[], ARRAY[]::float8[]
+        ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::ushort[], ARRAY[]::ushort[], ARRAY[]::decimal[],
+        ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::ushort[], ARRAY[]::ushort[], ARRAY[]::decimal[]
         INTO result;
     ELSE
 	
@@ -894,7 +894,7 @@ BEGIN
                     WHEN read='-Infinity'::float8 THEN 1 
                     ELSE 0 
                 END
-            ), array_agg(read), array_agg(read), array_agg(read), array_agg(
+            ), array_agg(read::decimal), array_agg(read), array_agg(read), array_agg(
                 CASE 
                     WHEN read IS NOT NULL THEN 0 
                     ELSE read
@@ -915,7 +915,7 @@ BEGIN
                     WHEN write='-Infinity'::float8 THEN 1 
                     ELSE 0 
                 END
-            ), array_agg(write), array_agg(write), array_agg(write), array_agg(
+            ), array_agg(write::decimal), array_agg(write), array_agg(write), array_agg(
                 CASE 
                     WHEN write IS NOT NULL THEN 0 
                     ELSE write
@@ -927,8 +927,8 @@ BEGIN
         IF CARDINALITY(state.avg_r) != CARDINALITY(new_row.value_r) or CARDINALITY(state.avg_w) != CARDINALITY(new_row.value_w)
         THEN
             SELECT 0, 0,
-            ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::float8[], ARRAY[]::float8[], ARRAY[]::float8[],
-            ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::float8[], ARRAY[]::float8[], ARRAY[]::float8[]
+            ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::float8[], ARRAY[]::float8[], ARRAY[]::decimal[],
+            ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::float8[], ARRAY[]::float8[], ARRAY[]::decimal[]
             INTO result;
         ELSE
 
@@ -959,8 +959,8 @@ BEGIN
                         WHEN read='Infinity'::float8 THEN avg_r 
                         WHEN read='-Infinity'::float8 THEN avg_r
                         WHEN read IS NULL THEN avg_r
-                        WHEN avg_r IS NULL THEN read
-                        ELSE avg_r + (read-avg_r)/(count_r+1.)
+                        WHEN avg_r IS NULL THEN read::decimal
+                        ELSE avg_r + (read::decimal-avg_r)/(count_r+1.)::decimal::decimal
                     END
                     ), array_agg(CASE 
                         WHEN read='NaN'::float8 THEN min_r 
@@ -980,7 +980,7 @@ BEGIN
                         WHEN read='-Infinity'::float8 THEN stddev_r
                         WHEN read IS NULL THEN stddev_r
                         WHEN stddev_r IS NULL THEN 0
-                        ELSE stddev_r + ((count_r+0.)/(count_r+1.))*power(read - avg_r, 2)
+                        ELSE stddev_r + ((count_r+0.)/(count_r+1.))::decimal*power(read::decimal - avg_r, 2)
                     END
                     ), array_agg(CASE
                         WHEN write='NaN'::float8 THEN count_w
@@ -1001,7 +1001,7 @@ BEGIN
                         WHEN write='-Infinity'::float8 THEN avg_w
                         WHEN write IS NULL THEN avg_w
                         WHEN avg_w IS NULL THEN write
-                        ELSE avg_w + (write-avg_w)/(count_w+1.)
+                        ELSE avg_w + (write::decimal-avg_w)/(count_w+1.)::decimal
                     END
                     ), array_agg(CASE 
                         WHEN write='NaN'::float8 THEN min_w 
@@ -1021,7 +1021,7 @@ BEGIN
                         WHEN write='-Infinity'::float8 THEN stddev_w
                         WHEN write IS NULL THEN stddev_w
                         WHEN stddev_w IS NULL THEN 0
-                        ELSE stddev_w + ((count_w+0.)/(count_w+1.))*power(write - avg_w, 2)
+                        ELSE stddev_w + ((count_w+0.)/(count_w+1.))::decimal*power(write::decimal - avg_w, 2)
                     END
                     )
                 INTO result FROM arrays;
@@ -1034,8 +1034,8 @@ BEGIN
                          ( SELECT array_agg(ROW(read, write
                     , count_r, nan_r, avg_r, min_r, max_r, stddev_r
                     , count_w, nan_w, avg_w, min_w, max_w, stddev_w)::double_agg_input) from arrays )
-                    ) as (n_count_r integer, n_count_nan_r integer, n_avg_r double precision, n_min_r double precision, n_max_r double precision, n_stddev_r double precision
-                        , n_count_w integer, n_count_nan_w integer, n_avg_w double precision, n_min_w double precision, n_max_w double precision, n_stddev_w double precision)
+                    ) as (n_count_r integer, n_count_nan_r integer, n_avg_r decimal, n_min_r double precision, n_max_r double precision, n_stddev_r decimal
+                        , n_count_w integer, n_count_nan_w integer, n_avg_w decimal, n_min_w double precision, n_max_w double precision, n_stddev_w decimal)
                 )
                 SELECT count, state.count_errors+count_err
                 , array_agg(aggregates.n_count_r), array_agg(aggregates.n_count_nan_r), array_agg(aggregates.n_avg_r), array_agg(aggregates.n_min_r), array_agg(aggregates.n_max_r), array_agg(aggregates.n_stddev_r)
@@ -1089,7 +1089,7 @@ BEGIN
                     WHEN read='-Infinity'::float8 THEN 1 
                     ELSE 0 
                 END
-            ), array_agg(read), array_agg(read), array_agg(read), array_agg(
+            ), array_agg(read::decimal), array_agg(read), array_agg(read), array_agg(
                 CASE 
                     WHEN read IS NOT NULL THEN 0 
                     ELSE read
@@ -1110,7 +1110,7 @@ BEGIN
                     WHEN write='-Infinity'::float8 THEN 1 
                     ELSE 0 
                 END
-            ), array_agg(write), array_agg(write), array_agg(write), array_agg(
+            ), array_agg(write::decimal), array_agg(write), array_agg(write), array_agg(
                 CASE 
                     WHEN write IS NOT NULL THEN 0 
                     ELSE write
@@ -1122,8 +1122,8 @@ BEGIN
         IF CARDINALITY(state.avg_r) != CARDINALITY(new_row.value_r) or CARDINALITY(state.avg_w) != CARDINALITY(new_row.value_w)
         THEN
             SELECT 0, 0,
-            ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::real[], ARRAY[]::real[], ARRAY[]::float8[],
-            ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::real[], ARRAY[]::real[], ARRAY[]::float8[]
+            ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::real[], ARRAY[]::real[], ARRAY[]::decimal[],
+            ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::real[], ARRAY[]::real[], ARRAY[]::decimal[]
             INTO result;
         ELSE
 
@@ -1155,7 +1155,7 @@ BEGIN
                         WHEN read='-Infinity'::float8 THEN avg_r
                         WHEN read IS NULL THEN avg_r
                         WHEN avg_r IS NULL THEN read
-                        ELSE avg_r + (read-avg_r)/(count_r+1.)
+                        ELSE avg_r + (read::decimal-avg_r)/(count_r+1.)::decimal
                     END
                     ), array_agg(CASE 
                         WHEN read='NaN'::float8 THEN min_r 
@@ -1175,7 +1175,7 @@ BEGIN
                         WHEN read='-Infinity'::float8 THEN stddev_r
                         WHEN read IS NULL THEN stddev_r
                         WHEN stddev_r IS NULL THEN 0
-                        ELSE stddev_r + ((count_r+0.)/(count_r+1.))*power(read - avg_r, 2)
+                        ELSE stddev_r + ((count_r+0.)/(count_r+1.))::decimal*power(read::decimal - avg_r, 2)
                     END
                     ), array_agg(CASE
                         WHEN write='NaN'::float8 THEN count_w
@@ -1196,7 +1196,7 @@ BEGIN
                         WHEN write='-Infinity'::float8 THEN avg_w
                         WHEN write IS NULL THEN avg_w
                         WHEN avg_w IS NULL THEN write
-                        ELSE avg_w + (write-avg_w)/(count_w+1.)
+                        ELSE avg_w + (write::decimal-avg_w)/(count_w+1.)::decimal
                     END
                     ), array_agg(CASE 
                         WHEN write='NaN'::float8 THEN min_w 
@@ -1216,7 +1216,7 @@ BEGIN
                         WHEN write='-Infinity'::float8 THEN stddev_w
                         WHEN write IS NULL THEN stddev_w
                         WHEN stddev_w IS NULL THEN 0
-                        ELSE stddev_w + ((count_w+0.)/(count_w+1.))*power(write - avg_w, 2)
+                        ELSE stddev_w + ((count_w+0.)/(count_w+1.))::decimal*power(write::decimal - avg_w, 2)
                     END
                     )
                 INTO result FROM arrays;
@@ -1257,7 +1257,7 @@ BEGIN
                     WHEN read IS NOT NULL THEN 1  
                     ELSE 0 
                 END
-            ), array_agg(read), array_agg(read), array_agg(read), array_agg(
+            ), array_agg(read::decimal), array_agg(read), array_agg(read), array_agg(
                 CASE 
                     WHEN read IS NOT NULL THEN 0 
                     ELSE read
@@ -1268,7 +1268,7 @@ BEGIN
                     WHEN write IS NOT NULL THEN 1 
                     ELSE 0 
                 END
-            ), array_agg(write), array_agg(write), array_agg(write), array_agg(
+            ), array_agg(write::decimal), array_agg(write), array_agg(write), array_agg(
                 CASE 
                     WHEN write IS NOT NULL THEN 0 
                     ELSE write
@@ -1280,8 +1280,8 @@ BEGIN
         IF CARDINALITY(state.avg_r) != CARDINALITY(new_row.value_r) or CARDINALITY(state.avg_w) != CARDINALITY(new_row.value_w)
         THEN
             SELECT 0, 0,
-            ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::float8[],
-            ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::float8[]
+            ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::decimal[],
+            ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::integer[], ARRAY[]::integer[], ARRAY[]::decimal[]
             INTO result;
         ELSE
 
@@ -1301,13 +1301,13 @@ BEGIN
                     ), array_agg(CASE 
                         WHEN read IS NULL THEN avg_r
                         WHEN avg_r IS NULL THEN read
-                        ELSE avg_r + (read-avg_r)/(count_r+1.)
+                        ELSE avg_r + (read::decimal-avg_r)/(count_r+1.)::decimal
                     END
                     ), array_agg(LEAST(read, min_r)), array_agg(GREATEST(read, max_r))
                     , array_agg(CASE 
                         WHEN read IS NULL THEN stddev_r
                         WHEN stddev_r IS NULL THEN 0
-                        ELSE stddev_r + ((count_r+0.)/(count_r+1.))*power(read - avg_r, 2)
+                        ELSE stddev_r + ((count_r+0.)/(count_r+1.))::decimal*power(read::decimal - avg_r, 2)
                     END
                     ), array_agg(CASE
                         WHEN write IS NOT NULL THEN count_w+1 
@@ -1316,13 +1316,13 @@ BEGIN
                     ), array_agg(CASE 
                         WHEN write IS NULL THEN avg_w
                         WHEN avg_w IS NULL THEN write
-                        ELSE avg_w + (write-avg_w)/(count_w+1.)
+                        ELSE avg_w + (write::decimal-avg_w)/(count_w+1.)::decimal
                     END
                     ), array_agg(LEAST(write, min_w)), array_agg(GREATEST(write, max_w))
                     , array_agg(CASE 
                         WHEN write IS NULL THEN stddev_w
                         WHEN stddev_w IS NULL THEN 0
-                        ELSE stddev_w + ((count_w+0.)/(count_w+1.))*power(write - avg_w, 2)
+                        ELSE stddev_w + ((count_w+0.)/(count_w+1.))::decimal*power(write::decimal - avg_w, 2)
                     END
                     )
                 INTO result FROM arrays;
@@ -1363,7 +1363,7 @@ BEGIN
                     WHEN read IS NOT NULL THEN 1  
                     ELSE 0 
                 END
-            ), array_agg(read), array_agg(read), array_agg(read), array_agg(
+            ), array_agg(read::decimal), array_agg(read), array_agg(read), array_agg(
                 CASE 
                     WHEN read IS NOT NULL THEN 0 
                     ELSE read
@@ -1374,7 +1374,7 @@ BEGIN
                     WHEN write IS NOT NULL THEN 1 
                     ELSE 0 
                 END
-            ), array_agg(write), array_agg(write), array_agg(write), array_agg(
+            ), array_agg(write::decimal), array_agg(write), array_agg(write), array_agg(
                 CASE 
                     WHEN write IS NOT NULL THEN 0 
                     ELSE write
@@ -1386,8 +1386,8 @@ BEGIN
         IF CARDINALITY(state.avg_r) != CARDINALITY(new_row.value_r) or CARDINALITY(state.avg_w) != CARDINALITY(new_row.value_w)
         THEN
             SELECT 0, 0,
-            ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::bigint[], ARRAY[]::bigint[], ARRAY[]::float8[],
-            ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::bigint[], ARRAY[]::bigint[], ARRAY[]::float8[]
+            ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::bigint[], ARRAY[]::bigint[], ARRAY[]::decimal[],
+            ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::bigint[], ARRAY[]::bigint[], ARRAY[]::decimal[]
             INTO result;
         ELSE
 
@@ -1407,13 +1407,13 @@ BEGIN
                     ), array_agg(CASE 
                         WHEN read IS NULL THEN avg_r
                         WHEN avg_r IS NULL THEN read
-                        ELSE avg_r + (read-avg_r)/(count_r+1.)
+                        ELSE avg_r + (read::decimal-avg_r)/(count_r+1.)::decimal
                     END
                     ), array_agg(LEAST(read, min_r)), array_agg(GREATEST(read, max_r))
                     , array_agg(CASE 
                         WHEN read IS NULL THEN stddev_r
                         WHEN stddev_r IS NULL THEN 0
-                        ELSE stddev_r + ((count_r+0.)/(count_r+1.))*power(read - avg_r, 2)
+                        ELSE stddev_r + ((count_r+0.)/(count_r+1.))::decimal*power(read::decimal - avg_r, 2)
                     END
                     ), array_agg(CASE
                         WHEN write IS NOT NULL THEN count_w+1 
@@ -1422,13 +1422,13 @@ BEGIN
                     ), array_agg(CASE 
                         WHEN write IS NULL THEN avg_w
                         WHEN avg_w IS NULL THEN write
-                        ELSE avg_w + (write-avg_w)/(count_w+1.)
+                        ELSE avg_w + (write::decimal-avg_w)/(count_w+1.)::decimal
                     END
                     ), array_agg(LEAST(write, min_w)), array_agg(GREATEST(write, max_w))
                     , array_agg(CASE 
                         WHEN write IS NULL THEN stddev_w
                         WHEN stddev_w IS NULL THEN 0
-                        ELSE stddev_w + ((count_w+0.)/(count_w+1.))*power(write - avg_w, 2)
+                        ELSE stddev_w + ((count_w+0.)/(count_w+1.))::decimal*power(write::decimal - avg_w, 2)
                     END
                     )
                 INTO result FROM arrays;
@@ -1469,7 +1469,7 @@ BEGIN
                     WHEN read IS NOT NULL THEN 1  
                     ELSE 0 
                 END
-            ), array_agg(read), array_agg(read), array_agg(read), array_agg(
+            ), array_agg(read::decimal), array_agg(read), array_agg(read), array_agg(
                 CASE 
                     WHEN read IS NOT NULL THEN 0 
                     ELSE read
@@ -1480,7 +1480,7 @@ BEGIN
                     WHEN write IS NOT NULL THEN 1 
                     ELSE 0 
                 END
-            ), array_agg(write), array_agg(write), array_agg(write), array_agg(
+            ), array_agg(write::decimal), array_agg(write), array_agg(write), array_agg(
                 CASE 
                     WHEN write IS NOT NULL THEN 0 
                     ELSE write
@@ -1492,8 +1492,8 @@ BEGIN
         IF CARDINALITY(state.avg_r) != CARDINALITY(new_row.value_r) or CARDINALITY(state.avg_w) != CARDINALITY(new_row.value_w)
         THEN
             SELECT 0, 0,
-            ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::smallint[], ARRAY[]::smallint[], ARRAY[]::float8[],
-            ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::smallint[], ARRAY[]::smallint[], ARRAY[]::float8[]
+            ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::smallint[], ARRAY[]::smallint[], ARRAY[]::decimal[],
+            ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::smallint[], ARRAY[]::smallint[], ARRAY[]::decimal[]
             INTO result;
         ELSE
 
@@ -1513,13 +1513,13 @@ BEGIN
                     ), array_agg(CASE 
                         WHEN read IS NULL THEN avg_r
                         WHEN avg_r IS NULL THEN read
-                        ELSE avg_r + (read-avg_r)/(count_r+1.)
+                        ELSE avg_r + (read::decimal-avg_r)/(count_r+1.)::decimal
                     END
                     ), array_agg(LEAST(read, min_r)), array_agg(GREATEST(read, max_r))
                     , array_agg(CASE 
                         WHEN read IS NULL THEN stddev_r
                         WHEN stddev_r IS NULL THEN 0
-                        ELSE stddev_r + ((count_r+0.)/(count_r+1.))*power(read - avg_r, 2)
+                        ELSE stddev_r + ((count_r+0.)/(count_r+1.))::decimal*power(read::decimal - avg_r, 2)
                     END
                     ), array_agg(CASE
                         WHEN write IS NOT NULL THEN count_w+1 
@@ -1528,13 +1528,13 @@ BEGIN
                     ), array_agg(CASE 
                         WHEN write IS NULL THEN avg_w
                         WHEN avg_w IS NULL THEN write
-                        ELSE avg_w + (write-avg_w)/(count_w+1.)
+                        ELSE avg_w + (write::decimal-avg_w)/(count_w+1.)::decimal
                     END
                     ), array_agg(LEAST(write, min_w)), array_agg(GREATEST(write, max_w))
                     , array_agg(CASE 
                         WHEN write IS NULL THEN stddev_w
                         WHEN stddev_w IS NULL THEN 0
-                        ELSE stddev_w + ((count_w+0.)/(count_w+1.))*power(write - avg_w, 2)
+                        ELSE stddev_w + ((count_w+0.)/(count_w+1.))::decimal*power(write::decimal - avg_w, 2)
                     END
                     )
                 INTO result FROM arrays;
@@ -1575,7 +1575,7 @@ BEGIN
                     WHEN read IS NOT NULL THEN 1  
                     ELSE 0 
                 END
-            ), array_agg(read), array_agg(read), array_agg(read), array_agg(
+            ), array_agg(read::decimal), array_agg(read), array_agg(read), array_agg(
                 CASE 
                     WHEN read IS NOT NULL THEN 0 
                     ELSE read
@@ -1586,7 +1586,7 @@ BEGIN
                     WHEN write IS NOT NULL THEN 1 
                     ELSE 0 
                 END
-            ), array_agg(write), array_agg(write), array_agg(write), array_agg(
+            ), array_agg(write::decimal), array_agg(write), array_agg(write), array_agg(
                 CASE 
                     WHEN write IS NOT NULL THEN 0 
                     ELSE write
@@ -1598,8 +1598,8 @@ BEGIN
         IF CARDINALITY(state.avg_r) != CARDINALITY(new_row.value_r) or CARDINALITY(state.avg_w) != CARDINALITY(new_row.value_w)
         THEN
             SELECT 0, 0,
-            ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::ulong[], ARRAY[]::ulong[], ARRAY[]::float8[],
-            ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::ulong[], ARRAY[]::ulong[], ARRAY[]::float8[]
+            ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::ulong[], ARRAY[]::ulong[], ARRAY[]::decimal[],
+            ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::ulong[], ARRAY[]::ulong[], ARRAY[]::decimal[]
             INTO result;
         ELSE
 
@@ -1619,13 +1619,13 @@ BEGIN
                     ), array_agg(CASE 
                         WHEN read IS NULL THEN avg_r
                         WHEN avg_r IS NULL THEN read
-                        ELSE avg_r + (read-avg_r)/(count_r+1.)
+                        ELSE avg_r + (read::decimal-avg_r)/(count_r+1.)::decimal
                     END
                     ), array_agg(LEAST(read, min_r)), array_agg(GREATEST(read, max_r))
                     , array_agg(CASE 
                         WHEN read IS NULL THEN stddev_r
                         WHEN stddev_r IS NULL THEN 0
-                        ELSE stddev_r + ((count_r+0.)/(count_r+1.))*power(read - avg_r, 2)
+                        ELSE stddev_r + ((count_r+0.)/(count_r+1.))::decimal*power(read::decimal - avg_r, 2)
                     END
                     ), array_agg(CASE
                         WHEN write IS NOT NULL THEN count_w+1 
@@ -1634,13 +1634,13 @@ BEGIN
                     ), array_agg(CASE 
                         WHEN write IS NULL THEN avg_w
                         WHEN avg_w IS NULL THEN write
-                        ELSE avg_w + (write-avg_w)/(count_w+1.)
+                        ELSE avg_w + (write::decimal-avg_w)/(count_w+1.)::decimal
                     END
                     ), array_agg(LEAST(write, min_w)), array_agg(GREATEST(write, max_w))
                     , array_agg(CASE 
                         WHEN write IS NULL THEN stddev_w
                         WHEN stddev_w IS NULL THEN 0
-                        ELSE stddev_w + ((count_w+0.)/(count_w+1.))*power(write - avg_w, 2)
+                        ELSE stddev_w + ((count_w+0.)/(count_w+1.))::decimal*power(write::decimal - avg_w, 2)
                     END
                     )
                 INTO result FROM arrays;
@@ -1681,7 +1681,7 @@ BEGIN
                     WHEN read IS NOT NULL THEN 1  
                     ELSE 0 
                 END
-            ), array_agg(read), array_agg(read), array_agg(read), array_agg(
+            ), array_agg(read::decimal), array_agg(read), array_agg(read), array_agg(
                 CASE 
                     WHEN read IS NOT NULL THEN 0 
                     ELSE read
@@ -1692,7 +1692,7 @@ BEGIN
                     WHEN write IS NOT NULL THEN 1 
                     ELSE 0 
                 END
-            ), array_agg(write), array_agg(write), array_agg(write), array_agg(
+            ), array_agg(write::decimal), array_agg(write), array_agg(write), array_agg(
                 CASE 
                     WHEN write IS NOT NULL THEN 0 
                     ELSE write
@@ -1704,8 +1704,8 @@ BEGIN
         IF CARDINALITY(state.avg_r) != CARDINALITY(new_row.value_r) or CARDINALITY(state.avg_w) != CARDINALITY(new_row.value_w)
         THEN
             SELECT 0, 0,
-            ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::ulong64[], ARRAY[]::ulong64[], ARRAY[]::float8[],
-            ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::ulong64[], ARRAY[]::ulong64[], ARRAY[]::float8[]
+            ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::ulong64[], ARRAY[]::ulong64[], ARRAY[]::decimal[],
+            ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::ulong64[], ARRAY[]::ulong64[], ARRAY[]::decimal[]
             INTO result;
         ELSE
 
@@ -1725,13 +1725,13 @@ BEGIN
                     ), array_agg(CASE 
                         WHEN read IS NULL THEN avg_r
                         WHEN avg_r IS NULL THEN read
-                        ELSE avg_r + (read-avg_r)/(count_r+1.)
+                        ELSE avg_r + (read::decimal-avg_r)/(count_r+1.)::decimal
                     END
                     ), array_agg(LEAST(read, min_r)), array_agg(GREATEST(read, max_r))
                     , array_agg(CASE 
                         WHEN read IS NULL THEN stddev_r
                         WHEN stddev_r IS NULL THEN 0
-                        ELSE stddev_r + ((count_r+0.)/(count_r+1.))*power(read - avg_r, 2)
+                        ELSE stddev_r + ((count_r+0.)/(count_r+1.))::decimal*power(read::decimal - avg_r, 2)
                     END
                     ), array_agg(CASE
                         WHEN write IS NOT NULL THEN count_w+1 
@@ -1740,13 +1740,13 @@ BEGIN
                     ), array_agg(CASE 
                         WHEN write IS NULL THEN avg_w
                         WHEN avg_w IS NULL THEN write
-                        ELSE avg_w + (write-avg_w)/(count_w+1.)
+                        ELSE avg_w + (write::decimal-avg_w)/(count_w+1.)::decimal
                     END
                     ), array_agg(LEAST(write, min_w)), array_agg(GREATEST(write, max_w))
                     , array_agg(CASE 
                         WHEN write IS NULL THEN stddev_w
                         WHEN stddev_w IS NULL THEN 0
-                        ELSE stddev_w + ((count_w+0.)/(count_w+1.))*power(write - avg_w, 2)
+                        ELSE stddev_w + ((count_w+0.)/(count_w+1.))::decimal*power(write::decimal - avg_w, 2)
                     END
                     )
                 INTO result FROM arrays;
@@ -1787,7 +1787,7 @@ BEGIN
                     WHEN read IS NOT NULL THEN 1  
                     ELSE 0 
                 END
-            ), array_agg(read), array_agg(read), array_agg(read), array_agg(
+            ), array_agg(read::decimal), array_agg(read), array_agg(read), array_agg(
                 CASE 
                     WHEN read IS NOT NULL THEN 0 
                     ELSE read
@@ -1798,7 +1798,7 @@ BEGIN
                     WHEN write IS NOT NULL THEN 1 
                     ELSE 0 
                 END
-            ), array_agg(write), array_agg(write), array_agg(write), array_agg(
+            ), array_agg(write::decimal), array_agg(write), array_agg(write), array_agg(
                 CASE 
                     WHEN write IS NOT NULL THEN 0 
                     ELSE write
@@ -1810,8 +1810,8 @@ BEGIN
         IF CARDINALITY(state.avg_r) != CARDINALITY(new_row.value_r) or CARDINALITY(state.avg_w) != CARDINALITY(new_row.value_w)
         THEN
             SELECT 0, 0,
-            ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::ushort[], ARRAY[]::ushort[], ARRAY[]::float8[],
-            ARRAY[]::integer[], ARRAY[]::float8[], ARRAY[]::ushort[], ARRAY[]::ushort[], ARRAY[]::float8[]
+            ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::ushort[], ARRAY[]::ushort[], ARRAY[]::decimal[],
+            ARRAY[]::integer[], ARRAY[]::decimal[], ARRAY[]::ushort[], ARRAY[]::ushort[], ARRAY[]::decimal[]
             INTO result;
         ELSE
 
@@ -1831,13 +1831,13 @@ BEGIN
                     ), array_agg(CASE 
                         WHEN read IS NULL THEN avg_r
                         WHEN avg_r IS NULL THEN read
-                        ELSE avg_r + (read-avg_r)/(count_r+1.)
+                        ELSE avg_r + (read::decimal-avg_r)/(count_r+1.)::decimal
                     END
                     ), array_agg(LEAST(read, min_r)), array_agg(GREATEST(read, max_r))
                     , array_agg(CASE 
                         WHEN read IS NULL THEN stddev_r
                         WHEN stddev_r IS NULL THEN 0
-                        ELSE stddev_r + ((count_r+0.)/(count_r+1.))*power(read - avg_r, 2)
+                        ELSE stddev_r + ((count_r+0.)/(count_r+1.))::decimal*power(read::decimal - avg_r, 2)
                     END
                     ), array_agg(CASE
                         WHEN write IS NOT NULL THEN count_w+1 
@@ -1846,13 +1846,13 @@ BEGIN
                     ), array_agg(CASE 
                         WHEN write IS NULL THEN avg_w
                         WHEN avg_w IS NULL THEN write
-                        ELSE avg_w + (write-avg_w)/(count_w+1.)
+                        ELSE avg_w + (write::decimal-avg_w)/(count_w+1.)::decimal
                     END
                     ), array_agg(LEAST(write, min_w)), array_agg(GREATEST(write, max_w))
                     , array_agg(CASE 
                         WHEN write IS NULL THEN stddev_w
                         WHEN stddev_w IS NULL THEN 0
-                        ELSE stddev_w + ((count_w+0.)/(count_w+1.))*power(write - avg_w, 2)
+                        ELSE stddev_w + ((count_w+0.)/(count_w+1.))::decimal*power(write::decimal - avg_w, 2)
                     END
                     )
                 INTO result FROM arrays;

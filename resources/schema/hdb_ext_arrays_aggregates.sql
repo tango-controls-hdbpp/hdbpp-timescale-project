@@ -28,8 +28,8 @@ CREATE VIEW cagg_array_devdouble_1hour(
                 , count_w, count_nan_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='1 hour')
        	AS SELECT att_conf_id, time_bucket('1 hour', data_time), (double_array_aggregate(t)).count,  (double_array_aggregate(t)).count_errors
-        , (double_array_aggregate(t)).count_r,  (double_array_aggregate(t)).count_nan_r,  (double_array_aggregate(t)).avg_r,  (double_array_aggregate(t)).min_r,  (double_array_aggregate(t)).max_r,  (double_array_aggregate(t)).stddev_r  
-        , (double_array_aggregate(t)).count_w,  (double_array_aggregate(t)).count_nan_w,  (double_array_aggregate(t)).avg_w,  (double_array_aggregate(t)).min_w,  (double_array_aggregate(t)).max_w,  (double_array_aggregate(t)).stddev_w  
+        , (double_array_aggregate(t)).count_r,  (double_array_aggregate(t)).count_nan_r, (double_array_aggregate(t)).avg_r::float8[],  (double_array_aggregate(t)).min_r,  (double_array_aggregate(t)).max_r,  (double_array_aggregate(t)).stddev_r::float8[]  
+        , (double_array_aggregate(t)).count_w,  (double_array_aggregate(t)).count_nan_w,  (double_array_aggregate(t)).avg_w::float8[], (double_array_aggregate(t)).min_w,  (double_array_aggregate(t)).max_w,  (double_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devdouble as t
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 hour', data_time), att_conf_id;
@@ -40,8 +40,8 @@ CREATE VIEW cagg_array_devdouble_8hour(
                 , count_w, count_nan_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='8 hours')
        	AS SELECT att_conf_id, time_bucket('8 hours', data_time), (double_array_aggregate(t)).count,  (double_array_aggregate(t)).count_errors
-        , (double_array_aggregate(t)).count_r,  (double_array_aggregate(t)).count_nan_r,  (double_array_aggregate(t)).avg_r,  (double_array_aggregate(t)).min_r,  (double_array_aggregate(t)).max_r,  (double_array_aggregate(t)).stddev_r  
-        , (double_array_aggregate(t)).count_w,  (double_array_aggregate(t)).count_nan_w,  (double_array_aggregate(t)).avg_w,  (double_array_aggregate(t)).min_w,  (double_array_aggregate(t)).max_w,  (double_array_aggregate(t)).stddev_w  
+        , (double_array_aggregate(t)).count_r,  (double_array_aggregate(t)).count_nan_r, (double_array_aggregate(t)).avg_r::float8[],  (double_array_aggregate(t)).min_r,  (double_array_aggregate(t)).max_r,  (double_array_aggregate(t)).stddev_r::float8[]  
+        , (double_array_aggregate(t)).count_w,  (double_array_aggregate(t)).count_nan_w,  (double_array_aggregate(t)).avg_w::float8[], (double_array_aggregate(t)).min_w,  (double_array_aggregate(t)).max_w,  (double_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devdouble as t
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('8 hours', data_time), att_conf_id;
@@ -52,8 +52,8 @@ CREATE VIEW cagg_array_devdouble_1day(
                 , count_w, count_nan_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='1 day')
        	AS SELECT att_conf_id, time_bucket('1 day', data_time), (double_array_aggregate(t)).count,  (double_array_aggregate(t)).count_errors
-        , (double_array_aggregate(t)).count_r,  (double_array_aggregate(t)).count_nan_r,  (double_array_aggregate(t)).avg_r,  (double_array_aggregate(t)).min_r,  (double_array_aggregate(t)).max_r,  (double_array_aggregate(t)).stddev_r  
-        , (double_array_aggregate(t)).count_w,  (double_array_aggregate(t)).count_nan_w,  (double_array_aggregate(t)).avg_w,  (double_array_aggregate(t)).min_w,  (double_array_aggregate(t)).max_w,  (double_array_aggregate(t)).stddev_w  
+        , (double_array_aggregate(t)).count_r,  (double_array_aggregate(t)).count_nan_r, (double_array_aggregate(t)).avg_r::float8[],  (double_array_aggregate(t)).min_r,  (double_array_aggregate(t)).max_r,  (double_array_aggregate(t)).stddev_r::float8[]  
+        , (double_array_aggregate(t)).count_w,  (double_array_aggregate(t)).count_nan_w,  (double_array_aggregate(t)).avg_w::float8[], (double_array_aggregate(t)).min_w,  (double_array_aggregate(t)).max_w,  (double_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devdouble as t
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 day', data_time), att_conf_id;
@@ -65,8 +65,8 @@ CREATE VIEW cagg_array_devfloat_1hour(
                 , count_w, count_nan_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='1 hour')
        	AS SELECT att_conf_id, time_bucket('1 hour', data_time), (float_array_aggregate(t)).count,  (float_array_aggregate(t)).count_errors
-        , (float_array_aggregate(t)).count_r,  (float_array_aggregate(t)).count_nan_r,  (float_array_aggregate(t)).avg_r,  (float_array_aggregate(t)).min_r,  (float_array_aggregate(t)).max_r,  (float_array_aggregate(t)).stddev_r  
-        , (float_array_aggregate(t)).count_w,  (float_array_aggregate(t)).count_nan_w,  (float_array_aggregate(t)).avg_w,  (float_array_aggregate(t)).min_w,  (float_array_aggregate(t)).max_w,  (float_array_aggregate(t)).stddev_w  
+        , (float_array_aggregate(t)).count_r,  (float_array_aggregate(t)).count_nan_r,  (float_array_aggregate(t)).avg_r::float8[], (float_array_aggregate(t)).min_r,  (float_array_aggregate(t)).max_r,  (float_array_aggregate(t)).stddev_r::float8[]  
+        , (float_array_aggregate(t)).count_w,  (float_array_aggregate(t)).count_nan_w,  (float_array_aggregate(t)).avg_w::float8[], (float_array_aggregate(t)).min_w,  (float_array_aggregate(t)).max_w,  (float_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devfloat as t
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 hour', data_time), att_conf_id;
@@ -77,8 +77,8 @@ CREATE VIEW cagg_array_devfloat_8hour(
                 , count_w, count_nan_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='8 hours')
        	AS SELECT att_conf_id, time_bucket('8 hours', data_time), (float_array_aggregate(t)).count,  (float_array_aggregate(t)).count_errors
-        , (float_array_aggregate(t)).count_r,  (float_array_aggregate(t)).count_nan_r,  (float_array_aggregate(t)).avg_r,  (float_array_aggregate(t)).min_r,  (float_array_aggregate(t)).max_r,  (float_array_aggregate(t)).stddev_r  
-        , (float_array_aggregate(t)).count_w,  (float_array_aggregate(t)).count_nan_w,  (float_array_aggregate(t)).avg_w,  (float_array_aggregate(t)).min_w,  (float_array_aggregate(t)).max_w,  (float_array_aggregate(t)).stddev_w  
+        , (float_array_aggregate(t)).count_r,  (float_array_aggregate(t)).count_nan_r,  (float_array_aggregate(t)).avg_r::float8[], (float_array_aggregate(t)).min_r,  (float_array_aggregate(t)).max_r,  (float_array_aggregate(t)).stddev_r::float8[]  
+        , (float_array_aggregate(t)).count_w,  (float_array_aggregate(t)).count_nan_w,  (float_array_aggregate(t)).avg_w::float8[], (float_array_aggregate(t)).min_w,  (float_array_aggregate(t)).max_w,  (float_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devfloat as t
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('8 hours', data_time), att_conf_id;
@@ -89,8 +89,8 @@ CREATE VIEW cagg_array_devfloat_1day(
                 , count_w, count_nan_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='1 day')
        	AS SELECT att_conf_id, time_bucket('1 day', data_time), (float_array_aggregate(t)).count,  (float_array_aggregate(t)).count_errors
-        , (float_array_aggregate(t)).count_r,  (float_array_aggregate(t)).count_nan_r,  (float_array_aggregate(t)).avg_r,  (float_array_aggregate(t)).min_r,  (float_array_aggregate(t)).max_r,  (float_array_aggregate(t)).stddev_r  
-        , (float_array_aggregate(t)).count_w,  (float_array_aggregate(t)).count_nan_w,  (float_array_aggregate(t)).avg_w,  (float_array_aggregate(t)).min_w,  (float_array_aggregate(t)).max_w,  (float_array_aggregate(t)).stddev_w  
+        , (float_array_aggregate(t)).count_r,  (float_array_aggregate(t)).count_nan_r,  (float_array_aggregate(t)).avg_r::float8[], (float_array_aggregate(t)).min_r,  (float_array_aggregate(t)).max_r,  (float_array_aggregate(t)).stddev_r::float8[]  
+        , (float_array_aggregate(t)).count_w,  (float_array_aggregate(t)).count_nan_w,  (float_array_aggregate(t)).avg_w::float8[], (float_array_aggregate(t)).min_w,  (float_array_aggregate(t)).max_w,  (float_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devfloat as t
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 day', data_time), att_conf_id;
@@ -102,8 +102,8 @@ CREATE VIEW cagg_array_devlong_1hour(
                 , count_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='1 hour')
        	AS SELECT att_conf_id, time_bucket('1 hour', data_time), (long_array_aggregate(t)).count,  (long_array_aggregate(t)).count_errors
-        , (long_array_aggregate(t)).count_r,  (long_array_aggregate(t)).avg_r,  (long_array_aggregate(t)).min_r,  (long_array_aggregate(t)).max_r,  (long_array_aggregate(t)).stddev_r  
-        , (long_array_aggregate(t)).count_w,  (long_array_aggregate(t)).avg_w,  (long_array_aggregate(t)).min_w,  (long_array_aggregate(t)).max_w,  (long_array_aggregate(t)).stddev_w  
+        , (long_array_aggregate(t)).count_r,  (long_array_aggregate(t)).avg_r::float8[], (long_array_aggregate(t)).min_r,  (long_array_aggregate(t)).max_r,  (long_array_aggregate(t)).stddev_r::float8[]  
+        , (long_array_aggregate(t)).count_w,  (long_array_aggregate(t)).avg_w::float8[], (long_array_aggregate(t)).min_w,  (long_array_aggregate(t)).max_w,  (long_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devlong as t
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 hour', data_time), att_conf_id;
@@ -114,8 +114,8 @@ CREATE VIEW cagg_array_devlong_8hour(
                 , count_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='8 hours')
        	AS SELECT att_conf_id, time_bucket('8 hours', data_time), (long_array_aggregate(t)).count,  (long_array_aggregate(t)).count_errors
-        , (long_array_aggregate(t)).count_r,  (long_array_aggregate(t)).avg_r,  (long_array_aggregate(t)).min_r,  (long_array_aggregate(t)).max_r,  (long_array_aggregate(t)).stddev_r  
-        , (long_array_aggregate(t)).count_w,  (long_array_aggregate(t)).avg_w,  (long_array_aggregate(t)).min_w,  (long_array_aggregate(t)).max_w,  (long_array_aggregate(t)).stddev_w  
+        , (long_array_aggregate(t)).count_r,  (long_array_aggregate(t)).avg_r::float8[], (long_array_aggregate(t)).min_r,  (long_array_aggregate(t)).max_r,  (long_array_aggregate(t)).stddev_r::float8[]  
+        , (long_array_aggregate(t)).count_w,  (long_array_aggregate(t)).avg_w::float8[], (long_array_aggregate(t)).min_w,  (long_array_aggregate(t)).max_w,  (long_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devlong as t
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('8 hours', data_time), att_conf_id;
@@ -126,8 +126,8 @@ CREATE VIEW cagg_array_devlong_1day(
                 , count_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='1 day')
        	AS SELECT att_conf_id, time_bucket('1 day', data_time), (long_array_aggregate(t)).count,  (long_array_aggregate(t)).count_errors
-        , (long_array_aggregate(t)).count_r, (long_array_aggregate(t)).avg_r,  (long_array_aggregate(t)).min_r,  (long_array_aggregate(t)).max_r,  (long_array_aggregate(t)).stddev_r  
-        , (long_array_aggregate(t)).count_w, (long_array_aggregate(t)).avg_w,  (long_array_aggregate(t)).min_w,  (long_array_aggregate(t)).max_w,  (long_array_aggregate(t)).stddev_w  
+        , (long_array_aggregate(t)).count_r, (long_array_aggregate(t)).avg_r::float8[], (long_array_aggregate(t)).min_r,  (long_array_aggregate(t)).max_r,  (long_array_aggregate(t)).stddev_r::float8[]  
+        , (long_array_aggregate(t)).count_w, (long_array_aggregate(t)).avg_w::float8[], (long_array_aggregate(t)).min_w,  (long_array_aggregate(t)).max_w,  (long_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devlong as t
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 day', data_time), att_conf_id;
@@ -139,8 +139,8 @@ CREATE VIEW cagg_array_devlong64_1hour(
                 , count_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='1 hour')
        	AS SELECT att_conf_id, time_bucket('1 hour', data_time), (long64_array_aggregate(t)).count,  (long64_array_aggregate(t)).count_errors
-        , (long64_array_aggregate(t)).count_r,  (long64_array_aggregate(t)).avg_r,  (long64_array_aggregate(t)).min_r,  (long64_array_aggregate(t)).max_r,  (long64_array_aggregate(t)).stddev_r  
-        , (long64_array_aggregate(t)).count_w,  (long64_array_aggregate(t)).avg_w,  (long64_array_aggregate(t)).min_w,  (long64_array_aggregate(t)).max_w,  (long64_array_aggregate(t)).stddev_w  
+        , (long64_array_aggregate(t)).count_r,  (long64_array_aggregate(t)).avg_r::float8[], (long64_array_aggregate(t)).min_r,  (long64_array_aggregate(t)).max_r,  (long64_array_aggregate(t)).stddev_r::float8[]  
+        , (long64_array_aggregate(t)).count_w,  (long64_array_aggregate(t)).avg_w::float8[], (long64_array_aggregate(t)).min_w,  (long64_array_aggregate(t)).max_w,  (long64_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devlong64 as t
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 hour', data_time), att_conf_id;
@@ -151,8 +151,8 @@ CREATE VIEW cagg_array_devlong64_8hour(
                 , count_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='8 hours')
        	AS SELECT att_conf_id, time_bucket('8 hours', data_time), (long64_array_aggregate(t)).count,  (long64_array_aggregate(t)).count_errors
-        , (long64_array_aggregate(t)).count_r,  (long64_array_aggregate(t)).avg_r,  (long64_array_aggregate(t)).min_r,  (long64_array_aggregate(t)).max_r,  (long64_array_aggregate(t)).stddev_r  
-        , (long64_array_aggregate(t)).count_w,  (long64_array_aggregate(t)).avg_w,  (long64_array_aggregate(t)).min_w,  (long64_array_aggregate(t)).max_w,  (long64_array_aggregate(t)).stddev_w  
+        , (long64_array_aggregate(t)).count_r,  (long64_array_aggregate(t)).avg_r::float8[], (long64_array_aggregate(t)).min_r,  (long64_array_aggregate(t)).max_r,  (long64_array_aggregate(t)).stddev_r::float8[]  
+        , (long64_array_aggregate(t)).count_w,  (long64_array_aggregate(t)).avg_w::float8[], (long64_array_aggregate(t)).min_w,  (long64_array_aggregate(t)).max_w,  (long64_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devlong64 as t
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('8 hours', data_time), att_conf_id;
@@ -163,8 +163,8 @@ CREATE VIEW cagg_array_devlong64_1day(
                 , count_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='1 day')
        	AS SELECT att_conf_id, time_bucket('1 day', data_time), (long64_array_aggregate(t)).count,  (long64_array_aggregate(t)).count_errors
-        , (long64_array_aggregate(t)).count_r, (long64_array_aggregate(t)).avg_r,  (long64_array_aggregate(t)).min_r,  (long64_array_aggregate(t)).max_r,  (long64_array_aggregate(t)).stddev_r  
-        , (long64_array_aggregate(t)).count_w, (long64_array_aggregate(t)).avg_w,  (long64_array_aggregate(t)).min_w,  (long64_array_aggregate(t)).max_w,  (long64_array_aggregate(t)).stddev_w  
+        , (long64_array_aggregate(t)).count_r, (long64_array_aggregate(t)).avg_r::float8[], (long64_array_aggregate(t)).min_r,  (long64_array_aggregate(t)).max_r,  (long64_array_aggregate(t)).stddev_r::float8[]  
+        , (long64_array_aggregate(t)).count_w, (long64_array_aggregate(t)).avg_w::float8[], (long64_array_aggregate(t)).min_w,  (long64_array_aggregate(t)).max_w,  (long64_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devlong64 as t
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 day', data_time), att_conf_id;
@@ -176,8 +176,8 @@ CREATE VIEW cagg_array_devshort_1hour(
                 , count_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='1 hour')
        	AS SELECT att_conf_id, time_bucket('1 hour', data_time), (short_array_aggregate(t)).count,  (short_array_aggregate(t)).count_errors
-        , (short_array_aggregate(t)).count_r,  (short_array_aggregate(t)).avg_r,  (short_array_aggregate(t)).min_r,  (short_array_aggregate(t)).max_r,  (short_array_aggregate(t)).stddev_r  
-        , (short_array_aggregate(t)).count_w,  (short_array_aggregate(t)).avg_w,  (short_array_aggregate(t)).min_w,  (short_array_aggregate(t)).max_w,  (short_array_aggregate(t)).stddev_w  
+        , (short_array_aggregate(t)).count_r,  (short_array_aggregate(t)).avg_r::float8[], (short_array_aggregate(t)).min_r,  (short_array_aggregate(t)).max_r,  (short_array_aggregate(t)).stddev_r::float8[]  
+        , (short_array_aggregate(t)).count_w,  (short_array_aggregate(t)).avg_w::float8[], (short_array_aggregate(t)).min_w,  (short_array_aggregate(t)).max_w,  (short_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devshort as t
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 hour', data_time), att_conf_id;
@@ -188,8 +188,8 @@ CREATE VIEW cagg_array_devshort_8hour(
                 , count_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='8 hours')
        	AS SELECT att_conf_id, time_bucket('8 hours', data_time), (short_array_aggregate(t)).count,  (short_array_aggregate(t)).count_errors
-        , (short_array_aggregate(t)).count_r,  (short_array_aggregate(t)).avg_r,  (short_array_aggregate(t)).min_r,  (short_array_aggregate(t)).max_r,  (short_array_aggregate(t)).stddev_r  
-        , (short_array_aggregate(t)).count_w,  (short_array_aggregate(t)).avg_w,  (short_array_aggregate(t)).min_w,  (short_array_aggregate(t)).max_w,  (short_array_aggregate(t)).stddev_w  
+        , (short_array_aggregate(t)).count_r,  (short_array_aggregate(t)).avg_r::float8[], (short_array_aggregate(t)).min_r,  (short_array_aggregate(t)).max_r,  (short_array_aggregate(t)).stddev_r::float8[]  
+        , (short_array_aggregate(t)).count_w,  (short_array_aggregate(t)).avg_w::float8[], (short_array_aggregate(t)).min_w,  (short_array_aggregate(t)).max_w,  (short_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devshort as t
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('8 hours', data_time), att_conf_id;
@@ -200,8 +200,8 @@ CREATE VIEW cagg_array_devshort_1day(
                 , count_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='1 day')
        	AS SELECT att_conf_id, time_bucket('1 day', data_time), (short_array_aggregate(t)).count,  (short_array_aggregate(t)).count_errors
-        , (short_array_aggregate(t)).count_r, (short_array_aggregate(t)).avg_r,  (short_array_aggregate(t)).min_r,  (short_array_aggregate(t)).max_r,  (short_array_aggregate(t)).stddev_r  
-        , (short_array_aggregate(t)).count_w, (short_array_aggregate(t)).avg_w,  (short_array_aggregate(t)).min_w,  (short_array_aggregate(t)).max_w,  (short_array_aggregate(t)).stddev_w  
+        , (short_array_aggregate(t)).count_r, (short_array_aggregate(t)).avg_r::float8[], (short_array_aggregate(t)).min_r,  (short_array_aggregate(t)).max_r,  (short_array_aggregate(t)).stddev_r::float8[]  
+        , (short_array_aggregate(t)).count_w, (short_array_aggregate(t)).avg_w::float8[], (short_array_aggregate(t)).min_w,  (short_array_aggregate(t)).max_w,  (short_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devshort as t
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 day', data_time), att_conf_id;
@@ -213,8 +213,8 @@ CREATE VIEW cagg_array_devulong_1hour(
                 , count_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='1 hour')
        	AS SELECT att_conf_id, time_bucket('1 hour', data_time), (ulong_array_aggregate(t)).count,  (ulong_array_aggregate(t)).count_errors
-        , (ulong_array_aggregate(t)).count_r,  (ulong_array_aggregate(t)).avg_r,  (ulong_array_aggregate(t)).min_r,  (ulong_array_aggregate(t)).max_r,  (ulong_array_aggregate(t)).stddev_r  
-        , (ulong_array_aggregate(t)).count_w,  (ulong_array_aggregate(t)).avg_w,  (ulong_array_aggregate(t)).min_w,  (ulong_array_aggregate(t)).max_w,  (ulong_array_aggregate(t)).stddev_w  
+        , (ulong_array_aggregate(t)).count_r,  (ulong_array_aggregate(t)).avg_r::float8[], (ulong_array_aggregate(t)).min_r,  (ulong_array_aggregate(t)).max_r,  (ulong_array_aggregate(t)).stddev_r::float8[]  
+        , (ulong_array_aggregate(t)).count_w,  (ulong_array_aggregate(t)).avg_w::float8[], (ulong_array_aggregate(t)).min_w,  (ulong_array_aggregate(t)).max_w,  (ulong_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devulong as t
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 hour', data_time), att_conf_id;
@@ -225,8 +225,8 @@ CREATE VIEW cagg_array_devulong_8hour(
                 , count_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='8 hours')
        	AS SELECT att_conf_id, time_bucket('8 hours', data_time), (ulong_array_aggregate(t)).count,  (ulong_array_aggregate(t)).count_errors
-        , (ulong_array_aggregate(t)).count_r,  (ulong_array_aggregate(t)).avg_r,  (ulong_array_aggregate(t)).min_r,  (ulong_array_aggregate(t)).max_r,  (ulong_array_aggregate(t)).stddev_r  
-        , (ulong_array_aggregate(t)).count_w,  (ulong_array_aggregate(t)).avg_w,  (ulong_array_aggregate(t)).min_w,  (ulong_array_aggregate(t)).max_w,  (ulong_array_aggregate(t)).stddev_w  
+        , (ulong_array_aggregate(t)).count_r,  (ulong_array_aggregate(t)).avg_r::float8[], (ulong_array_aggregate(t)).min_r,  (ulong_array_aggregate(t)).max_r,  (ulong_array_aggregate(t)).stddev_r::float8[]  
+        , (ulong_array_aggregate(t)).count_w,  (ulong_array_aggregate(t)).avg_w::float8[], (ulong_array_aggregate(t)).min_w,  (ulong_array_aggregate(t)).max_w,  (ulong_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devulong as t
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('8 hours', data_time), att_conf_id;
@@ -237,8 +237,8 @@ CREATE VIEW cagg_array_devulong_1day(
                 , count_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='1 day')
        	AS SELECT att_conf_id, time_bucket('1 day', data_time), (ulong_array_aggregate(t)).count,  (ulong_array_aggregate(t)).count_errors
-        , (ulong_array_aggregate(t)).count_r, (ulong_array_aggregate(t)).avg_r,  (ulong_array_aggregate(t)).min_r,  (ulong_array_aggregate(t)).max_r,  (ulong_array_aggregate(t)).stddev_r  
-        , (ulong_array_aggregate(t)).count_w, (ulong_array_aggregate(t)).avg_w,  (ulong_array_aggregate(t)).min_w,  (ulong_array_aggregate(t)).max_w,  (ulong_array_aggregate(t)).stddev_w  
+        , (ulong_array_aggregate(t)).count_r, (ulong_array_aggregate(t)).avg_r::float8[], (ulong_array_aggregate(t)).min_r,  (ulong_array_aggregate(t)).max_r,  (ulong_array_aggregate(t)).stddev_r::float8[]  
+        , (ulong_array_aggregate(t)).count_w, (ulong_array_aggregate(t)).avg_w::float8[], (ulong_array_aggregate(t)).min_w,  (ulong_array_aggregate(t)).max_w,  (ulong_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devulong as t
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 day', data_time), att_conf_id;
@@ -250,8 +250,8 @@ CREATE VIEW cagg_array_devulong64_1hour(
                 , count_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='1 hour')
        	AS SELECT att_conf_id, time_bucket('1 hour', data_time), (ulong64_array_aggregate(t)).count,  (ulong64_array_aggregate(t)).count_errors
-        , (ulong64_array_aggregate(t)).count_r,  (ulong64_array_aggregate(t)).avg_r,  (ulong64_array_aggregate(t)).min_r,  (ulong64_array_aggregate(t)).max_r,  (ulong64_array_aggregate(t)).stddev_r  
-        , (ulong64_array_aggregate(t)).count_w,  (ulong64_array_aggregate(t)).avg_w,  (ulong64_array_aggregate(t)).min_w,  (ulong64_array_aggregate(t)).max_w,  (ulong64_array_aggregate(t)).stddev_w  
+        , (ulong64_array_aggregate(t)).count_r,  (ulong64_array_aggregate(t)).avg_r::float8[], (ulong64_array_aggregate(t)).min_r,  (ulong64_array_aggregate(t)).max_r,  (ulong64_array_aggregate(t)).stddev_r::float8[]  
+        , (ulong64_array_aggregate(t)).count_w,  (ulong64_array_aggregate(t)).avg_w::float8[], (ulong64_array_aggregate(t)).min_w,  (ulong64_array_aggregate(t)).max_w,  (ulong64_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devulong64 as t
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 hour', data_time), att_conf_id;
@@ -262,8 +262,8 @@ CREATE VIEW cagg_array_devulong64_8hour(
                 , count_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='8 hours')
        	AS SELECT att_conf_id, time_bucket('8 hours', data_time), (ulong64_array_aggregate(t)).count,  (ulong64_array_aggregate(t)).count_errors
-        , (ulong64_array_aggregate(t)).count_r,  (ulong64_array_aggregate(t)).avg_r,  (ulong64_array_aggregate(t)).min_r,  (ulong64_array_aggregate(t)).max_r,  (ulong64_array_aggregate(t)).stddev_r  
-        , (ulong64_array_aggregate(t)).count_w,  (ulong64_array_aggregate(t)).avg_w,  (ulong64_array_aggregate(t)).min_w,  (ulong64_array_aggregate(t)).max_w,  (ulong64_array_aggregate(t)).stddev_w  
+        , (ulong64_array_aggregate(t)).count_r,  (ulong64_array_aggregate(t)).avg_r::float8[], (ulong64_array_aggregate(t)).min_r,  (ulong64_array_aggregate(t)).max_r,  (ulong64_array_aggregate(t)).stddev_r::float8[]  
+        , (ulong64_array_aggregate(t)).count_w,  (ulong64_array_aggregate(t)).avg_w::float8[], (ulong64_array_aggregate(t)).min_w,  (ulong64_array_aggregate(t)).max_w,  (ulong64_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devulong64 as t
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('8 hours', data_time), att_conf_id;
@@ -274,8 +274,8 @@ CREATE VIEW cagg_array_devulong64_1day(
                 , count_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='1 day')
        	AS SELECT att_conf_id, time_bucket('1 day', data_time), (ulong64_array_aggregate(t)).count,  (ulong64_array_aggregate(t)).count_errors
-        , (ulong64_array_aggregate(t)).count_r, (ulong64_array_aggregate(t)).avg_r,  (ulong64_array_aggregate(t)).min_r,  (ulong64_array_aggregate(t)).max_r,  (ulong64_array_aggregate(t)).stddev_r  
-        , (ulong64_array_aggregate(t)).count_w, (ulong64_array_aggregate(t)).avg_w,  (ulong64_array_aggregate(t)).min_w,  (ulong64_array_aggregate(t)).max_w,  (ulong64_array_aggregate(t)).stddev_w  
+        , (ulong64_array_aggregate(t)).count_r, (ulong64_array_aggregate(t)).avg_r::float8[], (ulong64_array_aggregate(t)).min_r,  (ulong64_array_aggregate(t)).max_r,  (ulong64_array_aggregate(t)).stddev_r::float8[]  
+        , (ulong64_array_aggregate(t)).count_w, (ulong64_array_aggregate(t)).avg_w::float8[], (ulong64_array_aggregate(t)).min_w,  (ulong64_array_aggregate(t)).max_w,  (ulong64_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devulong64 as t
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 day', data_time), att_conf_id;
@@ -287,8 +287,8 @@ CREATE VIEW cagg_array_devushort_1hour(
                 , count_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='1 hour')
        	AS SELECT att_conf_id, time_bucket('1 hour', data_time), (ushort_array_aggregate(t)).count,  (ushort_array_aggregate(t)).count_errors
-        , (ushort_array_aggregate(t)).count_r,  (ushort_array_aggregate(t)).avg_r,  (ushort_array_aggregate(t)).min_r,  (ushort_array_aggregate(t)).max_r,  (ushort_array_aggregate(t)).stddev_r  
-        , (ushort_array_aggregate(t)).count_w,  (ushort_array_aggregate(t)).avg_w,  (ushort_array_aggregate(t)).min_w,  (ushort_array_aggregate(t)).max_w,  (ushort_array_aggregate(t)).stddev_w  
+        , (ushort_array_aggregate(t)).count_r,  (ushort_array_aggregate(t)).avg_r::float8[], (ushort_array_aggregate(t)).min_r,  (ushort_array_aggregate(t)).max_r,  (ushort_array_aggregate(t)).stddev_r::float8[]  
+        , (ushort_array_aggregate(t)).count_w,  (ushort_array_aggregate(t)).avg_w::float8[], (ushort_array_aggregate(t)).min_w,  (ushort_array_aggregate(t)).max_w,  (ushort_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devushort as t
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 hour', data_time), att_conf_id;
@@ -299,8 +299,8 @@ CREATE VIEW cagg_array_devushort_8hour(
                 , count_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='8 hours')
        	AS SELECT att_conf_id, time_bucket('8 hours', data_time), (ushort_array_aggregate(t)).count,  (ushort_array_aggregate(t)).count_errors
-        , (ushort_array_aggregate(t)).count_r,  (ushort_array_aggregate(t)).avg_r,  (ushort_array_aggregate(t)).min_r,  (ushort_array_aggregate(t)).max_r,  (ushort_array_aggregate(t)).stddev_r  
-        , (ushort_array_aggregate(t)).count_w,  (ushort_array_aggregate(t)).avg_w,  (ushort_array_aggregate(t)).min_w,  (ushort_array_aggregate(t)).max_w,  (ushort_array_aggregate(t)).stddev_w  
+        , (ushort_array_aggregate(t)).count_r,  (ushort_array_aggregate(t)).avg_r::float8[], (ushort_array_aggregate(t)).min_r,  (ushort_array_aggregate(t)).max_r,  (ushort_array_aggregate(t)).stddev_r::float8[]  
+        , (ushort_array_aggregate(t)).count_w,  (ushort_array_aggregate(t)).avg_w::float8[], (ushort_array_aggregate(t)).min_w,  (ushort_array_aggregate(t)).max_w,  (ushort_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devushort as t
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('8 hours', data_time), att_conf_id;
@@ -311,14 +311,14 @@ CREATE VIEW cagg_array_devushort_1day(
                 , count_w, mean_w, min_w, max_w, stddev_w
 	) WITH (timescaledb.continuous, timescaledb.refresh_lag = '0 days', timescaledb.refresh_interval='1 day')
        	AS SELECT att_conf_id, time_bucket('1 day', data_time), (ushort_array_aggregate(t)).count,  (ushort_array_aggregate(t)).count_errors
-        , (ushort_array_aggregate(t)).count_r, (ushort_array_aggregate(t)).avg_r,  (ushort_array_aggregate(t)).min_r,  (ushort_array_aggregate(t)).max_r,  (ushort_array_aggregate(t)).stddev_r  
-        , (ushort_array_aggregate(t)).count_w, (ushort_array_aggregate(t)).avg_w,  (ushort_array_aggregate(t)).min_w,  (ushort_array_aggregate(t)).max_w,  (ushort_array_aggregate(t)).stddev_w  
+        , (ushort_array_aggregate(t)).count_r, (ushort_array_aggregate(t)).avg_r::float8[], (ushort_array_aggregate(t)).min_r,  (ushort_array_aggregate(t)).max_r,  (ushort_array_aggregate(t)).stddev_r::float8[]  
+        , (ushort_array_aggregate(t)).count_w, (ushort_array_aggregate(t)).avg_w::float8[], (ushort_array_aggregate(t)).min_w,  (ushort_array_aggregate(t)).max_w,  (ushort_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devushort as t
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 day', data_time), att_conf_id;
 
 -- Drop all the views
--- DROP VIEW cagg_array_devlong_1hour CASCADE;
+-- DROP VIEW cagg_array_devdouble_1hour CASCADE;
 -- DROP VIEW cagg_array_devdouble_8hour CASCADE;
 -- DROP VIEW cagg_array_devdouble_1day CASCADE;
 
