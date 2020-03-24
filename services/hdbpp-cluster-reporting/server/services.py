@@ -269,6 +269,26 @@ def extract_interval_rows(query_result):
     
     return table_name, att_type, att_format, query_result[1], query_result[2]
 
+def get_aggregate_table_name(format, type, interval):
+    """
+    From the type, format and interval desired, rebuild the corresponding
+    aggregate view name in the database.
+
+    Arguments:
+        type : str -- The type desired
+        format : str -- The format desired (SPECTRUM or SCALAR)
+        interval : str -- The interval desired (must exist)
+    Returns:
+        str with the view name in database.
+    """
+    
+    agg_format = 'scalar'
+    if format == "SPECTRUM":
+        agg_format = 'array'
+        
+    return 'cagg_'+agg_format+'_'+type.lower().replace('_', '')+'_'+interval.lower()
+
+
 def update_database_info(configuration):
     """
     Update the information on the HDB database and store it in
@@ -353,45 +373,43 @@ def update_database_info(configuration):
         # Retrieve all the aggregates row_count and sizes.
         for format_query in db.session.query(Aggregate.att_format.label('format')).distinct().all():
             
-            if format_query.format == 'SCALAR':
+            for type_query in db.session.query(Aggregate.att_type.label('type')).distinct().all():
                 
-                for type_query in db.session.query(Aggregate.att_type.label('type')).distinct().all():
+                for interval_query in db.session.query(Aggregate.agg_interval.label('interval')).distinct().all():
+                    agg_name = get_aggregate_table_name(format_query.format, type_query.type, interval_query.interval)
                     
-                    for interval_query in db.session.query(Aggregate.agg_interval.label('interval')).distinct().all():
-                        agg_name = 'cagg_'+format_query.format.lower()+'_'+type_query.type.lower().replace('_', '')+'_'+interval_query.interval
+                    try:
+                        cursor.execute("WITH s AS ("
+                                        "SELECT materialization_hypertable AS ht "
+                                        "FROM timescaledb_information.continuous_aggregates "
+                                        "WHERE view_name='"+agg_name+"'::regclass"
+                                    ") "
+                                    "SELECT total_bytes, row_estimate "
+                                    "FROM hypertable_relation_size((SELECT ht FROM s)), "
+                                    "hypertable_approximate_row_count((SELECT ht FROM s));")
                         
-                        try:
-                            cursor.execute("WITH s AS ("
-                                            "SELECT materialization_hypertable AS ht "
-                                            "FROM timescaledb_information.continuous_aggregates "
-                                            "WHERE view_name='"+agg_name+"'::regclass"
-                                        ") "
-                                        "SELECT total_bytes, row_estimate "
-                                        "FROM hypertable_relation_size((SELECT ht FROM s)), "
-                                        "hypertable_approximate_row_count((SELECT ht FROM s));")
+                        sizes = cursor.fetchall()
+                        for result in sizes:
+                            rows = result[1]
+                            agg_size = result[0]
+                    
+                            logger.debug(("Updating parameter type {} and format {} for interval size: {}"
+                                "\n  Estimate number of rows: {}"
+                                "\n  Table size: {}").format(type_query.type, format_query.format, interval_query.interval, rows, agg_size))
+            
+                            db.session.query(Aggregate).filter \
+                                    (Aggregate.att_format == format_query.format, Aggregate.att_type == type_query.type, Aggregate.agg_interval == interval_query.interval) \
+                                .update({"agg_row_count":rows, "agg_size":agg_size})
                         
-                            sizes = cursor.fetchall()
-                            for result in sizes:
-                                rows = result[1]
-                                agg_size = result[0]
-                        
-                                logger.debug(("Updating parameter type {} and format {} for interval size: {}"
-                                    "\n  Estimate number of rows: {}"
-                                    "\n  Table size: {}").format(type_query.type, format_query.format, interval_query.interval, rows, agg_size))
-                
-                                db.session.query(Aggregate).filter \
-                                        (Aggregate.att_format == format_query.format, Aggregate.att_type == type_query.type, Aggregate.agg_interval == interval_query.interval) \
-                                    .update({"agg_row_count":rows, "agg_size":agg_size})
-                        
-                        except psycopg2.Error as e:
-                            # Check for errors if the database does not exist
-                            if e.pgcode == '42P01':
-                                logger.debug("Parameter aggregate for type {} and format {} is not present for interval {}".format(type_query.type, format_query.format, interval_query.interval))
-                                
-                                # then remove it from the database as it is not present
-                                db.session.query(Aggregate).filter \
-                                        (Aggregate.att_format == format_query.format, Aggregate.att_type == type_query.type, Aggregate.agg_interval == interval_query.interval) \
-                                        .delete()
+                    except psycopg2.Error as e:
+                        # Check for errors if the database does not exist
+                        if e.pgcode == '42P01':
+                            logger.debug("Parameter aggregate for type {} and format {} is not present for interval {}".format(type_query.type, format_query.format, interval_query.interval))
+                            
+                            # then remove it from the database as it is not present
+                            db.session.query(Aggregate).filter \
+                                    (Aggregate.att_format == format_query.format, Aggregate.att_type == type_query.type, Aggregate.agg_interval == interval_query.interval) \
+                                    .delete()
 
         db.session.commit()
         connection.commit()
@@ -442,10 +460,11 @@ def init_services(configuration):
 
     # add the defaults
     for format in config.DB_FORMAT:
-        # So far only scalar is supported, but keep the loop for later maybe
-        if format is 'SCALAR':
-            for type in config.AGG_TYPES:
-                for interval in config.AGG_INTERVAL:
+        for type in config.AGG_TYPES:
+            for interval in config.AGG_INTERVAL:
+
+                #We do no support array less than an hour
+                if type is not 'SPECTRUM' or interval not in ['1min', '10min']:
                     att = Aggregate(format, type, interval)
                     db.session.add(att)
                     db.session.commit()

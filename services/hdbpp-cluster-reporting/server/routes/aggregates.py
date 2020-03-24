@@ -58,24 +58,25 @@ class Aggregates(Resource):
         aggs_result = Aggregate.query.all()
                     
         for aggregate in aggs_result:
-            if aggregate.att_format == 'SCALAR':
+            if aggregate.att_format not in aggregates:
+                aggregates[aggregate.att_format] = {}
+            
+            if aggregate.att_type not in aggregates[aggregate.att_format]:
+                aggregates[aggregate.att_format][aggregate.att_type] = []
                 
-                if aggregate.att_type not in aggregates:
-                    aggregates[aggregate.att_type] = []
-                
-                aggregates[aggregate.att_type].append(aggregate.agg_interval)
+            aggregates[aggregate.att_format][aggregate.att_type].append(aggregate.agg_interval)
         
         return jsonify(aggregates)
 
 
 class AggregatesRowCount(Resource):
-    def get(self, att_type, agg_interval):
-        return jsonify(get_from_db('SCALAR', att_type, agg_interval, Aggregate.agg_row_count))
+    def get(self, att_format, att_type, agg_interval):
+        return jsonify(get_from_db(att_format, att_type, agg_interval, Aggregate.agg_row_count))
 
 
 class AggregatesSize(Resource):
-    def get(self, att_type, agg_interval):
+    def get(self, att_format, att_type, agg_interval):
         result = {'unit':"bytes"}
-        result['size'] = get_from_db('SCALAR', att_type, agg_interval, Aggregate.agg_size)
+        result['size'] = get_from_db(att_format, att_type, agg_interval, Aggregate.agg_size)
         return jsonify(result)
 

@@ -7,10 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added [hdbpp-cluster-reporting]
+
+- Support for arrays aggregates.
+
 ### Change [hdbpp-ttl]
 
-* Docker image now includes all dependencies
-* Main script processes new config section in .conf file for rest access
+- Docker image now includes all dependencies
+- Main script processes new config section in .conf file for rest access
 
 ### Added [hdbpp-health-check]
 
