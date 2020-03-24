@@ -160,8 +160,12 @@ CREATE TABLE IF NOT EXISTS att_parameter (
     archive_period text NOT NULL DEFAULT '',
     description text NOT NULL DEFAULT '',
     details json,
+    enum_labels text[] NOT NULL DEFAULT ARRAY[]::text[],
     FOREIGN KEY (att_conf_id) REFERENCES att_conf (att_conf_id)
 );
+
+-- ALTER statement if the table was already created
+-- ALTER TABLE att_parameter ADD COLUMN enum_labels text[] NOT NULL DEFAULT ARRAY[]::text[];
 
 COMMENT ON TABLE att_parameter IS 'Attribute configuration parameters';
 CREATE INDEX IF NOT EXISTS att_parameter_recv_time_idx ON att_parameter (recv_time);
@@ -666,6 +670,22 @@ COMMENT ON TABLE att_scalar_devenum IS 'Scalar Enum Values Table';
 CREATE INDEX IF NOT EXISTS att_scalar_devenum_att_conf_id_idx ON att_scalar_devenum (att_conf_id);
 CREATE INDEX IF NOT EXISTS att_scalar_devenum_att_conf_id_data_time_idx ON att_scalar_devenum (att_conf_id,data_time DESC);
 SELECT create_hypertable('att_scalar_devenum', 'data_time', chunk_time_interval => interval '28 day', create_default_indexes => FALSE);
+
+-- Trigger to set the enum_labels
+CREATE OR REPLACE FUNCTION set_enum_label() RETURNS TRIGGER AS $$
+DECLARE
+BEGIN
+    IF NEW.value_r IS NOT NULL THEN
+        NEW.value_r_label := (SELECT enum_labels[NEW.value_r + 1] FROM att_parameter WHERE att_conf_id=NEW.att_conf_id ORDER BY recv_time DESC LIMIT 1);
+    END IF;
+    IF NEW.value_w IS NOT NULL THEN
+        NEW.value_w_label := (SELECT enum_labels[NEW.value_w + 1] FROM att_parameter WHERE att_conf_id=NEW.att_conf_id ORDER BY recv_time DESC LIMIT 1);
+    END IF;
+    RETURN NEW;
+END
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER enum_label_trigger BEFORE INSERT ON att_scalar_devenum FOR EACH ROW EXECUTE PROCEDURE set_enum_label();
 
 CREATE TABLE IF NOT EXISTS att_array_devenum (
     att_conf_id integer NOT NULL,
