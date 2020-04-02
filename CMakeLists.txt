@@ -17,6 +17,22 @@ set(CMAKE_COLOR_MAKEFILE ON)
 # Start the project
 project(hdbpp-timescale-project)
 
+# Build options
+option(BYPASS_LIBHDBPP "Link device servers directly tothe libhdbpp-timescale backend" OFF)
+option(STATIC_LINK_DEVICE_SERVERS "Statically link the device servers to the libraries (simplifies deployment)" OFF)
+
+if(BYPASS_LIBHDBPP)
+    if(STATIC_LINK_DEVICE_SERVERS)
+        set(BACKEND_LIBRARY_TARGET "libhdbpp_timescale_static_library")
+        message(STATUS "Set to bypass libhdbpp and link libhdbpp-timescale statically")
+    else()
+        set(BACKEND_LIBRARY_TARGET "libhdbpp_timescale_shared_library")
+        message(STATUS "Set to bypass libhdbpp and link libhdbpp-timescale as a shared object")
+    endif()
+else()
+    list(APPEND BACKEND_LIBRARY_TARGET "libhdbpp_shared_library")
+endif()
+
 # flags that take effect in the sub-components, this will configure 
 # the hdbpp_es/hdbpp_cm to link to the libhdbpp CMake target rather than
 # the actual library, this is better since it forces them to link to the version
@@ -86,17 +102,19 @@ if(NOT hdbpp_es_POPULATED)
     add_subdirectory(${hdbpp_es_SOURCE_DIR} ${hdbpp_es_BINARY_DIR} EXCLUDE_FROM_ALL)
 endif()
 
-FetchContent_Declare(
-    libhdbpp
-    GIT_REPOSITORY "https://github.com/tango-controls-hdbpp/libhdbpp.git" 
-    GIT_TAG ${LIBHDBPP_VERSION}
-    SOURCE_DIR "${CMAKE_SOURCE_DIR}/${EXTERNAL_PROJECT_DIR}/libhdbpp")
+if(NOT BYPASS_LIBHDBPP)
+    FetchContent_Declare(
+        libhdbpp
+        GIT_REPOSITORY "https://github.com/tango-controls-hdbpp/libhdbpp.git" 
+        GIT_TAG ${LIBHDBPP_VERSION}
+        SOURCE_DIR "${CMAKE_SOURCE_DIR}/${EXTERNAL_PROJECT_DIR}/libhdbpp")
 
-FetchContent_GetProperties(libhdbpp)
+    FetchContent_GetProperties(libhdbpp)
 
-if(NOT libhdbpp_POPULATED)
-    FetchContent_Populate(libhdbpp)
-    add_subdirectory(${libhdbpp_SOURCE_DIR} ${libhdbpp_BINARY_DIR} EXCLUDE_FROM_ALL)
+    if(NOT libhdbpp_POPULATED)
+        FetchContent_Populate(libhdbpp)
+        add_subdirectory(${libhdbpp_SOURCE_DIR} ${libhdbpp_BINARY_DIR} EXCLUDE_FROM_ALL)
+    endif()
 endif()
 
 FetchContent_Declare(
@@ -113,11 +131,14 @@ if(NOT libhdbpp_timescale_POPULATED)
 endif()
 
 # Redirect all binary artifacts to the build directory, to simplify testing
-set_target_properties(libhdbpp_shared_library
-    PROPERTIES
-        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+
+if(NOT BYPASS_LIBHDBPP)
+    set_target_properties(libhdbpp_shared_library
+        PROPERTIES
+            ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+            LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+endif()
 
 set_target_properties(hdbpp_es
     PROPERTIES
@@ -143,12 +164,17 @@ set_target_properties(libhdbpp_timescale_shared_library
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 
+set_target_properties(libhdbpp_timescale_static_library
+    PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+
 # now create a phoney target that can build the entire project
 add_custom_target(project)
 
 add_dependencies(project 
-    libhdbpp_shared_library 
-    libhdbpp_timescale_shared_library 
+    ${BACKEND_LIBRARY_TARGET}
     hdbpp_es 
     hdbpp_cm 
     hdbpp_health_check)

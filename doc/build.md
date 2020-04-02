@@ -1,19 +1,21 @@
 # Building Guide
 
-- [Building Guide](#Building-Guide)
-  - [Binary Components (Device Servers, Libraries etc)](#Binary-Components-Device-Servers-Libraries-etc)
-    - [Dependencies](#Dependencies)
-      - [Toolchain Dependencies](#Toolchain-Dependencies)
-      - [Build Dependencies](#Build-Dependencies)
-    - [Building](#Building)
-      - [Building Components Individually](#Building-Components-Individually)
-    - [Build Flags](#Build-Flags)
-      - [Standard CMake Flags](#Standard-CMake-Flags)
-      - [Project Flags](#Project-Flags)
-    - [Further Reading](#Further-Reading)
-  - [Docker Images For Services](#Docker-Images-For-Services)
-    - [Dependencies](#Dependencies-1)
-    - [Building](#Building-1)
+- [Building Guide](#building-guide)
+  - [Binary Components (Device Servers, Libraries etc)](#binary-components-device-servers-libraries-etc)
+    - [Dependencies](#dependencies)
+      - [Toolchain Dependencies](#toolchain-dependencies)
+      - [Build Dependencies](#build-dependencies)
+      - [Internal Version Dependencies](#internal-version-dependencies)
+    - [Building](#building)
+      - [Ubuntu](#ubuntu)
+      - [Building Components Individually](#building-components-individually)
+    - [Build Flags](#build-flags)
+      - [Standard CMake Flags](#standard-cmake-flags)
+      - [Project Flags](#project-flags)
+    - [Further Reading](#further-reading)
+  - [Docker Images For Services](#docker-images-for-services)
+    - [Dependencies](#dependencies-1)
+    - [Building](#building-1)
 
 ## Binary Components (Device Servers, Libraries etc)
 
@@ -41,6 +43,12 @@ Ensure the development version of the dependencies are installed. These are as f
 - libzmq3-dev or libzmq5-dev
 - libpq-dev - Postgres C development library
 
+#### Internal Version Dependencies
+
+The consolidated build system will fetch external dependencies via git. The repo and branch is defined in the root CMakeLists.txt. If you wish to test against different branches or versions, change the fetched version in the root CMakeLists.txt.
+
+In general, the repo/branch is set to a known working and compatible version. This eases deployment of the multiple components required. Only change it if you know what you are doing. 
+
 ### Building
 
 The build system of the various components uses pkg-config to find some dependencies, for example Tango. If Tango is not installed to a standard location, set PKG_CONFIG_PATH, i.e.
@@ -67,6 +75,16 @@ cmake -DCMAKE_PREFIX_PATH=/non/standard/tango/install/location ..
 ```
 
 The consolidated build system updates the binary output for each component to be the build directly. When building the entire project, all binaries will be under 'build'.
+
+#### Ubuntu
+
+When using Postgres from the Ubuntu repositoris, it appears to install its development libraries in a slightly different location. Some info on this issue [here](https://gitlab.kitware.com/cmake/cmake/issues/17223). In this case, we set the PostgreSQL_TYPE_INCLUDE_DIR variable directly when calling cmake:
+
+```
+cmake -DPostgreSQL_TYPE_INCLUDE_DIR=/usr/include/postgresql/ ..
+```
+
+This should replace the call to cmake in the previous section.
 
 #### Building Components Individually
 
