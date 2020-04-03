@@ -92,7 +92,7 @@ private:
     std::string _host;
     int _port;
     
-    HealthCheckResult to_healthcheck_result(const std::string &state) const;
+    static HealthCheckResult to_healthcheck_result(const std::string &state);
 };
 
 } // namespace HdbppHealthCheck_ns

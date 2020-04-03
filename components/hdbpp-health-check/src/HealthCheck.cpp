@@ -27,21 +27,22 @@
 
 namespace HdbppHealthCheck_ns
 {
+const int RequestOk = 200;
 
-HealthCheck::HealthCheckResult HealthCheck::to_healthcheck_result(const std::string& state) const
+HealthCheck::HealthCheckResult HealthCheck::to_healthcheck_result(const std::string& state)
 {
+    auto result = HealthCheckResult::ConnectionProblem;
+
     if (state == "Ok")
-        return HealthCheckResult::Ok;
+        result = HealthCheckResult::Ok;
 
     else if (state == "Warning")
-        return HealthCheckResult::Warning;
+        result = HealthCheckResult::Warning;
 
     else if (state == "Error")
-        return HealthCheckResult::Error;
+        result = HealthCheckResult::Error;
     
-    else 
-        return HealthCheckResult::ConnectionProblem;
-
+    return result;
 }
 
 //=============================================================================
@@ -74,19 +75,20 @@ std::tuple<HealthCheck::HealthCheckResult, std::string> HealthCheck::check_hosts
         Tango::Except::throw_exception("Bad Configuration", 
             "Attempting to check hosts when no endpoints have been configured", (const char *)__func__);
 
-    std::string error_message = "";
+    std::string error_message;
     HealthCheckResult health_result = HealthCheckResult::Ok;
     std::tuple<HealthCheck::HealthCheckResult, std::string> ret;
 
     // contact the cluster reporting server and request the server
     // health status
     httplib::Client cli(_host, _port);
-    for(auto it = _health_endpoints.cbegin(); it != _health_endpoints.cend(); ++it)
+
+    for(const auto &it : _health_endpoints)
     {
-        auto url = _root_url + *it;
+        auto url = _root_url + it;
         auto result = cli.Get(url.c_str());
         
-        if (result && result->status == 200) 
+        if (result && result->status == RequestOk) 
         {
             rapidjson::Document document;
             document.Parse(result->body.c_str());

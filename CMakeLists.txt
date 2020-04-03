@@ -30,7 +30,7 @@ if(BYPASS_LIBHDBPP)
         message(STATUS "Set to bypass libhdbpp and link libhdbpp-timescale as a shared object")
     endif()
 else()
-    list(APPEND BACKEND_LIBRARY_TARGET "libhdbpp_shared_library")
+    set(BACKEND_LIBRARY_TARGET "libhdbpp_shared_library")
 endif()
 
 # flags that take effect in the sub-components, this will configure 
@@ -49,7 +49,7 @@ set(EXTERNAL_PROJECT_DIR "external")
 set(DOWNLOAD_DIR "download")
 
 # this will enable clang on all sub-compoents
-option(ENABLE_CLANG "Enable clang code and layout analysis" OFF)
+option(ENABLE_CLANG "Enable clang code and layout analysis" ON)
 
 # Code Analysis -----------------------------------
 if(ENABLE_CLANG)
@@ -173,8 +173,16 @@ set_target_properties(libhdbpp_timescale_static_library
 # now create a phoney target that can build the entire project
 add_custom_target(project)
 
+
+
+if(BYPASS_LIBHDBPP)
+    set(HDBPP_LIBS ${BACKEND_LIBRARY_TARGET})
+else()
+    set(HDBPP_LIBS libhdbpp_shared_library libhdbpp_timescale_shared_library)
+endif()
+
 add_dependencies(project 
-    ${BACKEND_LIBRARY_TARGET}
+    ${HDBPP_LIBS}
     hdbpp_es 
     hdbpp_cm 
     hdbpp_health_check)
