@@ -1,16 +1,16 @@
 # hdbpp-cluster-reporting
 
 - [hdbpp-cluster-reporting](#hdbpp-cluster-reporting)
-  - [Dependencies](#Dependencies)
-  - [Usage](#Usage)
-  - [Rest API](#Rest-API)
-  - [Deployment](#Deployment)
-    - [Docker (Recommended)](#Docker-Recommended)
-      - [Logs](#Logs)
-    - [Direct (Untested)](#Direct-Untested)
-      - [Logs](#Logs-1)
-  - [Configuration](#Configuration)
-  - [License](#License)
+  - [Dependencies](#dependencies)
+  - [Usage](#usage)
+  - [Rest API](#rest-api)
+  - [Deployment](#deployment)
+    - [Docker (Recommended)](#docker-recommended)
+      - [Logs](#logs)
+    - [Direct (Untested)](#direct-untested)
+      - [Logs](#logs-1)
+  - [Configuration](#configuration)
+  - [License](#license)
 
 WORK IN PROGRESS - Current release is still a development release.
 
@@ -27,6 +27,8 @@ Following Python dependencies are required for direct deployment or development:
 * requests
 * Flask-RestPlus
 * Flask-SQLAlchemy
+
+Some rest endpoints assume a deployment with Patroni to manage the database nodes.
 
 ## Usage
 

@@ -1,21 +1,30 @@
 # Deployment
 
-- [Deployment](#Deployment)
-  - [Device Server and Shared Library Deployment](#Device-Server-and-Shared-Library-Deployment)
-    - [Dependencies](#Dependencies)
-    - [Configuration](#Configuration)
-      - [libhdbpp-timescale Shared Library](#libhdbpp-timescale-Shared-Library)
-      - [hdbpp-health-check Device Server](#hdbpp-health-check-Device-Server)
-  - [Service Deployment](#Service-Deployment)
-    - [hdbpp-reorder-chunks (Required)](#hdbpp-reorder-chunks-Required)
-    - [hdbpp-ttl (Optional)](#hdbpp-ttl-Optional)
-    - [hdbpp-cluster-reporting (Optional)](#hdbpp-cluster-reporting-Optional)
+- [Deployment](#deployment)
+  - [Device Server and Shared Library Deployment](#device-server-and-shared-library-deployment)
+    - [Simplified Deployment](#simplified-deployment)
+    - [Dependencies](#dependencies)
+    - [Configuration](#configuration)
+      - [libhdbpp-timescale Shared Library](#libhdbpp-timescale-shared-library)
+      - [hdbpp-health-check Device Server](#hdbpp-health-check-device-server)
+  - [Service Deployment](#service-deployment)
+    - [hdbpp-reorder-chunks (Required)](#hdbpp-reorder-chunks-required)
+    - [hdbpp-ttl (Optional)](#hdbpp-ttl-optional)
+    - [hdbpp-cluster-reporting (Optional)](#hdbpp-cluster-reporting-optional)
 
 Deployment is composed of two phases, the binary components from the consolidated build (hdbpp-es etc) and the services.
 
 ## Device Server and Shared Library Deployment
 
 Once built, all the Device Server and shared library binaries are available directly in the build directory. These must be installed as per the policy you have on site. At the most basic, they can be copied to /usr/local/bin or /usr/bin.
+
+### Simplified Deployment
+
+It is possible to build a single Event Subscriber or Config Manager binary without the need of the shared objects with this project. This is not possible when building the Event Subscriber or Config Manager project directly from its repo.
+
+See the build guide for the required flags. Once built like this, the hdbpp_es/hdbpp_cm binary contains everything it needs to run.
+
+Reference the build guide and look up the flags to bypass libhdbpp.
 
 ### Dependencies
 

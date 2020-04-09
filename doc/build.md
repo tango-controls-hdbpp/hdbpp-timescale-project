@@ -7,6 +7,7 @@
       - [Build Dependencies](#build-dependencies)
       - [Internal Version Dependencies](#internal-version-dependencies)
     - [Building](#building)
+      - [Bypassing libhbdpp](#bypassing-libhbdpp)
       - [Ubuntu](#ubuntu)
       - [Building Components Individually](#building-components-individually)
     - [Build Flags](#build-flags)
@@ -76,6 +77,10 @@ cmake -DCMAKE_PREFIX_PATH=/non/standard/tango/install/location ..
 
 The consolidated build system updates the binary output for each component to be the build directly. When building the entire project, all binaries will be under 'build'.
 
+#### Bypassing libhbdpp
+
+This section references the flag table below. It is now possible to build and link directly against libhbdpp-timescale, so omitting the need to deploy the libhbdpp shared library. Further, it is also possible to link statically to libhdbpp-timescale, for a greatly simplifed deployment.
+
 #### Ubuntu
 
 When using Postgres from the Ubuntu repositoris, it appears to install its development libraries in a slightly different location. Some info on this issue [here](https://gitlab.kitware.com/cmake/cmake/issues/17223). In this case, we set the PostgreSQL_TYPE_INCLUDE_DIR variable directly when calling cmake:
@@ -120,6 +125,8 @@ The following is a list of common useful CMake flags and their use:
 | Flag | Setting | Default | Description |
 |------|-----|-----|-----|
 | ENABLE_CLANG | ON/OFF | OFF | Clang code static analysis, readability, and cppcore guideline enforcement for any component that supports it|
+| BYPASS_LIBHDBPP | ON/OFF | OFF | Completely bypass the libhdbpp shared library and link the Event Subscriber + Config Manager to libhdbpp-timescale|
+| STATIC_LINK_DEVICE_SERVERS | ON/OFF | OFF | When BYPASS_LIBHDBPP is ON, setting this will link libhbdpp-timescale statically to binaries to ease deployment.|
 
 ### Further Reading
 
@@ -129,8 +136,6 @@ Each fetched components repository has a detailed README with additional informa
 - [hdbpp-cm](https://github.com/tango-controls-hdbpp/hdbpp-cm)
 - [libhdbpp](https://github.com/tango-controls-hdbpp/libhdbpp)
 - [libhdbpp-timescale](https://github.com/tango-controls-hdbpp/libhdbpp-timescale)
-
-
 
 ## Docker Images For Services
 
