@@ -1189,6 +1189,99 @@ CREATE VIEW cagg_scalar_devushort_1day(
                 WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 day', data_time), att_conf_id;
 
+
+--Set access
+
+GRANT ALL ON cagg_scalar_devdouble_1min TO readwrite;
+GRANT SELECT ON cagg_scalar_devdouble_1min TO readonly;
+GRANT ALL ON cagg_scalar_devdouble_10min TO readwrite;
+GRANT SELECT ON cagg_scalar_devdouble_10min TO readonly;
+GRANT ALL ON cagg_scalar_devdouble_1hour TO readwrite;
+GRANT SELECT ON cagg_scalar_devdouble_1hour TO readonly;
+GRANT ALL ON cagg_scalar_devdouble_8hour TO readwrite;
+GRANT SELECT ON cagg_scalar_devdouble_8hour TO readonly;
+GRANT ALL ON cagg_scalar_devdouble_1day TO readwrite;
+GRANT SELECT ON cagg_scalar_devdouble_1day TO readonly;
+
+GRANT ALL ON cagg_scalar_devfloat_1min TO readwrite;
+GRANT SELECT ON cagg_scalar_devfloat_1min TO readonly;
+GRANT ALL ON cagg_scalar_devfloat_10min TO readwrite;
+GRANT SELECT ON cagg_scalar_devfloat_10min TO readonly;
+GRANT ALL ON cagg_scalar_devfloat_1hour TO readwrite;
+GRANT SELECT ON cagg_scalar_devfloat_1hour TO readonly;
+GRANT ALL ON cagg_scalar_devfloat_8hour TO readwrite;
+GRANT SELECT ON cagg_scalar_devfloat_8hour TO readonly;
+GRANT ALL ON cagg_scalar_devfloat_1day TO readwrite;
+GRANT SELECT ON cagg_scalar_devfloat_1day TO readonly;
+
+GRANT ALL ON cagg_scalar_devlong_1min TO readwrite;
+GRANT SELECT ON cagg_scalar_devlong_1min TO readonly;
+GRANT ALL ON cagg_scalar_devlong_10min TO readwrite;
+GRANT SELECT ON cagg_scalar_devlong_10min TO readonly;
+GRANT ALL ON cagg_scalar_devlong_1hour TO readwrite;
+GRANT SELECT ON cagg_scalar_devlong_1hour TO readonly;
+GRANT ALL ON cagg_scalar_devlong_8hour TO readwrite;
+GRANT SELECT ON cagg_scalar_devlong_8hour TO readonly;
+GRANT ALL ON cagg_scalar_devlong_1day TO readwrite;
+GRANT SELECT ON cagg_scalar_devlong_1day TO readonly;
+
+GRANT ALL ON cagg_scalar_devulong_1min TO readwrite;
+GRANT SELECT ON cagg_scalar_devulong_1min TO readonly;
+GRANT ALL ON cagg_scalar_devulong_10min TO readwrite;
+GRANT SELECT ON cagg_scalar_devulong_10min TO readonly;
+GRANT ALL ON cagg_scalar_devulong_1hour TO readwrite;
+GRANT SELECT ON cagg_scalar_devulong_1hour TO readonly;
+GRANT ALL ON cagg_scalar_devulong_8hour TO readwrite;
+GRANT SELECT ON cagg_scalar_devulong_8hour TO readonly;
+GRANT ALL ON cagg_scalar_devulong_1day TO readwrite;
+GRANT SELECT ON cagg_scalar_devulong_1day TO readonly;
+
+GRANT ALL ON cagg_scalar_devulong64_1min TO readwrite;
+GRANT SELECT ON cagg_scalar_devulong64_1min TO readonly;
+GRANT ALL ON cagg_scalar_devulong64_10min TO readwrite;
+GRANT SELECT ON cagg_scalar_devulong64_10min TO readonly;
+GRANT ALL ON cagg_scalar_devulong64_1hour TO readwrite;
+GRANT SELECT ON cagg_scalar_devulong64_1hour TO readonly;
+GRANT ALL ON cagg_scalar_devulong64_8hour TO readwrite;
+GRANT SELECT ON cagg_scalar_devulong64_8hour TO readonly;
+GRANT ALL ON cagg_scalar_devulong64_1day TO readwrite;
+GRANT SELECT ON cagg_scalar_devulong64_1day TO readonly;
+
+GRANT ALL ON cagg_scalar_devlong64_1min TO readwrite;
+GRANT SELECT ON cagg_scalar_devlong64_1min TO readonly;
+GRANT ALL ON cagg_scalar_devlong64_10min TO readwrite;
+GRANT SELECT ON cagg_scalar_devlong64_10min TO readonly;
+GRANT ALL ON cagg_scalar_devlong64_1hour TO readwrite;
+GRANT SELECT ON cagg_scalar_devlong64_1hour TO readonly;
+GRANT ALL ON cagg_scalar_devlong64_8hour TO readwrite;
+GRANT SELECT ON cagg_scalar_devlong64_8hour TO readonly;
+GRANT ALL ON cagg_scalar_devlong64_1day TO readwrite;
+GRANT SELECT ON cagg_scalar_devlong64_1day TO readonly;
+
+GRANT ALL ON cagg_scalar_devshort_1min TO readwrite;
+GRANT SELECT ON cagg_scalar_devshort_1min TO readonly;
+GRANT ALL ON cagg_scalar_devshort_10min TO readwrite;
+GRANT SELECT ON cagg_scalar_devshort_10min TO readonly;
+GRANT ALL ON cagg_scalar_devshort_1hour TO readwrite;
+GRANT SELECT ON cagg_scalar_devshort_1hour TO readonly;
+GRANT ALL ON cagg_scalar_devshort_8hour TO readwrite;
+GRANT SELECT ON cagg_scalar_devshort_8hour TO readonly;
+GRANT ALL ON cagg_scalar_devshort_1day TO readwrite;
+GRANT SELECT ON cagg_scalar_devshort_1day TO readonly;
+
+GRANT ALL ON cagg_scalar_devushort_1min TO readwrite;
+GRANT SELECT ON cagg_scalar_devushort_1min TO readonly;
+GRANT ALL ON cagg_scalar_devushort_10min TO readwrite;
+GRANT SELECT ON cagg_scalar_devushort_10min TO readonly;
+GRANT ALL ON cagg_scalar_devushort_1hour TO readwrite;
+GRANT SELECT ON cagg_scalar_devushort_1hour TO readonly;
+GRANT ALL ON cagg_scalar_devushort_8hour TO readwrite;
+GRANT SELECT ON cagg_scalar_devushort_8hour TO readonly;
+GRANT ALL ON cagg_scalar_devushort_1day TO readwrite;
+GRANT SELECT ON cagg_scalar_devushort_1day TO readonly;
+
+
+
 -- Drop all the views
 -- DROP VIEW cagg_scalar_devdouble_1min CASCADE;
 -- DROP VIEW cagg_scalar_devdouble_10min CASCADE;
