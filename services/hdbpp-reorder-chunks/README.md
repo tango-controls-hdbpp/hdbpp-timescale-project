@@ -12,6 +12,8 @@
   - [Configuration](#Configuration)
   - [License](#License)
 
+With newer version of timescaledb (>1.7), the reorder policy is made available in the community edition. Using this script is no longer necessary, we recommend using the reorder policy by executing the sql instruction resources/schema/hdb_ext_reorder_policy.sql.
+
 This service provides a means to ensure the timescale database data is kept in the optimal query order. To ensure the data can be queried quickly on an attribute basis, it is ordered by att_conf_id and data_time, this is not the same as the insert order, which is data_time (since its received in real time). Without reordering the data, the query performance is seriously degraded.
 
 To achieve this reordering, we run this script daily to detect and reorder chunks that have previously not been reordered. It creates a log of all chunks processed, so it does not repeatedly process the same chunks.
