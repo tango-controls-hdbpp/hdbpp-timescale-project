@@ -22,11 +22,12 @@ project(hdbpp-timescale-project)
 # the actual library, this is better since it forces them to link to the version
 # produced here, and test against it if they are run from the build folder
 set(LIBHDBPP_PROJECT_BUILD TRUE)
+set(BACKEND_LIBRARY_TARGET libhdbpp_shared_library)
 
 # component versions that will be pulled on building. This can be a commit number, a branch name or a tag.
 set(HDBPP_ES_VERSION "integrated-build")
-set(HDBPP_CM_VERSION "integrated-build")
-set(LIBHDBPP_VERSION "exp-refactor")
+set(HDBPP_CM_VERSION "master")
+set(LIBHDBPP_VERSION "master")
 set(LIBHDBPP_TIMESCALE_VERSION "project-build2")
 
 set(EXTERNAL_PROJECT_DIR "external")
@@ -56,6 +57,7 @@ endif(ENABLE_CLANG)
 
 # Find Dependencies  ---------------------
 add_subdirectory(components/hdbpp-health-check EXCLUDE_FROM_ALL)
+add_subdirectory(components/test EXCLUDE_FROM_ALL)
 
 include(FetchContent)
 set(FETCHCONTENT_QUIET off)
@@ -63,7 +65,7 @@ set(FETCHCONTENT_QUIET off)
 FetchContent_Declare(
     hdbpp_cm
     GIT_REPOSITORY "https://github.com/tango-controls-hdbpp/hdbpp-cm.git" 
-    GIT_TAG ${HDBPP_ES_VERSION}
+    GIT_TAG ${HDBPP_CM_VERSION}
     SOURCE_DIR "${CMAKE_SOURCE_DIR}/${EXTERNAL_PROJECT_DIR}/hdbpp_cm")
 
 FetchContent_GetProperties(hdbpp_cm)
