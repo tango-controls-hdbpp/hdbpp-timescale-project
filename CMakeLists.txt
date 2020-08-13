@@ -25,9 +25,9 @@ set(LIBHDBPP_PROJECT_BUILD TRUE)
 set(BACKEND_LIBRARY_TARGET libhdbpp_shared_library)
 
 # component versions that will be pulled on building. This can be a commit number, a branch name or a tag.
-set(HDBPP_ES_VERSION "integrated-build")
-set(HDBPP_CM_VERSION "master")
-set(LIBHDBPP_VERSION "master")
+set(HDBPP_ES_VERSION "v2.0.0")
+set(HDBPP_CM_VERSION "v2.0.0")
+set(LIBHDBPP_VERSION "v2.0.0")
 set(LIBHDBPP_TIMESCALE_VERSION "project-build2")
 
 set(EXTERNAL_PROJECT_DIR "external")
