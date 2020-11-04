@@ -57,7 +57,7 @@ endif(ENABLE_CLANG)
 
 # Find Dependencies  ---------------------
 add_subdirectory(components/hdbpp-health-check EXCLUDE_FROM_ALL)
-add_subdirectory(components/test EXCLUDE_FROM_ALL)
+#add_subdirectory(components/test EXCLUDE_FROM_ALL)
 
 include(FetchContent)
 set(FETCHCONTENT_QUIET off)
