@@ -22,7 +22,7 @@ The hdbpp timescale project is a Tango Control system archival backend. The proj
 
 Additional documentation is stored in the doc folder, and indexed on its [README](doc/)
 
-Some of the information assumes familiarity with TimescaleDb terms and technologies. Please to TimescaleDb [documentation](www.timescaledb.com) for more information.
+Some of the information assumes familiarity with TimescaleDb terms and technologies. Please go to TimescaleDb [documentation](www.timescaledb.com) for more information.
 
 ## Cloning 
 
