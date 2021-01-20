@@ -31,7 +31,6 @@ CREATE VIEW cagg_array_devdouble_1hour(
         , (double_array_aggregate(t)).count_r,  (double_array_aggregate(t)).count_nan_r, (double_array_aggregate(t)).avg_r::float8[],  (double_array_aggregate(t)).min_r,  (double_array_aggregate(t)).max_r,  (double_array_aggregate(t)).stddev_r::float8[]  
         , (double_array_aggregate(t)).count_w,  (double_array_aggregate(t)).count_nan_w,  (double_array_aggregate(t)).avg_w::float8[], (double_array_aggregate(t)).min_w,  (double_array_aggregate(t)).max_w,  (double_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devdouble as t
-                WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 hour', data_time), att_conf_id;
 
 CREATE VIEW cagg_array_devdouble_8hour(
@@ -43,7 +42,6 @@ CREATE VIEW cagg_array_devdouble_8hour(
         , (double_array_aggregate(t)).count_r,  (double_array_aggregate(t)).count_nan_r, (double_array_aggregate(t)).avg_r::float8[],  (double_array_aggregate(t)).min_r,  (double_array_aggregate(t)).max_r,  (double_array_aggregate(t)).stddev_r::float8[]  
         , (double_array_aggregate(t)).count_w,  (double_array_aggregate(t)).count_nan_w,  (double_array_aggregate(t)).avg_w::float8[], (double_array_aggregate(t)).min_w,  (double_array_aggregate(t)).max_w,  (double_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devdouble as t
-                WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('8 hours', data_time), att_conf_id;
 
 CREATE VIEW cagg_array_devdouble_1day(
@@ -55,7 +53,6 @@ CREATE VIEW cagg_array_devdouble_1day(
         , (double_array_aggregate(t)).count_r,  (double_array_aggregate(t)).count_nan_r, (double_array_aggregate(t)).avg_r::float8[],  (double_array_aggregate(t)).min_r,  (double_array_aggregate(t)).max_r,  (double_array_aggregate(t)).stddev_r::float8[]  
         , (double_array_aggregate(t)).count_w,  (double_array_aggregate(t)).count_nan_w,  (double_array_aggregate(t)).avg_w::float8[], (double_array_aggregate(t)).min_w,  (double_array_aggregate(t)).max_w,  (double_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devdouble as t
-                WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 day', data_time), att_conf_id;
 
 -- Float attributes
@@ -68,7 +65,6 @@ CREATE VIEW cagg_array_devfloat_1hour(
         , (float_array_aggregate(t)).count_r,  (float_array_aggregate(t)).count_nan_r,  (float_array_aggregate(t)).avg_r::float8[], (float_array_aggregate(t)).min_r,  (float_array_aggregate(t)).max_r,  (float_array_aggregate(t)).stddev_r::float8[]  
         , (float_array_aggregate(t)).count_w,  (float_array_aggregate(t)).count_nan_w,  (float_array_aggregate(t)).avg_w::float8[], (float_array_aggregate(t)).min_w,  (float_array_aggregate(t)).max_w,  (float_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devfloat as t
-                WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 hour', data_time), att_conf_id;
 
 CREATE VIEW cagg_array_devfloat_8hour(
@@ -80,7 +76,6 @@ CREATE VIEW cagg_array_devfloat_8hour(
         , (float_array_aggregate(t)).count_r,  (float_array_aggregate(t)).count_nan_r,  (float_array_aggregate(t)).avg_r::float8[], (float_array_aggregate(t)).min_r,  (float_array_aggregate(t)).max_r,  (float_array_aggregate(t)).stddev_r::float8[]  
         , (float_array_aggregate(t)).count_w,  (float_array_aggregate(t)).count_nan_w,  (float_array_aggregate(t)).avg_w::float8[], (float_array_aggregate(t)).min_w,  (float_array_aggregate(t)).max_w,  (float_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devfloat as t
-                WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('8 hours', data_time), att_conf_id;
 
 CREATE VIEW cagg_array_devfloat_1day(
@@ -92,7 +87,6 @@ CREATE VIEW cagg_array_devfloat_1day(
         , (float_array_aggregate(t)).count_r,  (float_array_aggregate(t)).count_nan_r,  (float_array_aggregate(t)).avg_r::float8[], (float_array_aggregate(t)).min_r,  (float_array_aggregate(t)).max_r,  (float_array_aggregate(t)).stddev_r::float8[]  
         , (float_array_aggregate(t)).count_w,  (float_array_aggregate(t)).count_nan_w,  (float_array_aggregate(t)).avg_w::float8[], (float_array_aggregate(t)).min_w,  (float_array_aggregate(t)).max_w,  (float_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devfloat as t
-                WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 day', data_time), att_conf_id;
 
 -- Long attributes
@@ -105,7 +99,6 @@ CREATE VIEW cagg_array_devlong_1hour(
         , (long_array_aggregate(t)).count_r,  (long_array_aggregate(t)).avg_r::float8[], (long_array_aggregate(t)).min_r,  (long_array_aggregate(t)).max_r,  (long_array_aggregate(t)).stddev_r::float8[]  
         , (long_array_aggregate(t)).count_w,  (long_array_aggregate(t)).avg_w::float8[], (long_array_aggregate(t)).min_w,  (long_array_aggregate(t)).max_w,  (long_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devlong as t
-                WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 hour', data_time), att_conf_id;
 
 CREATE VIEW cagg_array_devlong_8hour(
@@ -117,7 +110,6 @@ CREATE VIEW cagg_array_devlong_8hour(
         , (long_array_aggregate(t)).count_r,  (long_array_aggregate(t)).avg_r::float8[], (long_array_aggregate(t)).min_r,  (long_array_aggregate(t)).max_r,  (long_array_aggregate(t)).stddev_r::float8[]  
         , (long_array_aggregate(t)).count_w,  (long_array_aggregate(t)).avg_w::float8[], (long_array_aggregate(t)).min_w,  (long_array_aggregate(t)).max_w,  (long_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devlong as t
-                WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('8 hours', data_time), att_conf_id;
 
 CREATE VIEW cagg_array_devlong_1day(
@@ -129,7 +121,6 @@ CREATE VIEW cagg_array_devlong_1day(
         , (long_array_aggregate(t)).count_r, (long_array_aggregate(t)).avg_r::float8[], (long_array_aggregate(t)).min_r,  (long_array_aggregate(t)).max_r,  (long_array_aggregate(t)).stddev_r::float8[]  
         , (long_array_aggregate(t)).count_w, (long_array_aggregate(t)).avg_w::float8[], (long_array_aggregate(t)).min_w,  (long_array_aggregate(t)).max_w,  (long_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devlong as t
-                WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 day', data_time), att_conf_id;
 
 -- Long 64 attributes
@@ -142,7 +133,6 @@ CREATE VIEW cagg_array_devlong64_1hour(
         , (long64_array_aggregate(t)).count_r,  (long64_array_aggregate(t)).avg_r::float8[], (long64_array_aggregate(t)).min_r,  (long64_array_aggregate(t)).max_r,  (long64_array_aggregate(t)).stddev_r::float8[]  
         , (long64_array_aggregate(t)).count_w,  (long64_array_aggregate(t)).avg_w::float8[], (long64_array_aggregate(t)).min_w,  (long64_array_aggregate(t)).max_w,  (long64_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devlong64 as t
-                WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 hour', data_time), att_conf_id;
 
 CREATE VIEW cagg_array_devlong64_8hour(
@@ -154,7 +144,6 @@ CREATE VIEW cagg_array_devlong64_8hour(
         , (long64_array_aggregate(t)).count_r,  (long64_array_aggregate(t)).avg_r::float8[], (long64_array_aggregate(t)).min_r,  (long64_array_aggregate(t)).max_r,  (long64_array_aggregate(t)).stddev_r::float8[]  
         , (long64_array_aggregate(t)).count_w,  (long64_array_aggregate(t)).avg_w::float8[], (long64_array_aggregate(t)).min_w,  (long64_array_aggregate(t)).max_w,  (long64_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devlong64 as t
-                WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('8 hours', data_time), att_conf_id;
 
 CREATE VIEW cagg_array_devlong64_1day(
@@ -166,7 +155,6 @@ CREATE VIEW cagg_array_devlong64_1day(
         , (long64_array_aggregate(t)).count_r, (long64_array_aggregate(t)).avg_r::float8[], (long64_array_aggregate(t)).min_r,  (long64_array_aggregate(t)).max_r,  (long64_array_aggregate(t)).stddev_r::float8[]  
         , (long64_array_aggregate(t)).count_w, (long64_array_aggregate(t)).avg_w::float8[], (long64_array_aggregate(t)).min_w,  (long64_array_aggregate(t)).max_w,  (long64_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devlong64 as t
-                WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 day', data_time), att_conf_id;
 
 -- Short attributes
@@ -179,7 +167,6 @@ CREATE VIEW cagg_array_devshort_1hour(
         , (short_array_aggregate(t)).count_r,  (short_array_aggregate(t)).avg_r::float8[], (short_array_aggregate(t)).min_r,  (short_array_aggregate(t)).max_r,  (short_array_aggregate(t)).stddev_r::float8[]  
         , (short_array_aggregate(t)).count_w,  (short_array_aggregate(t)).avg_w::float8[], (short_array_aggregate(t)).min_w,  (short_array_aggregate(t)).max_w,  (short_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devshort as t
-                WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 hour', data_time), att_conf_id;
 
 CREATE VIEW cagg_array_devshort_8hour(
@@ -191,7 +178,6 @@ CREATE VIEW cagg_array_devshort_8hour(
         , (short_array_aggregate(t)).count_r,  (short_array_aggregate(t)).avg_r::float8[], (short_array_aggregate(t)).min_r,  (short_array_aggregate(t)).max_r,  (short_array_aggregate(t)).stddev_r::float8[]  
         , (short_array_aggregate(t)).count_w,  (short_array_aggregate(t)).avg_w::float8[], (short_array_aggregate(t)).min_w,  (short_array_aggregate(t)).max_w,  (short_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devshort as t
-                WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('8 hours', data_time), att_conf_id;
 
 CREATE VIEW cagg_array_devshort_1day(
@@ -203,7 +189,6 @@ CREATE VIEW cagg_array_devshort_1day(
         , (short_array_aggregate(t)).count_r, (short_array_aggregate(t)).avg_r::float8[], (short_array_aggregate(t)).min_r,  (short_array_aggregate(t)).max_r,  (short_array_aggregate(t)).stddev_r::float8[]  
         , (short_array_aggregate(t)).count_w, (short_array_aggregate(t)).avg_w::float8[], (short_array_aggregate(t)).min_w,  (short_array_aggregate(t)).max_w,  (short_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devshort as t
-                WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 day', data_time), att_conf_id;
 
 -- Unsigned long attributes
@@ -216,7 +201,6 @@ CREATE VIEW cagg_array_devulong_1hour(
         , (ulong_array_aggregate(t)).count_r,  (ulong_array_aggregate(t)).avg_r::float8[], (ulong_array_aggregate(t)).min_r,  (ulong_array_aggregate(t)).max_r,  (ulong_array_aggregate(t)).stddev_r::float8[]  
         , (ulong_array_aggregate(t)).count_w,  (ulong_array_aggregate(t)).avg_w::float8[], (ulong_array_aggregate(t)).min_w,  (ulong_array_aggregate(t)).max_w,  (ulong_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devulong as t
-                WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 hour', data_time), att_conf_id;
 
 CREATE VIEW cagg_array_devulong_8hour(
@@ -228,7 +212,6 @@ CREATE VIEW cagg_array_devulong_8hour(
         , (ulong_array_aggregate(t)).count_r,  (ulong_array_aggregate(t)).avg_r::float8[], (ulong_array_aggregate(t)).min_r,  (ulong_array_aggregate(t)).max_r,  (ulong_array_aggregate(t)).stddev_r::float8[]  
         , (ulong_array_aggregate(t)).count_w,  (ulong_array_aggregate(t)).avg_w::float8[], (ulong_array_aggregate(t)).min_w,  (ulong_array_aggregate(t)).max_w,  (ulong_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devulong as t
-                WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('8 hours', data_time), att_conf_id;
 
 CREATE VIEW cagg_array_devulong_1day(
@@ -240,7 +223,6 @@ CREATE VIEW cagg_array_devulong_1day(
         , (ulong_array_aggregate(t)).count_r, (ulong_array_aggregate(t)).avg_r::float8[], (ulong_array_aggregate(t)).min_r,  (ulong_array_aggregate(t)).max_r,  (ulong_array_aggregate(t)).stddev_r::float8[]  
         , (ulong_array_aggregate(t)).count_w, (ulong_array_aggregate(t)).avg_w::float8[], (ulong_array_aggregate(t)).min_w,  (ulong_array_aggregate(t)).max_w,  (ulong_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devulong as t
-                WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 day', data_time), att_conf_id;
 
 -- Unsigned long 64 attributes
@@ -253,7 +235,6 @@ CREATE VIEW cagg_array_devulong64_1hour(
         , (ulong64_array_aggregate(t)).count_r,  (ulong64_array_aggregate(t)).avg_r::float8[], (ulong64_array_aggregate(t)).min_r,  (ulong64_array_aggregate(t)).max_r,  (ulong64_array_aggregate(t)).stddev_r::float8[]  
         , (ulong64_array_aggregate(t)).count_w,  (ulong64_array_aggregate(t)).avg_w::float8[], (ulong64_array_aggregate(t)).min_w,  (ulong64_array_aggregate(t)).max_w,  (ulong64_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devulong64 as t
-                WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 hour', data_time), att_conf_id;
 
 CREATE VIEW cagg_array_devulong64_8hour(
@@ -265,7 +246,6 @@ CREATE VIEW cagg_array_devulong64_8hour(
         , (ulong64_array_aggregate(t)).count_r,  (ulong64_array_aggregate(t)).avg_r::float8[], (ulong64_array_aggregate(t)).min_r,  (ulong64_array_aggregate(t)).max_r,  (ulong64_array_aggregate(t)).stddev_r::float8[]  
         , (ulong64_array_aggregate(t)).count_w,  (ulong64_array_aggregate(t)).avg_w::float8[], (ulong64_array_aggregate(t)).min_w,  (ulong64_array_aggregate(t)).max_w,  (ulong64_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devulong64 as t
-                WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('8 hours', data_time), att_conf_id;
 
 CREATE VIEW cagg_array_devulong64_1day(
@@ -277,7 +257,6 @@ CREATE VIEW cagg_array_devulong64_1day(
         , (ulong64_array_aggregate(t)).count_r, (ulong64_array_aggregate(t)).avg_r::float8[], (ulong64_array_aggregate(t)).min_r,  (ulong64_array_aggregate(t)).max_r,  (ulong64_array_aggregate(t)).stddev_r::float8[]  
         , (ulong64_array_aggregate(t)).count_w, (ulong64_array_aggregate(t)).avg_w::float8[], (ulong64_array_aggregate(t)).min_w,  (ulong64_array_aggregate(t)).max_w,  (ulong64_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devulong64 as t
-                WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 day', data_time), att_conf_id;
 
 -- Unsigned short attributes
@@ -290,7 +269,6 @@ CREATE VIEW cagg_array_devushort_1hour(
         , (ushort_array_aggregate(t)).count_r,  (ushort_array_aggregate(t)).avg_r::float8[], (ushort_array_aggregate(t)).min_r,  (ushort_array_aggregate(t)).max_r,  (ushort_array_aggregate(t)).stddev_r::float8[]  
         , (ushort_array_aggregate(t)).count_w,  (ushort_array_aggregate(t)).avg_w::float8[], (ushort_array_aggregate(t)).min_w,  (ushort_array_aggregate(t)).max_w,  (ushort_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devushort as t
-                WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 hour', data_time), att_conf_id;
 
 CREATE VIEW cagg_array_devushort_8hour(
@@ -302,7 +280,6 @@ CREATE VIEW cagg_array_devushort_8hour(
         , (ushort_array_aggregate(t)).count_r,  (ushort_array_aggregate(t)).avg_r::float8[], (ushort_array_aggregate(t)).min_r,  (ushort_array_aggregate(t)).max_r,  (ushort_array_aggregate(t)).stddev_r::float8[]  
         , (ushort_array_aggregate(t)).count_w,  (ushort_array_aggregate(t)).avg_w::float8[], (ushort_array_aggregate(t)).min_w,  (ushort_array_aggregate(t)).max_w,  (ushort_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devushort as t
-                WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('8 hours', data_time), att_conf_id;
 
 CREATE VIEW cagg_array_devushort_1day(
@@ -314,7 +291,6 @@ CREATE VIEW cagg_array_devushort_1day(
         , (ushort_array_aggregate(t)).count_r, (ushort_array_aggregate(t)).avg_r::float8[], (ushort_array_aggregate(t)).min_r,  (ushort_array_aggregate(t)).max_r,  (ushort_array_aggregate(t)).stddev_r::float8[]  
         , (ushort_array_aggregate(t)).count_w, (ushort_array_aggregate(t)).avg_w::float8[], (ushort_array_aggregate(t)).min_w,  (ushort_array_aggregate(t)).max_w,  (ushort_array_aggregate(t)).stddev_w::float8[]  
        	FROM att_array_devushort as t
-                WHERE data_time > now() - interval '1 year' 
         GROUP BY time_bucket('1 day', data_time), att_conf_id;
 
 -- Drop all the views
