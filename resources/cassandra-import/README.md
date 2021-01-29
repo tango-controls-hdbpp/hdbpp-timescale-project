@@ -4,6 +4,7 @@
 
 - [Cassandra to TimescaleDB import](#Cassandra-to-TimescaleDB-import)
   - [Overview](#Overview)
+  - [Dependencies](#Dependencies)
   - [Dump Cassandra data](#Dump-Cassandra-data)
     - [naming convention](#Naming-convention)
   - [Import script](#Import-script)
@@ -17,6 +18,12 @@ This guide do not describe how to install and set up the timescaleDB cluster.
 
 In order to import data from cassandra to timescaledb, we chose to first dump cassandra data to csv files, and then process them using a python script to import them into an existing TimescaleDB HDB cluster.
 This guide Describes how to dump the cassandra cluster to csv files and then run the import script.
+
+## Dependencies
+
+To dump cassandra data, [Datastax dsbulk](https://docs.datastax.com/en/dsbulk/doc/dsbulk/reference/dsbulkCmd.html) might be needed.
+
+On importing data, the schema [hdb_ext_import.sql](../schema/hdb_ext_import.sql) must be set on the target database. It breaks the FQDN into cs_name, family, domain, etc… This could be done in the python script, but it might as well be done in the database.
 
 ## Dump Cassandra data
 
@@ -66,6 +73,8 @@ Note that the att_conf.csv file is the dump of the att_conf table, and is the ma
 Once all or part of the cassandra data has been dumped to csv files the script can be run to import data in the timescaledb cluster.
 
 Be sure that all the csv files respect the [naming convention](#Naming-Convention) and are in the same folder.
+
+Be sure that [hdb_ext_import.sql](../schema/hdb_ext_import.sql) has been set on the target database, otherwise the cs_name, family, etc… won't be set on the imported data.
 
 The script comes with a [configuration file](conf/hdbpp_import.conf) in the yaml format that is commented. Some parameters are mandatory for the script to run properly:
 
