@@ -40,10 +40,17 @@ COPY att_scalar_devdouble_ro TO att_scalar_devdouble_ro.csv
 
 For more detailed options see the [official documentation](https://cassandra.apache.org/doc/latest/tools/cqlsh.html?highlight=copy#copy-to)
 
-Nevertheless this command may fail on some tables (usually array table with big arrays). To overcome this issue one might use [Datastax dsbulk](https://docs.datastax.com/en/dsbulk/doc/dsbulk/reference/dsbulkCmd.html)
+Nevertheless this command may fail on some tables (usually array table with big arrays). Upon failure, you can find the range that couldn't be extracted and try to do it again at a lower speed. This can be achieved with the PAGESIZE and MAXREQUESTS options. Increasing the timeout value might help. A low speed request might look like:
+
+```SQL
+COPY att_array_devdouble_ro TO att_array_devdouble_ro.csv WITH MAXREQUESTS=1 AND PAGESIZE=1 AND PAGETIMEOUT=60 AND MAXATTEMPTS=10 AND BEGINTOKEN=375742984298437549 AND ENDTOKEN=421553931176082414;
+```
+
+If one still has problem extracting data, one might use [Datastax dsbulk](https://docs.datastax.com/en/dsbulk/doc/dsbulk/reference/dsbulkCmd.html)
 This tool provide finer control upon speed and timeouts so that you can extract all the data, even if it takes longer.
 
 A common command line to extract the devdouble array table looks like (replace [hdbhost] with a proper value):
+
 ```bash
 ./dsbulk unload -url att_array_devdouble_ro.csv -cl QUORUM --driver.basic.request.timeout "60 minutes" --advanced.heartbeat.interval 600 --advanced.heartbeat.timeout 1200 --executor.maxPerSecond 800 -maxErrors -1 -h [hdbhost] -k hdb -t att_array_devdouble_ro
 ```
@@ -92,9 +99,9 @@ Then to execute the script use:
 As it is, this guide was successfully used to migrate data, but suffers for some limitations.
 
   - Code quality: the script is not much more than a proof of concept, it should be refactored to improve readability and maintainability.
+  - Logging: Some information should be logged in the separate processes, but it doesn't work.
   - Speed: The process is long. Data extraction from Cassandra can take some time, and for some type of data is not possible unless performed at low speed. This could be a problem the bigger the base is.
   The import script, then, can take a long time to run, but there are some ways to improve it:
-    - Parrallelize the code: In this first iteration all the files are processed sequentially, a better approach would be to read all of them and insert the data in parrallel. This would allow as well to cut big csv files into smaller chunks to be treated.
+    - Parallelize the code: The code is running in parallel, importing each file in a single process, but it could still be faster if we could load the files in small chunks. If the data was exported in multiple files we do not suffer from this issue.
     - Use a better query: There are different ways to insert data into postgresql using psycopg2 in python. An interesting comparative study can be found [here](https://hakibenita.com/fast-load-data-python-postgresql).
-    - Cache error table: in case of errors we do not use batch insert to insert the errors and this can really impact the performances. Loading the error table and keeping it in a cache would reduce these kind of request and improve performances.
 
