@@ -94,6 +94,22 @@ Then to execute the script use:
 ./hdbpp_import.py -c conf/hdbpp_import.conf
 ```
 
+## Data comparison script
+
+In order to test if all the data has been properly imported into the timescaledb cluster, one can use the hdbpp_compare.py script.
+
+The script extract some values, randomly from timescaledb, and check there are well in the old cassandra cluster. A proper comparison would be to test the opposite, but it is easier to get random samples from a postgresql database than a cassandra one.
+
+To run the script use:
+
+```bash
+./hdbpp_compare.py -c conf/hdbpp_compare.conf
+```
+
+This method will not guarantee that the import went ok, but give some confidence in it.
+
+Some errors will be detected as there are some differences in design. For instance, cassandra accepts multiple values for a single timestamp, which is not possible on timescaledb. Another source of error will be floating point rounding, big and really small floating point number will be slightly different, the underlying precision might be different according to the backend.
+
 ## Limitations and improvements
 
 As it is, this guide was successfully used to migrate data, but suffers for some limitations.
@@ -104,4 +120,3 @@ As it is, this guide was successfully used to migrate data, but suffers for some
   The import script, then, can take a long time to run, but there are some ways to improve it:
     - Parallelize the code: The code is running in parallel, importing each file in a single process, but it could still be faster if we could load the files in small chunks. If the data was exported in multiple files we do not suffer from this issue.
     - Use a better query: There are different ways to insert data into postgresql using psycopg2 in python. An interesting comparative study can be found [here](https://hakibenita.com/fast-load-data-python-postgresql).
-
