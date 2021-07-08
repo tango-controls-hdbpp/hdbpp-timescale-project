@@ -22,13 +22,13 @@ project(hdbpp-timescale-project)
 # the actual library, this is better since it forces them to link to the version
 # produced here, and test against it if they are run from the build folder
 set(LIBHDBPP_PROJECT_BUILD TRUE)
-set(BACKEND_LIBRARY_TARGET libhdbpp_shared_library)
+set(LIBHDBPP_BACKEND "timescale")
 
 # component versions that will be pulled on building. This can be a commit number, a branch name or a tag.
-set(HDBPP_ES_VERSION "v2.0.0")
-set(HDBPP_CM_VERSION "v2.0.0")
-set(LIBHDBPP_VERSION "v2.0.0")
-set(LIBHDBPP_TIMESCALE_VERSION "project-build2")
+set(HDBPP_ES_VERSION "master")
+set(HDBPP_CM_VERSION "master")
+set(LIBHDBPP_VERSION "master")
+set(LIBHDBPP_TIMESCALE_VERSION "master")
 
 set(EXTERNAL_PROJECT_DIR "external")
 set(DOWNLOAD_DIR "download")
@@ -115,7 +115,7 @@ if(NOT libhdbpp_timescale_POPULATED)
 endif()
 
 # Redirect all binary artifacts to the build directory, to simplify testing
-set_target_properties(libhdbpp_shared_library
+set_target_properties(libhdbpp_headers
     PROPERTIES
         ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
@@ -149,7 +149,7 @@ set_target_properties(libhdbpp_timescale_shared_library
 add_custom_target(project)
 
 add_dependencies(project 
-    libhdbpp_shared_library 
+    libhdbpp_headers 
     libhdbpp_timescale_shared_library 
     hdbpp_es 
     hdbpp_cm 
