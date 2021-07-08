@@ -58,6 +58,18 @@ cmake ..
 make project
 ```
 
+In some cases, cmake step can fail to build libpqxx with an error like:
+
+```
+Could NOT find PostgreSQL (missing: PostgreSQL_TYPE_INCLUDE_DIR) 
+```
+This is a bug in the cmake procedure to find postgresql, see(https://gitlab.kitware.com/cmake/cmake/-/issues/17223), it has been fixed in newer revisions of cmake.
+In case it happens, run cmake with setting the PostgreSQL_TYPE_INCLUDE_DIR variable:
+
+```
+cmake -DPostgreSQL_TYPE_INCLUDE_DIR=/usr/include/postgresql ..
+```
+
 The pkg-config path can also be set with the cmake argument CMAKE_PREFIX_PATH. This can be set on the command line at configuration time, i.e.:
 
 ```
