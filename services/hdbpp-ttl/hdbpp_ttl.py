@@ -180,38 +180,44 @@ def process_ttl(server_config, dryrun, processed_ttl=None):
         attributes = cursor.fetchall()
         logger.info("Fetched {} attributes with a ttl configured".format(len(attributes)))
 
+        i = 0
         for attr in attributes:
 
-            # the ttl is stored in hours, but here to keep things simple we work only in days,
-            # so note how the ttl is divided by 24 and rounded up to ensure data is not removed
-            # to soon.
+            i += 1
+            try:
+                # the ttl is stored in hours, but here to keep things simple we work only in days,
+                # so note how the ttl is divided by 24 and rounded up to ensure data is not removed
+                # to soon.
 
-            # also note the delete is done by counting back from midnight of yesterday, this
-            # means a ttl of 1 will always at least 24 hours of data (yesterday), since today is considered
-            # day 0 (or filling)
-            if not dryrun:
-                cursor.execute(
-                    "DELETE FROM {} WHERE data_time < CURRENT_DATE - INTERVAL '{} days' AND att_conf_id = {}".format(
-                        attr[2], math.ceil(int(attr[1]) / 24), attr[0]
+                # also note the delete is done by counting back from midnight of yesterday, this
+                # means a ttl of 1 will always at least 24 hours of data (yesterday), since today is considered
+                # day 0 (or filling)
+                if not dryrun:
+                    cursor.execute(
+                        "DELETE FROM {} WHERE data_time < CURRENT_DATE - INTERVAL '{} days' AND att_conf_id = {}".format(
+                            attr[2], math.ceil(int(attr[1]) / 24), attr[0]
+                        )
                     )
-                )
 
-                deleted_rows = cursor.rowcount
+                    deleted_rows = cursor.rowcount
 
-                if processed_ttl is not None:
-                    processed_ttl[attr[3]] = {"ttl_rows_deleted": deleted_rows}
+                    if processed_ttl is not None:
+                        processed_ttl[attr[3]] = {"ttl_rows_deleted": deleted_rows}
 
-                logger.info("Deleted {} rows in table: {} for attribute: {}".format(deleted_rows, attr[2], attr[3]))
+                    logger.info("{}: Deleted {} rows in table: {} for attribute: {}".format(i, deleted_rows, attr[2], attr[3]))
 
-            else:
-                cursor.execute(
-                    "SELECT COUNT(*) FROM {} WHERE data_time < CURRENT_DATE - INTERVAL '{} days' AND att_conf_id = {}".format(
-                        attr[2], math.ceil(int(attr[1]) / 24), attr[0]
+                else:
+                    cursor.execute(
+                        "SELECT COUNT(*) FROM {} WHERE data_time < CURRENT_DATE - INTERVAL '{} days' AND att_conf_id = {}".format(
+                            attr[2], math.ceil(int(attr[1]) / 24), attr[0]
+                        )
                     )
-                )
 
-                result = cursor.fetchone()
-                logger.info("{} rows would be deleted in table: {} for attribute: {}".format(result[0], attr[2], attr[3]))
+                    result = cursor.fetchone()
+                    logger.info("{}: {} rows would be deleted in table: {} for attribute: {}".format(i, result[0], attr[2], attr[3]))
+            
+            except (Exception, psycopg2.Error) as error:
+                logger.error("{}: Error deleting attribute: {}".format(i, error))
 
         connection.commit()
         cursor.close()
