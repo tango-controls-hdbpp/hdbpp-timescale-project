@@ -113,6 +113,9 @@ def add_defaults_to_config(config):
 
         if "database" not in val["connection"]:
             val["database"] = "hdb"
+        
+        if "compress_threshold_days" not in val:
+            val["compress_threshold_days"] = 0
 
         reporting.add_defaults_to_config(val["rest_endpoint"])
 
@@ -141,7 +144,7 @@ def load_config(path):
     return config
 
 
-def process_ttl(server_config, dryrun, processed_ttl=None):
+def process_ttl(server_config, compress_threshold_days, dryrun, processed_ttl=None):
     """
     This function opens a connection to the server and processes all ttl values in the
     att_conf table. What this means in practice is it selects all values from att_conf 
@@ -180,6 +183,14 @@ def process_ttl(server_config, dryrun, processed_ttl=None):
         attributes = cursor.fetchall()
         logger.info("Fetched {} attributes with a ttl configured".format(len(attributes)))
 
+        # get the timestamp for beginning of compression
+        # We retrieve the value as a string, cause giving the value as a timstamp
+        # mess with postgresql planner and the compressed chunks are scanned,
+        # causing the delete operation to fail
+        if compress_threshold_days > 0:
+            cursor.execute("SELECT CURRENT_DATE - INTERVAL '{} days'".format(compress_threshold_days))
+            timestamp = cursor.fetchall()[0][0].strftime("%a, %d %b %Y %H:%M:%S +0000")
+
         i = 0
         for attr in attributes:
 
@@ -193,11 +204,18 @@ def process_ttl(server_config, dryrun, processed_ttl=None):
                 # means a ttl of 1 will always at least 24 hours of data (yesterday), since today is considered
                 # day 0 (or filling)
                 if not dryrun:
-                    cursor.execute(
-                        "DELETE FROM {} WHERE data_time < CURRENT_DATE - INTERVAL '{} days' AND att_conf_id = {}".format(
-                            attr[2], math.ceil(int(attr[1]) / 24), attr[0]
+                    if compress_threshold_days > 0:
+                        cursor.execute(
+                            "DELETE FROM {} WHERE data_time BETWEEN '{}' AND CURRENT_DATE - INTERVAL '{} days' AND att_conf_id = {}".format( 
+                                attr[2], timestamp, math.ceil(int(attr[1]) / 24), attr[0]
+                                )
                         )
-                    )
+                    else:
+                        cursor.execute(
+                            "DELETE FROM {} WHERE data_time < CURRENT_DATE - INTERVAL '{} days' AND att_conf_id = {}".format( 
+                                attr[2], math.ceil(int(attr[1]) / 24), attr[0]
+                                )
+                        )
 
                     deleted_rows = cursor.rowcount
 
@@ -207,11 +225,18 @@ def process_ttl(server_config, dryrun, processed_ttl=None):
                     logger.info("{}: Deleted {} rows in table: {} for attribute: {}".format(i, deleted_rows, attr[2], attr[3]))
 
                 else:
-                    cursor.execute(
-                        "SELECT COUNT(*) FROM {} WHERE data_time < CURRENT_DATE - INTERVAL '{} days' AND att_conf_id = {}".format(
-                            attr[2], math.ceil(int(attr[1]) / 24), attr[0]
+                    if compress_threshold_days > 0:
+                        cursor.execute(
+                            "SELECT COUNT(*) FROM {} WHERE data_time BETWEEN '{}' AND CURRENT_DATE - INTERVAL '{} days' AND att_conf_id = {}".format(
+                                attr[2], timestamp, math.ceil(int(attr[1]) / 24), attr[0]
+                            )
                         )
-                    )
+                    else:
+                        cursor.execute(
+                            "SELECT COUNT(*) FROM {} WHERE data_time < CURRENT_DATE - INTERVAL '{} days' AND att_conf_id = {}".format(
+                                attr[2], math.ceil(int(attr[1]) / 24), attr[0]
+                                )
+                        )
 
                     result = cursor.fetchone()
                     logger.info("{}: {} rows would be deleted in table: {} for attribute: {}".format(i, result[0], attr[2], attr[3]))
@@ -279,7 +304,7 @@ def run_command(args):
                 start_time = time.monotonic()
                 logger.info("Processing ttl requests for configuration: {}".format(key))
                 processed_ttl = {}
-                process_ttl(val["connection"], args.dryrun, processed_ttl)
+                process_ttl(val["connection"], val["compress_threshold_days"], args.dryrun, processed_ttl)
                 delete_time = timedelta(seconds=time.monotonic() - start_time)
                 logger.info("Processed ttl request for configuration {} in: {}".format(key, delete_time))
 
