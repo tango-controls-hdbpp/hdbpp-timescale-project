@@ -20,7 +20,7 @@
 -- -----------------------------------------------------------------------------
 
 -- Continuous aggregates views for the array attributes.
-
+\c hdb
 -- Double attributes
 CREATE VIEW cagg_array_devdouble_1hour(
 		att_conf_id, data_time, count_rows, count_errors

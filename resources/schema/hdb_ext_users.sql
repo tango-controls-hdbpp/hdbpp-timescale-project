@@ -19,6 +19,8 @@
 -- along with libhdb++timescale.  If not, see <http://www.gnu.org/licenses/>.
 -- -----------------------------------------------------------------------------
 
+\c hdb
+
 -- Some useful users for a basic system
 CREATE ROLE hdb_cfg_man WITH LOGIN PASSWORD 'hdbpp';
 GRANT readwrite TO hdb_cfg_man;

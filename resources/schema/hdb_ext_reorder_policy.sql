@@ -19,6 +19,7 @@
 -- along with libhdb++timescale.  If not, see <http://www.gnu.org/licenses/>.
 -- -----------------------------------------------------------------------------
 
+\c hdb
 -- Reorder chunk policy
 
 SELECT add_reorder_policy('att_scalar_devboolean', 'att_scalar_devboolean_att_conf_id_data_time_idx', if_not_exists => true);

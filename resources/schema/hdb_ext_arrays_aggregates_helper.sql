@@ -21,6 +21,8 @@
 
 -- Aggregates function helper for the continuous aggregates views for the array attributes.
 
+\c hdb
+
 /*
 NOT USED
 Keep as a different approach, should be benchmarked for execution speed

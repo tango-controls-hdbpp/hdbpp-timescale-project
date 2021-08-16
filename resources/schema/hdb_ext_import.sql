@@ -1,3 +1,5 @@
+\c hdb
+
 CREATE OR REPLACE FUNCTION expand_name() RETURNS TRIGGER AS $$
 DECLARE
     len integer;

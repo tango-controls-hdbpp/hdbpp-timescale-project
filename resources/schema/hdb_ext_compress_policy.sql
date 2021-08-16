@@ -18,7 +18,7 @@
 -- You should have received a copy of the Lesser GNU General Public License
 -- along with libhdb++timescale.  If not, see <http://www.gnu.org/licenses/>.
 -- -----------------------------------------------------------------------------
-
+\c hdb
 -- Compress chunk policy
 -- Allow compression on the table
 ALTER TABLE att_scalar_devboolean SET(timescaledb.compress, timescaledb.compress_segmentby = 'att_conf_id, att_error_desc_id', timescaledb.compress_orderby = 'data_time DESC');
@@ -51,64 +51,68 @@ ALTER TABLE att_array_devlong SET(timescaledb.compress, timescaledb.compress_seg
 ALTER TABLE att_array_devushort SET(timescaledb.compress, timescaledb.compress_segmentby = 'att_conf_id, att_error_desc_id', timescaledb.compress_orderby = 'data_time DESC');
 ALTER TABLE att_array_devshort SET(timescaledb.compress, timescaledb.compress_segmentby = 'att_conf_id, att_error_desc_id', timescaledb.compress_orderby = 'data_time DESC');
 
--- If using timescaledb v1.7
-SELECT add_compress_chunks_policy('att_scalar_devboolean', INTERVAL '200d', if_not_exists => true);
-SELECT add_compress_chunks_policy('att_scalar_devdouble', INTERVAL '200d', if_not_exists => true);
-SELECT add_compress_chunks_policy('att_scalar_devfloat', INTERVAL '200d', if_not_exists => true);
-SELECT add_compress_chunks_policy('att_scalar_devencoded', INTERVAL '200d', if_not_exists => true);
-SELECT add_compress_chunks_policy('att_scalar_devenum', INTERVAL '200d', if_not_exists => true);
-SELECT add_compress_chunks_policy('att_scalar_devstate', INTERVAL '200d', if_not_exists => true);
-SELECT add_compress_chunks_policy('att_scalar_devstring', INTERVAL '200d', if_not_exists => true);
-SELECT add_compress_chunks_policy('att_scalar_devuchar', INTERVAL '200d', if_not_exists => true);
-SELECT add_compress_chunks_policy('att_scalar_devulong', INTERVAL '200d', if_not_exists => true);
-SELECT add_compress_chunks_policy('att_scalar_devulong64', INTERVAL '200d', if_not_exists => true);
-SELECT add_compress_chunks_policy('att_scalar_devlong64', INTERVAL '200d', if_not_exists => true);
-SELECT add_compress_chunks_policy('att_scalar_devlong', INTERVAL '200d', if_not_exists => true);
-SELECT add_compress_chunks_policy('att_scalar_devushort', INTERVAL '200d', if_not_exists => true);
-SELECT add_compress_chunks_policy('att_scalar_devshort', INTERVAL '200d', if_not_exists => true);
+DO $$ BEGIN
+    IF (SELECT extversion>'2.0.0' FROM pg_extension where extname = 'timescaledb') THEN
+        -- If using timescaledb v2
+        PERFORM add_compression_policy('att_scalar_devboolean', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compression_policy('att_scalar_devdouble', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compression_policy('att_scalar_devfloat', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compression_policy('att_scalar_devencoded', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compression_policy('att_scalar_devenum', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compression_policy('att_scalar_devstate', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compression_policy('att_scalar_devstring', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compression_policy('att_scalar_devuchar', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compression_policy('att_scalar_devulong', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compression_policy('att_scalar_devulong64', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compression_policy('att_scalar_devlong64', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compression_policy('att_scalar_devlong', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compression_policy('att_scalar_devushort', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compression_policy('att_scalar_devshort', INTERVAL '200d', if_not_exists => true);
 
-SELECT add_compress_chunks_policy('att_array_devboolean', INTERVAL '200d', if_not_exists => true);
-SELECT add_compress_chunks_policy('att_array_devdouble', INTERVAL '200d', if_not_exists => true);
-SELECT add_compress_chunks_policy('att_array_devfloat', INTERVAL '200d', if_not_exists => true);
-SELECT add_compress_chunks_policy('att_array_devencoded', INTERVAL '200d', if_not_exists => true);
-SELECT add_compress_chunks_policy('att_array_devenum', INTERVAL '200d', if_not_exists => true);
-SELECT add_compress_chunks_policy('att_array_devstate', INTERVAL '200d', if_not_exists => true);
-SELECT add_compress_chunks_policy('att_array_devstring', INTERVAL '200d', if_not_exists => true);
-SELECT add_compress_chunks_policy('att_array_devuchar', INTERVAL '200d', if_not_exists => true);
-SELECT add_compress_chunks_policy('att_array_devulong', INTERVAL '200d', if_not_exists => true);
-SELECT add_compress_chunks_policy('att_array_devulong64', INTERVAL '200d', if_not_exists => true);
-SELECT add_compress_chunks_policy('att_array_devlong64', INTERVAL '200d', if_not_exists => true);
-SELECT add_compress_chunks_policy('att_array_devlong', INTERVAL '200d', if_not_exists => true);
-SELECT add_compress_chunks_policy('att_array_devushort', INTERVAL '200d', if_not_exists => true);
-SELECT add_compress_chunks_policy('att_array_devshort', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compression_policy('att_array_devboolean', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compression_policy('att_array_devdouble', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compression_policy('att_array_devfloat', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compression_policy('att_array_devencoded', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compression_policy('att_array_devenum', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compression_policy('att_array_devstate', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compression_policy('att_array_devstring', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compression_policy('att_array_devuchar', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compression_policy('att_array_devulong', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compression_policy('att_array_devulong64', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compression_policy('att_array_devlong64', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compression_policy('att_array_devlong', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compression_policy('att_array_devushort', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compression_policy('att_array_devshort', INTERVAL '200d', if_not_exists => true);
+    ELSE
+        -- If using timescaledb v1.7
+        PERFORM add_compress_chunks_policy('att_scalar_devboolean', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compress_chunks_policy('att_scalar_devdouble', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compress_chunks_policy('att_scalar_devfloat', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compress_chunks_policy('att_scalar_devencoded', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compress_chunks_policy('att_scalar_devenum', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compress_chunks_policy('att_scalar_devstate', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compress_chunks_policy('att_scalar_devstring', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compress_chunks_policy('att_scalar_devuchar', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compress_chunks_policy('att_scalar_devulong', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compress_chunks_policy('att_scalar_devulong64', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compress_chunks_policy('att_scalar_devlong64', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compress_chunks_policy('att_scalar_devlong', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compress_chunks_policy('att_scalar_devushort', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compress_chunks_policy('att_scalar_devshort', INTERVAL '200d', if_not_exists => true);
 
--- If using timescaledb v2
--- SELECT add_compression_policy('att_scalar_devboolean', INTERVAL '200d', if_not_exists => true);
--- SELECT add_compression_policy('att_scalar_devdouble', INTERVAL '200d', if_not_exists => true);
--- SELECT add_compression_policy('att_scalar_devfloat', INTERVAL '200d', if_not_exists => true);
--- SELECT add_compression_policy('att_scalar_devencoded', INTERVAL '200d', if_not_exists => true);
--- SELECT add_compression_policy('att_scalar_devenum', INTERVAL '200d', if_not_exists => true);
--- SELECT add_compression_policy('att_scalar_devstate', INTERVAL '200d', if_not_exists => true);
--- SELECT add_compression_policy('att_scalar_devstring', INTERVAL '200d', if_not_exists => true);
--- SELECT add_compression_policy('att_scalar_devuchar', INTERVAL '200d', if_not_exists => true);
--- SELECT add_compression_policy('att_scalar_devulong', INTERVAL '200d', if_not_exists => true);
--- SELECT add_compression_policy('att_scalar_devulong64', INTERVAL '200d', if_not_exists => true);
--- SELECT add_compression_policy('att_scalar_devlong64', INTERVAL '200d', if_not_exists => true);
--- SELECT add_compression_policy('att_scalar_devlong', INTERVAL '200d', if_not_exists => true);
--- SELECT add_compression_policy('att_scalar_devushort', INTERVAL '200d', if_not_exists => true);
--- SELECT add_compression_policy('att_scalar_devshort', INTERVAL '200d', if_not_exists => true);
-
--- SELECT add_compression_policy('att_array_devboolean', INTERVAL '200d', if_not_exists => true);
--- SELECT add_compression_policy('att_array_devdouble', INTERVAL '200d', if_not_exists => true);
--- SELECT add_compression_policy('att_array_devfloat', INTERVAL '200d', if_not_exists => true);
--- SELECT add_compression_policy('att_array_devencoded', INTERVAL '200d', if_not_exists => true);
--- SELECT add_compression_policy('att_array_devenum', INTERVAL '200d', if_not_exists => true);
--- SELECT add_compression_policy('att_array_devstate', INTERVAL '200d', if_not_exists => true);
--- SELECT add_compression_policy('att_array_devstring', INTERVAL '200d', if_not_exists => true);
--- SELECT add_compression_policy('att_array_devuchar', INTERVAL '200d', if_not_exists => true);
--- SELECT add_compression_policy('att_array_devulong', INTERVAL '200d', if_not_exists => true);
--- SELECT add_compression_policy('att_array_devulong64', INTERVAL '200d', if_not_exists => true);
--- SELECT add_compression_policy('att_array_devlong64', INTERVAL '200d', if_not_exists => true);
--- SELECT add_compression_policy('att_array_devlong', INTERVAL '200d', if_not_exists => true);
--- SELECT add_compression_policy('att_array_devushort', INTERVAL '200d', if_not_exists => true);
--- SELECT add_compression_policy('att_array_devshort', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compress_chunks_policy('att_array_devboolean', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compress_chunks_policy('att_array_devdouble', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compress_chunks_policy('att_array_devfloat', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compress_chunks_policy('att_array_devencoded', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compress_chunks_policy('att_array_devenum', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compress_chunks_policy('att_array_devstate', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compress_chunks_policy('att_array_devstring', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compress_chunks_policy('att_array_devuchar', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compress_chunks_policy('att_array_devulong', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compress_chunks_policy('att_array_devulong64', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compress_chunks_policy('att_array_devlong64', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compress_chunks_policy('att_array_devlong', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compress_chunks_policy('att_array_devushort', INTERVAL '200d', if_not_exists => true);
+        PERFORM add_compress_chunks_policy('att_array_devshort', INTERVAL '200d', if_not_exists => true);
+    END IF;
+END $$;

@@ -20,7 +20,7 @@
 -- -----------------------------------------------------------------------------
 
 -- Continuous aggregates views for the attributes.
-
+\c hdb
 -- Double attributes
 CREATE VIEW cagg_scalar_devdouble_1min(
 		att_conf_id, data_time, count_rows, count_errors
