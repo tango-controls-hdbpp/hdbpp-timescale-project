@@ -53,7 +53,7 @@ from datetime import timedelta
 logger = logging.getLogger('hdbpp-ttl')
 
 version_major = 0
-version_minor = 1
+version_minor = 2
 version_patch = 0
 debug = False
 
@@ -83,12 +83,9 @@ def valid_config(config):
                 logger.error("No user defined in 'connection' section. Please check the config file is valid")
                 return False
 
-        if "rest_endpoint" not in val:
-            logger.error("Missing section 'rest_endpoint' in config file. Please check the config file is valid")
-            return False
-
-        if not reporting.valid_config(val["rest_endpoint"]):
-            return False
+        if "rest_endpoint" in val:
+            if not reporting.valid_config(val["rest_endpoint"]):
+                return False
 
     return True
 
@@ -117,7 +114,16 @@ def add_defaults_to_config(config):
         if "compress_threshold_days" not in val:
             val["compress_threshold_days"] = 0
 
+        if "rest_endpoint" not in val:
+            val["rest_endpoint"] = {}
+       
         reporting.add_defaults_to_config(val["rest_endpoint"])
+
+        if "db_report" not in val:
+            val["db_report"] = {"enabled": False}
+        else:
+            if "enabled" not in val["db_report"]:
+                val["db_report"]["enabled"] = False
 
 
 def load_config(path):
@@ -143,6 +149,67 @@ def load_config(path):
     # return the dictionary with the configuration in for the script to use
     return config
 
+def connect(server_config):
+    logger.debug("Attempting to connect to server: {}".format(server_config["host"]))
+
+    # attempt to connect to the server
+    connection = psycopg2.connect(
+        user=server_config["user"],
+        password=server_config["password"],
+        host=server_config["host"],
+        port=server_config["port"],
+        database=server_config["database"])
+
+    connection.autocommit = True
+
+    logger.debug("Connected to database at server: {}".format(server_config["host"]))
+
+    return connection
+
+def push_report_to_db(server_config, ttl_report):
+    """
+    This function opens a connection to the server and writes the result
+    of the script into a table used for monitoring purposes.
+    """
+    # first attempt to open a connection to the database
+    try:
+
+        connection = connect(server_config)
+
+    except (Exception, psycopg2.Error) as error:
+        logger.error("Error: {}".format(error))
+        return False
+
+    # now we have a database connection, proceed and writes the report
+    try:
+        cursor = connection.cursor()
+
+        # Add the job information and retrieve the job id to insert the statistics
+        cursor.execute("INSERT INTO ttl_jobs(start_time, duration) VALUES (%s, %s) RETURNING ttl_job_id", (ttl_report["ttl_start_time"], ttl_report["ttl_delete_duration"]))
+
+        job_id = cursor.fetchone()[0]
+
+        for attr_name, attr in ttl_report["attributes"].items():
+            cursor.execute("INSERT INTO ttl_stats(att_conf_id, deleted_rows, ttl_job_id) VALUES (%s, %s, %s)", (attr["att_conf_id"], attr["ttl_rows_deleted"], job_id))
+
+        connection.commit()
+        cursor.close()
+
+    except (Exception, psycopg2.Error) as error:
+        logger.error("Error writing ttl report: {}".format(error))
+
+        # closing database connection.
+        if(connection):
+            connection.close()
+            logger.debug("Closed connection to server: {} due to error".format(server_config["host"]))
+
+        return False
+
+    connection.close()
+    logger.debug("Closed connection to server: {}".format(server_config["host"]))
+
+    return True
+
 
 def process_ttl(server_config, compress_threshold_days, dryrun, processed_ttl=None):
     """
@@ -155,19 +222,8 @@ def process_ttl(server_config, compress_threshold_days, dryrun, processed_ttl=No
 
     # first attempt to open a connection to the database
     try:
-        logger.debug("Attempting to connect to server: {}".format(server_config["host"]))
 
-        # attempt to connect to the server
-        connection = psycopg2.connect(
-            user=server_config["user"],
-            password=server_config["password"],
-            host=server_config["host"],
-            port=server_config["port"],
-            database=server_config["database"])
-
-        connection.autocommit = True
-
-        logger.debug("Connected to database at server: {}".format(server_config["host"]))
+        connection = connect(server_config)
 
     except (Exception, psycopg2.Error) as error:
         logger.error("Error: {}".format(error))
@@ -220,7 +276,7 @@ def process_ttl(server_config, compress_threshold_days, dryrun, processed_ttl=No
                     deleted_rows = cursor.rowcount
 
                     if processed_ttl is not None:
-                        processed_ttl[attr[3]] = {"ttl_rows_deleted": deleted_rows}
+                        processed_ttl[attr[3]] = {"att_conf_id": attr[0], "ttl_rows_deleted": deleted_rows}
 
                     logger.info("{}: Deleted {} rows in table: {} for attribute: {}".format(i, deleted_rows, attr[2], attr[3]))
 
@@ -301,20 +357,26 @@ def run_command(args):
             add_defaults_to_config(config)
 
             for key, val in config.items():
-                start_time = time.monotonic()
+                start_time = datetime.datetime.now()
+                start = time.monotonic()
                 logger.info("Processing ttl requests for configuration: {}".format(key))
                 processed_ttl = {}
                 process_ttl(val["connection"], val["compress_threshold_days"], args.dryrun, processed_ttl)
-                delete_time = timedelta(seconds=time.monotonic() - start_time)
+                delete_time = timedelta(seconds=time.monotonic() - start)
                 logger.info("Processed ttl request for configuration {} in: {}".format(key, delete_time))
 
                 ttl_report = {"attributes": processed_ttl,
                               "ttl_delete_duration": delete_time,
+                              "ttl_start_time": start_time,
                               "ttl_last_timestamp": datetime.datetime.now()}
 
-                if val["rest_endpoint"]["enable"] is True:
-                    reporting.put_dict_to_rest(
-                        val["rest_endpoint"]["api_url"] +  val["rest_endpoint"]["endpoint"], ttl_report)
+                if not args.dryrun:
+                    if val["rest_endpoint"]["enable"] is True:
+                        reporting.put_dict_to_rest(
+                            val["rest_endpoint"]["api_url"] +  val["rest_endpoint"]["endpoint"], ttl_report)
+                    
+                    if val["db_report"]["enable"] is True:
+                        push_report_to_db(val["connection"], ttl_report)
 
         else:
             return False
