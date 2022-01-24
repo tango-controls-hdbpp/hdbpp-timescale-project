@@ -1,0 +1,2 @@
+# /etc/cron.d/hdbpp_postprocessing: crontab entries for the hdbpp_postprocessing script
+0 2 * * * root /usr/local/bin/python3 /usr/src/service/hdbpp_postprocessing.py -c /etc/hdb/hdbpp_postprocessing.conf > /proc/1/fd/1 2>/proc/1/fd/2
